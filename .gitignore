@@ -5,5 +5,5 @@ frontend/node_modules/
 frontend/dist/*
 !frontend/dist/.gitkeep
 .DS_Store
-# Nur lokal: Server-Zugänge und Interna, nie ins Repo
-*.lokal.md
+# Nur lokal: Server-Zugänge, Interna und das Aufspiel-Skript, nie ins Repo
+*.lokal.*
