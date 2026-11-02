@@ -6,7 +6,8 @@ import { zeige } from './snackbar.svelte.js';
 export const zustand = $state({
 	bereit: false,
 	benutzer: null,
-	einstellungen: { schulname: '', domain: '', fotoTage: 30, aufbewahrungTage: 365 },
+	// artenAus: Kacheln, die das Formular nicht zeigt (Einstellungen → Arten), etwa Medientechnik.
+	einstellungen: { schulname: '', domain: '', fotoTage: 30, aufbewahrungTage: 365, mailAktiv: false, artenAus: [] },
 	offen: [],
 	erledigt: [],
 	raeume: [],
@@ -58,11 +59,9 @@ export async function vergissAlles() {
 // ── Laden ────────────────────────────────────────────────────────────────────
 
 export async function starte() {
-	try {
-		zustand.einstellungen = await api('/api/einstellungen');
-	} catch {
+	await ladeEinstellungen().catch(() => {
 		/* Ohne Einstellungen geht es mit den Vorgaben weiter. */
-	}
+	});
 	try {
 		zustand.benutzer = await api('/api/ich');
 		await ladeAlles();
@@ -84,6 +83,10 @@ export async function starte() {
 	}
 	await ladeAusgang();
 	zustand.bereit = true;
+}
+
+export async function ladeEinstellungen() {
+	zustand.einstellungen = await api('/api/einstellungen');
 }
 
 export async function ladeAlles() {
@@ -109,7 +112,9 @@ export async function auffrischen() {
 	if (!zustand.benutzer) return;
 	try {
 		await sendeAusgang();
-		await ladeMeldungen();
+		// Die Einstellungen kommen mit: Schaltet jemand eine Art ab, verschwindet ihre Kachel bald überall.
+		await Promise.all([ladeMeldungen(), ladeEinstellungen()]);
+		merkeStand();
 	} catch (e) {
 		if (e.status === 0) zustand.offline = true;
 	}

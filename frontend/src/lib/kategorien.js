@@ -62,3 +62,23 @@ export const kategorien = [
 ];
 
 export const kategorieNach = (key) => kategorien.find((k) => k.key === key) ?? kategorien.at(-1);
+
+/** Die Arten, die das Formular zeigt: alle außer den unter Einstellungen → Arten abgeschalteten. */
+export const sichtbareArten = (aus = []) => kategorien.filter((k) => !aus.includes(k.key));
+
+/**
+ * Die letzte Kachel („Sonstiges“) füllt die letzte Reihe auf, damit das Raster bei jeder Zahl von
+ * Arten aufgeht, auch wenn eine abgeschaltet ist: zwei Spalten am Handy, vier ab sm. Liegt sie
+ * breit, steht ihr Symbol vor dem Namen statt darüber. Die Klassen stehen ausgeschrieben für Tailwind.
+ */
+export function letzteKachel(anzahl) {
+	const handyBreit = (anzahl - 1) % 2 === 0;
+	const rest = (anzahl - 1) % 4;
+	return {
+		klassen: [
+			handyBreit ? 'col-span-2 min-h-16 flex-row items-center gap-4' : 'min-h-28 flex-col justify-between gap-3',
+			['sm:col-span-4', 'sm:col-span-3', 'sm:col-span-2', 'sm:col-span-1'][rest],
+			rest === 3 ? 'sm:min-h-28 sm:flex-col sm:items-start sm:justify-between sm:gap-3' : 'sm:min-h-16 sm:flex-row sm:items-center sm:justify-start sm:gap-4'
+		]
+	};
+}

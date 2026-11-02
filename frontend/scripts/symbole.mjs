@@ -7,17 +7,17 @@ const namen = [
 	// Arten des Schadens
 	'lightbulb', 'heat', 'water_drop', 'door_front', 'chair', 'tv', 'cleaning_services', 'more_horiz',
 	// Bedienung
-	'add_circle', 'checklist', 'meeting_room', 'location_on', 'search', 'photo_camera', 'close', 'check',
-	'check_circle', 'send', 'warning', 'edit_note', 'schedule', 'construction', 'local_shipping', 'engineering',
-	'chat', 'undo', 'delete', 'print', 'qr_code_2', 'upload_file', 'logout', 'privacy_tip', 'arrow_back', 'task_alt',
-	'dark_mode', 'light_mode', 'contrast', 'visibility', 'visibility_off', 'build', 'add_comment', 'history',
-	'person', 'keyboard_arrow_down', 'cloud_off', 'schedule_send', 'arrow_downward', 'add', 'group', 'mail', 'settings', 'admin_panel_settings', 'mark_email_read', 'open_in_new', 'task_alt'
+	'meeting_room', 'location_on', 'search', 'photo_camera', 'close', 'check', 'check_circle', 'send', 'warning',
+	'error', 'edit_note', 'edit', 'schedule', 'local_shipping', 'engineering', 'undo', 'delete', 'print', 'qr_code_2',
+	'upload_file', 'download', 'picture_as_pdf', 'table_view', 'logout', 'privacy_tip', 'arrow_back', 'task_alt',
+	'visibility', 'visibility_off', 'build', 'add_comment', 'history', 'cloud_off', 'schedule_send', 'arrow_downward',
+	'arrow_drop_down', 'chevron_right', 'add', 'settings', 'category', 'admin_panel_settings', 'open_in_new'
 ];
 
 // Gefüllt zeigt M3 das gewählte Ziel und die gewählte Art; nur dafür kommt die zweite Form mit.
 const gefuellt = new Set([
 	'lightbulb', 'heat', 'water_drop', 'door_front', 'chair', 'tv', 'cleaning_services', 'more_horiz',
-	'add_circle', 'checklist', 'meeting_room', 'location_on', 'warning', 'check_circle', 'build'
+	'meeting_room', 'location_on', 'warning', 'check_circle', 'build'
 ]);
 
 const ordner = new URL('../node_modules/@material-symbols/svg-400/rounded/', import.meta.url);

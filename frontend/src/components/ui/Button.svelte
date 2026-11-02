@@ -7,8 +7,8 @@
 	 * gibt der State-Layer aus styles/komponenten.css.
 	 *
 	 * Varianten nach M3, Buttons: `primary` gefüllt, `tonal` in secondary-container, `secondary`
-	 * umrandet (outline-variant, on-surface-variant), `ghost` der Textknopf in primary. `success`
-	 * und `danger` sind getönte Knöpfe in den Container-Rollen. `symbol` trägt nur ein Symbol und
+	 * umrandet (outline-variant, on-surface-variant), `ghost` der Textknopf in primary, `warnend` der
+	 * Textknopf für Endgültiges in error (wie „Löschen“ in Googles Dialogen). `symbol` trägt nur ein Symbol und
 	 * hat über .icon-btn die Trefferfläche von 48 px.
 	 *
 	 * Höhen nach M3 (Button-Größen): sm 32, md 40, lg 56 px. Am Handy ist 40 die Regel, 56 für die
@@ -20,9 +20,8 @@
 		primary: 'bg-primary text-on-primary border-transparent',
 		tonal: 'bg-secondary-container text-on-secondary-container border-transparent',
 		secondary: 'bg-surface-container-lowest border-outline-variant text-on-surface-variant',
-		success: 'bg-success-container text-on-success-container border-transparent',
-		danger: 'bg-error-container text-on-error-container border-transparent',
 		ghost: 'bg-transparent border-transparent text-primary',
+		warnend: 'bg-transparent border-transparent text-error',
 		symbol: 'icon-btn bg-transparent border-transparent text-on-surface-variant'
 	};
 	const groessen = {
@@ -32,12 +31,15 @@
 	};
 </script>
 
-<!-- Gesperrt: ein Zustand für alle Varianten, nach M3 – Fläche on-surface 12 %, Beschriftung 38 %. -->
+<!-- Gesperrt: ein Zustand für alle Varianten, nach M3 – Fläche on-surface 12 %, Beschriftung 38 %.
+     aria-disabled sieht genauso aus, bleibt aber antippbar und fokussierbar („soft-disabled“ in
+     material-web): So kann ein Knopf beim Antippen sagen, was noch fehlt. -->
 <button
 	bind:this={element}
 	class={[
 		'inline-flex shrink-0 items-center justify-center rounded-full border transition-colors duration-200',
 		'disabled:cursor-not-allowed disabled:border-transparent! disabled:bg-on-surface/12! disabled:text-on-surface/38!',
+		'aria-disabled:border-transparent! aria-disabled:bg-on-surface/12! aria-disabled:text-on-surface/38!',
 		variant !== 'symbol' && groessen[size],
 		variant !== 'symbol' && size !== 'lg' && 'treffer',
 		varianten[variant],

@@ -69,30 +69,72 @@ await k.close();
 await s.goto(B + '/'); await bild(s, '08-aufgaben-dunkel'); await k.close();
 
 // 4. Leitung darf alles, die Verwaltung (Sekretariat) sieht alles und ändert nichts
-const knoepfe = /Erledigt|Vermerk|Gesehen|Bestellt|Fachfirma|löschen/;
+const haken = /^Erledigt: /;
 [k, s] = await kontext('direktorin');
-await s.goto(B + '/'); await s.locator('article').first().waitFor(); await bild(s, '09-leitung');
-pruefe((await s.locator('article').getByRole('button', { name: knoepfe }).count()) > 0, 'Leitung: Karten mit Bearbeiten-Knöpfen');
+await s.goto(B + '/'); await s.getByRole('button', { name: haken }).first().waitFor(); await bild(s, '09-leitung');
+pruefe((await s.getByRole('button', { name: haken }).count()) >= 6, 'Leitung: jede offene Meldung mit Häkchen „Erledigt“');
 await k.close();
 [k, s] = await kontext('sekretariat');
-await s.goto(B + '/'); await s.locator('article').first().waitFor(); await bild(s, '09b-verwaltung');
-pruefe((await s.locator('article').count()) >= 6 && (await s.locator('article').getByRole('button', { name: knoepfe }).count()) === 0, 'Verwaltung: alle Karten, ohne Bearbeiten-Knöpfe');
+await s.goto(B + '/'); await s.getByRole('button', { name: /WC verstopft/ }).waitFor(); await bild(s, '09b-verwaltung');
+pruefe((await s.getByRole('list', { name: 'Meldungen' }).getByRole('listitem').count()) >= 6 && (await s.getByRole('button', { name: haken }).count()) === 0, 'Verwaltung: alle Meldungen, ohne Häkchen');
+await s.getByRole('button', { name: /^Bio 1/ }).click();
+await s.getByRole('heading', { name: 'Licht flackert' }).waitFor();
+pruefe(!(await s.getByRole('group', { name: 'Stand' }).isVisible()) && !(await s.getByLabel('Interner Vermerk').isVisible()) && !(await s.getByRole('button', { name: 'Erledigt' }).isVisible()), 'Verwaltung: Meldung nur lesend, ohne Stand, Vermerk-Feld und Erledigt');
+await bild(s, '09c-verwaltung-meldung');
+await s.getByRole('button', { name: 'Zurück' }).click();
 await s.getByRole('button', { name: /Konto/ }).click();
-pruefe(await s.getByRole('button', { name: 'QR-Aufkleber drucken' }).isVisible() && !(await s.getByRole('button', { name: 'Räume & Personen' }).isVisible()), 'Verwaltung: QR-Aufkleber im Kontomenü, keine Räume & Personen');
+pruefe(await s.getByRole('button', { name: 'QR-Aufkleber drucken' }).isVisible() && !(await s.getByRole('button', { name: 'Einstellungen', exact: true }).isVisible()), 'Verwaltung: QR-Aufkleber im Kontomenü, keine Einstellungen');
 await k.close();
 
-// 5. Admin: Personen
+// 4b. Hausmeister: Meldung öffnen, Stand setzen, in der Liste abhaken und rückgängig machen
+[k, s] = await kontext('hausmeister');
+await s.goto(B + '/');
+await s.getByRole('button', { name: /^Lehrerzimmer/ }).click();
+await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'Gesehen' }).click();
+await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'Gesehen', pressed: true }).waitFor({ timeout: 5000 });
+pruefe(true, 'Detailseite: „Gesehen“ gesetzt');
+await bild(s, '09d-meldung-hausmeister');
+await s.getByRole('button', { name: 'Zurück' }).click();
+await s.getByRole('button', { name: 'Erledigt: Lehrerzimmer, Tisch wackelt' }).click();
+await s.getByText('Erledigt: Lehrerzimmer').waitFor();
+await s.getByRole('button', { name: /^Lehrerzimmer/ }).waitFor({ state: 'hidden' });
+pruefe(true, 'Häkchen in der Liste: Meldung ist erledigt');
+await bild(s, '09e-abgehakt');
+await s.getByRole('button', { name: 'Rückgängig' }).click();
+await s.getByRole('button', { name: /^Lehrerzimmer/ }).waitFor();
+pruefe(true, 'Rückgängig holt die Meldung zurück');
+await k.close();
+
+// 5. Admin: Personen, Räume, Arten
 [k, s] = await kontext('admin');
-await s.goto(B + '/verwaltung'); await s.getByRole('tab', { name: 'Personen' }).click(); await bild(s, '10-personen');
+await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Personen' }).click(); await bild(s, '10-personen');
 await s.getByRole('tab', { name: 'Räume' }).click(); await bild(s, '11-raeume');
 // Räume aus einer Datei: Die Zeilen landen zum Prüfen im Feld, angelegt wird erst mit „Hinzufügen“.
+await s.getByRole('button', { name: 'Räume hinzufügen' }).click();
 await s.locator('input[type=file]').setInputFiles({ name: 'raeume.csv', mimeType: 'text/csv', buffer: Buffer.from('Raum;Gebäude\nProbe 1;Erprobung\nProbe 2;Erprobung\n') });
 await s.getByText('2 Räume gelesen').waitFor();
 pruefe((await s.getByLabel('Räume', { exact: true }).inputValue()).includes('Probe 1; Erprobung'), 'Räume aus CSV: Zeilen stehen zum Prüfen im Feld');
 await s.getByRole('button', { name: 'Hinzufügen', exact: true }).click();
 await s.getByText('2 Räume angelegt').waitFor();
-pruefe(await s.getByText('Probe 2', { exact: true }).isVisible(), 'Räume aus CSV angelegt');
-await k.close();
+pruefe(await s.getByRole('button', { name: 'Probe 2' }).isVisible(), 'Räume aus CSV angelegt');
+// Umbenennen behält den QR-Code.
+await s.getByRole('button', { name: 'Probe 1' }).click();
+await s.getByLabel('Name', { exact: true }).fill('Probe 1a');
+await s.getByRole('button', { name: 'Speichern' }).click();
+await s.getByText('Raum gespeichert').waitFor();
+pruefe(await s.getByRole('button', { name: 'Probe 1a' }).isVisible(), 'Raum umbenannt');
+// Arten: Medientechnik ist zu Beginn aus und lässt sich anschalten.
+await s.getByRole('tab', { name: 'Arten' }).click(); await bild(s, '11b-arten');
+const technik = s.getByRole('switch', { name: 'Medientechnik' });
+pruefe((await technik.getAttribute('aria-checked')) === 'false', 'Arten: Medientechnik ist zu Beginn aus');
+const [kk, lehrer] = await kontext('m.mustermann');
+await lehrer.goto(B + '/melden'); await lehrer.getByRole('button', { name: 'Licht & Strom' }).waitFor();
+pruefe(!(await lehrer.getByRole('button', { name: 'Medientechnik' }).isVisible()), 'Formular ohne Kachel Medientechnik');
+await technik.click(); await s.getByText('steht wieder im Formular').waitFor();
+await lehrer.reload(); await lehrer.getByRole('button', { name: 'Licht & Strom' }).waitFor();
+pruefe(await lehrer.getByRole('button', { name: 'Medientechnik' }).isVisible(), 'Angeschaltet: Kachel Medientechnik ist da');
+await technik.click(); await s.getByText('aus dem Formular genommen').waitFor();
+await kk.close(); await k.close();
 
 // 6. Die Mail an den Hausmeister und ihr Knopf „Erledigt“
 const post = await (await fetch('http://127.0.0.1:8025/api/v1/messages')).json();

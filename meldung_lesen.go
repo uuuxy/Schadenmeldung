@@ -40,7 +40,7 @@ func (a *app) leseMeldung(r *http.Request, b benutzer) (meldung, error) {
 		GemeldetVon: b.Email,
 		GemeldetAm:  zeitpunktAusAusgang(r.FormValue("erstellt"), a.jetzt()),
 	}
-	if !kategorien[m.Kategorie] {
+	if artName(m.Kategorie) == "" {
 		return m, eingabeFehler("Bitte eine Art des Schadens wählen.")
 	}
 	if m.Was == "" || utf8.RuneCountInString(m.Was) > 160 || utf8.RuneCountInString(m.Notiz) > 600 {

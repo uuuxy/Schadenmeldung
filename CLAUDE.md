@@ -21,6 +21,10 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Kopfleiste per Segmented Button zwischen „Übersicht“ und „Melden“ (`KopfLeiste ebene=…`), nicht
   per Switch: M3 nimmt Switches nur für Ein/Aus. Die Übersicht aktualisiert sich live über
   `/api/ereignisse`; jeder neue Schreibweg für Meldungen ruft `a.verteiler.melde()`.
+- **Liste und Detail (M3 list-detail):** Eine Zeile der Übersicht trägt nur eine Zusatzaktion (das
+  Häkchen „Erledigt“); alles Weitere steht auf der Seite der Meldung (`/meldung/<id>`). M3: Auf eine
+  antippbare Fläche gehört keine weitere Aktion, mehr als drei Knöpfe nebeneinander sind zu viel.
+  Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`), nie über `confirm()`.
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
   Wert im hellen und im dunklen Schema. Einzige Ausnahme: der QR-Bogen, denn Papier ist weiß.
@@ -52,10 +56,11 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 
 ## Doppelte Stellen
 
-Arten (`kategorien`) und Stati stehen im Server (`server.go`) und in der Oberfläche
-(`frontend/src/lib/kategorien.js`, `status.js`); die Stati zusätzlich im CHECK der Migration, die
-Arten zusätzlich mit ihren Farbrollen `kat-<key>` in `rollen.css` (hell und dunkel). Eine Änderung
-braucht alle Stellen.
+Arten (`kategorien`) und Stati stehen mit ihren Namen im Server (`einstellungen.go`, für Export und
+PDF) und in der Oberfläche (`frontend/src/lib/kategorien.js`, `status.js`); `einstellungen_test.go`
+prüft, dass sie gleich heißen. Die Stati stehen zusätzlich im CHECK der Migration, die Arten
+zusätzlich mit ihren Farbrollen `kat-<key>` in `rollen.css` (hell und dunkel). Eine Änderung braucht
+alle Stellen. Welche Arten das Formular zeigt, schaltet die App selbst (Tabelle `arten_aus`).
 
 ## Datenschutz
 

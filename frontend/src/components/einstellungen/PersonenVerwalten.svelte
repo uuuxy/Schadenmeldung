@@ -1,13 +1,13 @@
 <script>
-	import { api } from '../lib/api.js';
-	import { zustand } from '../lib/zustand.svelte.js';
-	import { zeige } from '../lib/snackbar.svelte.js';
-	import { rollenNamen, rollenText, rollenWahl } from '../lib/rollen.js';
-	import Icon from './Icon.svelte';
-	import Blatt from './Blatt.svelte';
-	import Button from './ui/Button.svelte';
-	import Feld from './ui/Feld.svelte';
-	import FilterChips from './ui/FilterChips.svelte';
+	import { api } from '../../lib/api.js';
+	import { zustand } from '../../lib/zustand.svelte.js';
+	import { zeige } from '../../lib/snackbar.svelte.js';
+	import { rollenNamen, rollenText, rollenWahl } from '../../lib/rollen.js';
+	import Icon from '../Icon.svelte';
+	import Blatt from '../Blatt.svelte';
+	import Button from '../ui/Button.svelte';
+	import Feld from '../ui/Feld.svelte';
+	import FilterChips from '../ui/FilterChips.svelte';
 
 	/** Wer mehr sieht als das Meldeformular: Personen eintragen, Rolle ändern, Rolle entfernen. */
 	let personen = $state([]);
@@ -71,20 +71,20 @@
 		<Button class="self-end" disabled={!neueAdresse.trim()} onclick={hinzufuegen}><Icon name="add" groesse={20} />Hinzufügen</Button>
 	</section>
 
-	<ul class="overflow-hidden rounded-xl bg-surface-container-low">
+	<ul class="flex flex-col gap-0.5">
 		{#each personen as p (p.email)}
-			<li>
-				<button class="flex min-h-16 w-full items-center gap-4 px-4 py-2 text-left disabled:cursor-default" disabled={!aenderbar(p)} onclick={() => bearbeiten(p)}>
+			<li class="rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg">
+				<button class="flex min-h-16 w-full items-center gap-4 rounded-[inherit] px-4 py-2 text-left disabled:cursor-default" disabled={!aenderbar(p)} onclick={() => bearbeiten(p)}>
 					<span class="grid size-10 shrink-0 place-items-center rounded-full bg-primary-container text-title-medium text-on-primary-container">{p.email.charAt(0).toUpperCase()}</span>
 					<span class="min-w-0 flex-1">
 						<span class="block truncate text-body-large text-on-surface">{p.email}</span>
 						<span class="block text-body-medium text-on-surface-variant">{rollenNamen[p.rolle]}{p.fest ? ' · fest eingetragen' : p.email === zustand.benutzer?.email ? ' · du' : ''}</span>
 					</span>
-					{#if aenderbar(p)}<Icon name="edit_note" class="text-on-surface-variant" />{/if}
+					{#if aenderbar(p)}<Icon name="chevron_right" class="text-on-surface-variant" />{/if}
 				</button>
 			</li>
 		{:else}
-			<li class="px-4 py-6 text-center text-body-medium text-on-surface-variant">Noch niemand eingetragen.</li>
+			<li class="rounded-lg bg-surface-container-low px-4 py-6 text-center text-body-medium text-on-surface-variant">Noch niemand eingetragen.</li>
 		{/each}
 	</ul>
 </main>
@@ -95,7 +95,7 @@
 			<FilterChips etikett="Rolle" abwaehlbar={false} optionen={rollenWahl} wert={bearbeitet.rolle} onwahl={async (r) => { if (await rolleSetzen(bearbeitet.email, r)) bearbeitet.rolle = r; }} />
 			<p class="text-body-medium text-on-surface-variant">{rollenNamen[bearbeitet.rolle]}: {rollenText[bearbeitet.rolle]}.</p>
 			<div class="flex justify-between gap-2">
-				<Button variant="danger" onclick={() => entfernen(bearbeitet)}><Icon name="delete" groesse={18} />Rolle entfernen</Button>
+				<Button variant="warnend" class="-ml-3" onclick={() => entfernen(bearbeitet)}><Icon name="delete" groesse={18} />Rolle entfernen</Button>
 				<Button variant="ghost" onclick={() => (blattOffen = false)}>Fertig</Button>
 			</div>
 		</div>

@@ -5,24 +5,27 @@
 	import Anmelden from './views/Anmelden.svelte';
 	import Melden from './views/Melden.svelte';
 	import Uebersicht from './views/Uebersicht.svelte';
-	import Verwaltung from './views/Verwaltung.svelte';
+	import Einstellungen from './views/Einstellungen.svelte';
+	import MeldungDetail from './views/MeldungDetail.svelte';
 	import Aktion from './views/Aktion.svelte';
 	import Datenschutz from './views/Datenschutz.svelte';
 	import Snackbar from './components/Snackbar.svelte';
+	import Rueckfrage from './components/Rueckfrage.svelte';
 	import Ladekreis from './components/Ladekreis.svelte';
 
 	// Nach dem Start gleich nachreichen, was im Funkloch liegen geblieben ist.
 	onMount(() => starte().then(auffrischen));
 
 	// Wer wohin kommt: Das Kollegium sieht nur „Schaden melden“. Alle mit Übersicht landen bei den
-	// Meldungen und drucken QR-Aufkleber; wer alles darf, kommt auch zu Räumen und Personen. Der
-	// QR-Code (/r/…) führt jeden direkt ins Formular, mit dem Raum schon gewählt.
+	// Meldungen, öffnen einzelne und drucken QR-Aufkleber; wer alles darf, kommt auch zu den
+	// Einstellungen. Der QR-Code (/r/…) führt jeden direkt ins Formular, mit dem Raum schon gewählt.
 	const ansicht = $derived.by(() => {
 		const p = weg.pfad;
 		if (p.startsWith('/aktion/')) return 'aktion';
 		if (p === '/datenschutz') return 'datenschutz';
 		if (p.startsWith('/r/') || p === '/melden') return 'melden';
-		if (p === '/verwaltung' && darfBearbeiten()) return 'verwaltung';
+		if (p.startsWith('/meldung/') && darfSehen()) return 'meldung';
+		if ((p === '/einstellungen' || p === '/verwaltung') && darfBearbeiten()) return 'einstellungen';
 		if (p === '/raeume/qr' && darfSehen()) return 'qr';
 		return darfSehen() ? 'uebersicht' : 'melden';
 	});
@@ -93,11 +96,14 @@
 		{@const Bogen = modul.default}
 		<Bogen />
 	{/await}
-{:else if ansicht === 'verwaltung'}
-	<Verwaltung />
+{:else if ansicht === 'einstellungen'}
+	<Einstellungen />
+{:else if ansicht === 'meldung'}
+	{#key weg.pfad}<MeldungDetail id={Number(weg.pfad.slice(9))} />{/key}
 {:else if ansicht === 'uebersicht'}
 	<Uebersicht />
 {:else}
 	{#key raumCode}<Melden {raumCode} />{/key}
 {/if}
 <Snackbar />
+<Rueckfrage />

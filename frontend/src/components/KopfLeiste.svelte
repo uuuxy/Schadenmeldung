@@ -7,7 +7,8 @@
 	import { gehe } from '../lib/weg.svelte.js';
 
 	/**
-	 * M3 Top App Bar (small). Beim Scrollen hebt sie sich mit surface-container vom Inhalt ab.
+	 * M3 App Bar (small, seit M3 Expressive nicht mehr „Top“). Beim Scrollen hebt sie sich mit
+	 * surface-container vom Inhalt ab. Google rät zu höchstens zwei Aktionen; hier ist es das Konto.
 	 *
 	 * ebene ('uebersicht' | 'melden'): Wer die Übersicht sieht, wechselt hier zwischen ihr und dem
 	 * Meldeformular. M3 nimmt für zwei Ansichten einen Segmented Button, keinen Switch („Avoid using

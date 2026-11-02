@@ -1,0 +1,38 @@
+/* Seitenwechsel als M3 „fade through“: die alte Seite blendet schnell aus, die neue kommt mit leichtem
+   Zoom. Die Navigationsleiste hat einen eigenen Namen und bleibt dabei stehen. */
+::view-transition-old(root) {
+	animation: 90ms var(--ease-emphasized-accelerate) both ausblenden;
+}
+::view-transition-new(root) {
+	animation: 210ms var(--ease-emphasized-decelerate) 90ms both einblenden;
+}
+::view-transition-group(navleiste) {
+	animation: none;
+}
+@keyframes ausblenden {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes einblenden {
+	from {
+		opacity: 0;
+		transform: scale(0.98);
+	}
+}
+
+/* Solange ein Blatt offen ist, scrollt der Hintergrund nicht mit (sonst auf iOS spürbar). */
+html:has(dialog[open]) {
+	overflow: hidden;
+}
+
+/* Bewegung reduzieren (Systemeinstellung). Der Ladekreis dreht weiter: Er zeigt, dass etwas läuft. */
+@media (prefers-reduced-motion: reduce) {
+	*:not(.ladekreis),
+	*:not(.ladekreis)::before,
+	*:not(.ladekreis)::after {
+		animation-duration: 0s !important;
+		transition-duration: 0s !important;
+		scroll-behavior: auto !important;
+	}
+}

@@ -9,12 +9,7 @@ import (
 	"unicode/utf8"
 )
 
-var (
-	kategorien = map[string]bool{"licht": true, "heizung": true, "wasser": true, "fenster": true,
-		"moebel": true, "technik": true, "reinigung": true, "sonstiges": true}
-	stati    = map[string]bool{"offen": true, "gesehen": true, "bestellt": true, "fachfirma": true, "erledigt": true}
-	fotoName = regexp.MustCompile(`^[0-9a-f]{32}\.jpg$`)
-)
+var fotoName = regexp.MustCompile(`^[0-9a-f]{32}\.jpg$`)
 
 // fuerAnsicht bereitet eine Meldung für die Antwort auf. Wer gemeldet hat, sehen nur Hausmeister,
 // Leitung und Verwaltung, für Rückfragen.
@@ -89,7 +84,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	if !leseJSON(w, r, &ein) {
 		return
 	}
-	if ein.Status != nil && !stati[*ein.Status] {
+	if ein.Status != nil && statusNamen[*ein.Status] == "" {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
 		return
 	}

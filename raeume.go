@@ -6,19 +6,6 @@ import (
 	"unicode/utf8"
 )
 
-func (a *app) einstellungen(w http.ResponseWriter, _ *http.Request) {
-	domain := ""
-	if len(a.konf.Domains) == 1 {
-		domain = a.konf.Domains[0]
-	}
-	schreibeJSON(w, http.StatusOK, map[string]any{
-		"schulname":        a.konf.Schulname,
-		"domain":           domain,
-		"fotoTage":         a.konf.FotoTage,
-		"aufbewahrungTage": a.konf.AufbewahrungTage,
-	})
-}
-
 func (a *app) raeume(w http.ResponseWriter, r *http.Request, _ benutzer) {
 	liste, err := a.sp.raeume(r.Context())
 	if err != nil {
@@ -77,4 +64,32 @@ func (a *app) raumLoeschen(w http.ResponseWriter, r *http.Request, _ benutzer) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// raumAendern benennt einen Raum um oder setzt ihn in einen anderen Bereich. Sein QR-Code bleibt,
+// der Aufkleber an der Tür gilt also weiter; seine Meldungen tragen danach den neuen Namen.
+func (a *app) raumAendern(w http.ResponseWriter, r *http.Request, _ benutzer) {
+	id, ok := idAusPfad(w, r)
+	if !ok {
+		return
+	}
+	var ein raum
+	if !leseJSON(w, r, &ein) {
+		return
+	}
+	ein.ID, ein.Name, ein.Bereich = id, strings.TrimSpace(ein.Name), strings.TrimSpace(ein.Bereich)
+	if ein.Name == "" || utf8.RuneCountInString(ein.Name) > 60 || utf8.RuneCountInString(ein.Bereich) > 80 {
+		fehler(w, http.StatusBadRequest, "Bitte einen Namen eingeben (höchstens 60 Zeichen, Bereich 80).")
+		return
+	}
+	if antworteFehler(w, a.sp.aendereRaum(r.Context(), ein)) {
+		return
+	}
+	a.verteiler.melde()
+	liste, err := a.sp.raeume(r.Context())
+	if err != nil {
+		intern(w, err)
+		return
+	}
+	schreibeJSON(w, http.StatusOK, liste)
 }

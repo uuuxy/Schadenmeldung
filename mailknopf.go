@@ -91,7 +91,7 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 	if !leseJSON(w, r, &ein) {
 		return
 	}
-	if !stati[ein.Status] {
+	if statusNamen[ein.Status] == "" {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
 		return
 	}

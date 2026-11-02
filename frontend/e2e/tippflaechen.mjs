@@ -11,7 +11,11 @@ async function kontext(name) {
 const messen = () => {
 	const sel = 'button, a[href], input:not([type=hidden]):not([type=file]), label:has(input[type=file]), textarea';
 	const liste = [];
-	for (const el of document.querySelectorAll(sel)) {
+	// Ist ein Blatt, Dialog oder Menü offen, zählt nur, was darin liegt: Der Rest ist nicht antippbar.
+	const oben = document.querySelector('dialog[open], :popover-open') ?? document;
+	// Unter einer festen Leiste (Melden, Erledigt) rollt der Inhalt durch; das ist keine Überlappung.
+	const fest = (el) => { for (let e = el; e; e = e.parentElement) if (getComputedStyle(e).position === 'fixed') return true; return false; };
+	for (const el of oben.querySelectorAll(sel)) {
 		const r = el.getBoundingClientRect();
 		if (r.width === 0 || r.height === 0 || getComputedStyle(el).visibility === 'hidden') continue;
 		let h = r.height, w = r.width, top = r.top, left = r.left;
@@ -22,15 +26,16 @@ const messen = () => {
 			if (vw > w) { left = r.left + (r.width - vw) / 2; w = vw; }
 		}
 		const name = (el.getAttribute('aria-label') || el.textContent || el.placeholder || el.type || '').trim().replace(/\s+/g, ' ').slice(0, 34);
-		liste.push({ name, sichtbar: `${Math.round(r.width)}×${Math.round(r.height)}`, w: Math.round(w), h: Math.round(h), box: { top, left, bottom: top + h, right: left + w } });
+		liste.push({ name, fest: fest(el), sichtbar: `${Math.round(r.width)}×${Math.round(r.height)}`, w: Math.round(w), h: Math.round(h), box: { top, left, bottom: top + h, right: left + w } });
 	}
 	const ueber = [];
 	for (let i = 0; i < liste.length; i++) for (let j = i + 1; j < liste.length; j++) {
+		if (liste[i].fest !== liste[j].fest) continue;
 		const a = liste[i].box, b = liste[j].box;
 		const dx = Math.min(a.right, b.right) - Math.max(a.left, b.left), dy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
 		if (dx > 1 && dy > 1) ueber.push(`${liste[i].name} ↔ ${liste[j].name} (${Math.round(dx)}×${Math.round(dy)} px)`);
 	}
-	return { liste: liste.map(({ box, ...x }) => x), ueber };
+	return { liste: liste.map(({ box, fest, ...x }) => x), ueber };
 };
 const seiten = [
 	['Anmelden', null, async (s) => s.goto(B + '/')],
@@ -38,7 +43,12 @@ const seiten = [
 	['Melden (Art gewählt)', 's.schmidt', async (s) => { await s.goto(B + '/melden'); await s.getByRole('button', { name: '101' }).click(); await s.getByRole('button', { name: 'Licht & Strom' }).click(); await s.waitForTimeout(500); }],
 	['Aufgaben', 'hausmeister', async (s) => s.goto(B + '/')],
 	['Kontomenü', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: 'Konto und Einstellungen' }).click(); await s.waitForTimeout(400); }],
-	['Personen', 'admin', async (s) => { await s.goto(B + '/verwaltung'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }]
+	['Meldung', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: /^Bio 1/ }).click(); await s.waitForTimeout(400); }],
+	['Blatt Export', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: 'Exportieren' }).click(); await s.waitForTimeout(500); }],
+	['Blatt Bereich', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: 'Bereich' }).click(); await s.waitForTimeout(500); }],
+	['Räume', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.waitForTimeout(400); }],
+	['Arten', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Arten' }).click(); await s.waitForTimeout(400); }],
+	['Personen', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }]
 ];
 let gesamt = 0, zuKlein = 0;
 for (const [titel, name, hin] of seiten) {

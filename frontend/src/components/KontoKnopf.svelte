@@ -85,11 +85,11 @@
 	<hr class="border-outline-variant" />
 	<div class="py-1">
 		{#if darfBearbeiten()}
-			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/verwaltung')}>
-				<Icon name="admin_panel_settings" class="text-on-surface-variant" /> Räume & Personen
+			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/einstellungen')}>
+				<Icon name="settings" class="text-on-surface-variant" /> Einstellungen
 			</button>
 		{:else if darfSehen()}
-			<!-- Die Verwaltung druckt Aufkleber, ohne Räume zu ändern; die übrigen finden sie unter Räume & Personen. -->
+			<!-- Die Verwaltung druckt Aufkleber, ohne Räume zu ändern; die übrigen finden sie unter Einstellungen. -->
 			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/raeume/qr')}>
 				<Icon name="qr_code_2" class="text-on-surface-variant" /> QR-Aufkleber drucken
 			</button>

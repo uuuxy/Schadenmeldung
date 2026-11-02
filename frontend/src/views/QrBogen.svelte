@@ -1,29 +1,28 @@
 <script>
 	import { renderSVG } from 'uqr';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
-	import { gehe } from '../lib/weg.svelte.js';
+	import { zurueck } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
+	import KopfLeiste from '../components/KopfLeiste.svelte';
+	import Button from '../components/ui/Button.svelte';
 
-	// Der Code führt auf die Adresse, unter der die App gerade läuft – also vom Server aus drucken.
+	// Der Code führt auf die Adresse, unter der die App gerade läuft.
 	const basis = location.origin;
 	// Dieselbe Reihenfolge wie in der Raumliste (vom Server): so liegen die Aufkleber eines Flurs beisammen.
 	const raeume = $derived(zustand.raeume);
 	const qr = (r) => renderSVG(`${basis}/r/${r.code}`, { border: 1, ecc: 'M' });
 </script>
 
-<div class="sticky top-0 z-10 flex items-center gap-2 bg-surface px-2 pt-[env(safe-area-inset-top)] print:hidden">
-	<div class="mx-auto flex h-16 w-full max-w-5xl items-center gap-2">
-		<button class="icon-btn text-on-surface" aria-label="Zurück" onclick={() => gehe(darfBearbeiten() ? '/verwaltung' : '/')}><Icon name="arrow_back" /></button>
-		<h1 class="flex-1 text-title-large text-on-surface">QR-Aufkleber</h1>
-		<button class="inline-flex h-10 items-center gap-2 rounded-full bg-primary pr-6 pl-4 text-label-large text-on-primary" onclick={() => window.print()}>
-			<Icon name="print" groesse={18} /> Drucken
-		</button>
-	</div>
+<div class="contents print:hidden">
+	<KopfLeiste titel="QR-Aufkleber" konto={false} zurueck={() => zurueck(darfBearbeiten() ? '/einstellungen' : '/')}>
+		{#snippet aktionen()}
+			<Button class="mr-2" onclick={() => window.print()}><Icon name="print" groesse={18} />Drucken</Button>
+		{/snippet}
+	</KopfLeiste>
+	<p class="mx-auto max-w-5xl px-4 pb-4 text-body-medium text-on-surface-variant">
+		{raeume.length === 1 ? '1 Aufkleber' : `${raeume.length} Aufkleber`}, 12 je A4-Blatt. Der Code führt mit dem Handy direkt zur Meldung für diesen Raum.
+	</p>
 </div>
-
-<p class="mx-auto max-w-5xl px-4 pb-4 text-body-medium text-on-surface-variant print:hidden">
-	Codes führen auf {basis}. Zum Ausdrucken die Seite vom Server aus öffnen, nicht vom Entwicklungsrechner.
-</p>
 
 <div class="bogen mx-auto grid max-w-5xl grid-cols-2 gap-3 px-4 pb-10 sm:grid-cols-3 print:max-w-none print:gap-0 print:p-0">
 	{#each raeume as r (r.id)}

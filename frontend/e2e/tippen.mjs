@@ -43,13 +43,20 @@ await k.close();
 
 [k, s] = await seite('hausmeister');
 await s.goto(B + '/');
-const karte = s.locator('article').first();
-const ortVorher = await karte.locator('h3').textContent();
-wo = await tippeNeben(s, karte.getByRole('button', { name: 'Gesehen' }), 'oben', 3);
-pruefe((await karte.getByRole('button', { name: 'Gesehen' }).getAttribute('aria-pressed')) === 'true', `Hausmeister „Gesehen“ (${wo})`);
-wo = await tippeNeben(s, karte.getByRole('button', { name: 'Erledigt' }), 'unten', 3);
+const haken = s.getByRole('button', { name: /^Erledigt: / }).first();
+const name = await haken.getAttribute('aria-label');
+wo = await tippeNeben(s, haken, 'unten', 3);
 await s.waitForTimeout(400);
-pruefe((await s.locator('article').first().locator('h3').textContent()) !== ortVorher || (await s.getByText(/Erledigt: /).isVisible()), `Hausmeister „Erledigt“ (${wo})`);
+pruefe(!(await s.getByRole('button', { name }).isVisible()) && (await s.getByText(/Erledigt: /).isVisible()), `Häkchen „Erledigt“ in der Liste (${wo})`);
+await s.getByRole('button', { name: 'Rückgängig' }).click();
+await s.getByRole('button', { name: /^Bio 1/ }).click();
+// Erst nach dem Überblenden (View Transition, 0,3 s) nimmt die neue Seite Tipps an.
+await s.waitForTimeout(500);
+const gesehen = s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'Gesehen' });
+wo = await tippeNeben(s, gesehen, 'oben', 3);
+await s.waitForTimeout(500);
+pruefe((await gesehen.getAttribute('aria-pressed')) === 'true', `Stand „Gesehen“ auf der Meldung (${wo})`);
+await s.getByRole('button', { name: 'Zurück' }).click();
 wo = await tippeNeben(s, s.getByRole('group', { name: 'Ansicht' }).getByRole('button', { name: 'Melden' }), 'unten', 3);
 await s.waitForTimeout(300);
 pruefe(new URL(s.url()).pathname === '/melden', `Umschalter „Melden“ in der Kopfleiste (${wo})`);

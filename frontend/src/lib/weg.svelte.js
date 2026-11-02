@@ -4,11 +4,15 @@ import { flushSync } from 'svelte';
 export const weg = $state({ pfad: location.pathname });
 
 const wenigBewegung = matchMedia('(prefers-reduced-motion: reduce)');
+// Die Stelle in der Liste stellt die App beim Zurückgehen selbst wieder her (siehe popstate).
+history.scrollRestoration = 'manual';
 
 export function gehe(pfad, { ersetzen = false } = {}) {
 	if (pfad === weg.pfad) return;
+	history.replaceState({ ...history.state, scrollY: window.scrollY }, '');
 	const wechsel = () => {
-		history[ersetzen ? 'replaceState' : 'pushState']({}, '', pfad);
+		// zurueck: Dieser Eintrag kam aus der App, „Zurück“ darf also einen Schritt in der History gehen.
+		history[ersetzen ? 'replaceState' : 'pushState']({ zurueck: !ersetzen || !!history.state?.zurueck }, '', pfad);
 		weg.pfad = pfad;
 		window.scrollTo({ top: 0 });
 	};
@@ -20,6 +24,15 @@ export function gehe(pfad, { ersetzen = false } = {}) {
 	}
 }
 
+/** Zurück, wie der Pfeil in der Kopfleiste: in der History, wenn die Seite aus der App kam, sonst nach ersatz. */
+export function zurueck(ersatz = '/') {
+	if (history.state?.zurueck) history.back();
+	else gehe(ersatz, { ersetzen: true });
+}
+
 window.addEventListener('popstate', () => {
 	weg.pfad = location.pathname;
+	const y = history.state?.scrollY ?? 0;
+	// Erst wenn die Liste wieder steht, lässt sich an ihre alte Stelle rollen.
+	requestAnimationFrame(() => window.scrollTo({ top: y }));
 });

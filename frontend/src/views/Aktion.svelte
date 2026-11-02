@@ -64,8 +64,8 @@
 	{:else}
 		<article class="rounded-xl bg-surface-container-low p-4">
 			<div class="flex gap-4">
-				<span class="grid size-10 shrink-0 place-items-center rounded-full bg-primary-container text-on-primary-container">
-					<Icon name={kategorieNach(meldung.kategorie).icon} groesse={22} />
+				<span class={['grid size-10 shrink-0 place-items-center rounded-full', kategorieNach(meldung.kategorie).farbe.flaeche]}>
+					<Icon name={kategorieNach(meldung.kategorie).icon} groesse={22} class={kategorieNach(meldung.kategorie).farbe.symbol} />
 				</span>
 				<div class="min-w-0 flex-1">
 					<h2 class="text-title-medium text-on-surface">{meldung.ort}</h2>

@@ -45,7 +45,7 @@ func fotoMitExif(t *testing.T, breite, hoehe int) []byte {
 	if err := jpeg.Encode(&jpg, bild, nil); err != nil {
 		t.Fatal(err)
 	}
-	nutzlast := append([]byte("Exif\x00\x00"), []byte("GPS 50.2213N 8.6198E")...)
+	nutzlast := append([]byte("Exif\x00\x00"), []byte("GPS 12.3456N 65.4321E")...)
 	segment := append([]byte{0xFF, 0xE1, byte((len(nutzlast) + 2) >> 8), byte(len(nutzlast) + 2)}, nutzlast...)
 	roh := jpg.Bytes()
 	return append(append(append([]byte{}, roh[:2]...), segment...), roh[2:]...)

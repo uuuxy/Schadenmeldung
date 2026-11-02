@@ -9,22 +9,30 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   ein Tipp auf „Zuletzt“, zwei Tipps über Bereich → Raum, oder kurz „204“ ins Suchfeld. Für alles
   ohne Raum gibt es „Anderer Ort“.
 - **Was? – antippen statt tippen:** Art (Licht, Heizung, Wasser …) → typischer Fall („Lampe defekt“)
-  → Melden. Datum, Uhrzeit und wer gemeldet hat, setzt der Server. Foto aus der Kamera, Notiz und
-  „Dringend / Gefahr“ sind freiwillig.
+  → Melden. Jede beantwortete Frage schrumpft auf eine Zeile mit „Ändern“, so steht die offene Frage
+  immer oben im Bild. Datum, Uhrzeit und wer gemeldet hat, setzt der Server. Foto aus der Kamera,
+  Notiz und „Dringend / Gefahr“ sind freiwillig. Tippt jemand zu früh auf „Melden“, wird die offene
+  Frage rot und sagt, was fehlt.
 - **Keine Doppelmeldungen:** Im gewählten Raum steht sofort, was dort schon gemeldet ist und wie
   weit es ist.
 - **Rollen:** Das Kollegium sieht nur „Schaden melden“, sonst nichts. **Hausmeister**, **Leitung**
-  und **Admin** dürfen alles: Meldungen bearbeiten und löschen, Räume, Personen und Rollen. Die
+  und **Admin** dürfen alles: Meldungen bearbeiten und löschen, Räume, Arten, Personen und Rollen. Die
   **Verwaltung** (Sekretariat) sieht die Übersicht und druckt QR-Aufkleber, ändert aber nichts. Die
   Adressen aus `ADMINS` sind immer Admin, damit sich niemand aussperren kann.
-- **Bearbeiten:** offene Aufgaben, Dringendes zuerst, Filter nach Bereich; Zwischenstand mit einem
-  Tipp („Gesehen“, „Bestellt“, „Fachfirma“), ein interner Vermerk mit Schnelltexten (sehen alle mit
-  Übersicht, nicht das Kollegium), „Erledigt“ mit Rückgängig, Ziehen zum Aktualisieren.
+- **Bearbeiten:** eine schlanke Liste der offenen Meldungen, Dringendes zuerst, Filter nach Bereich
+  (ein Chip, die Bereiche im Blatt). Hinten an jeder Zeile das Häkchen „Erledigt“ mit Rückgängig.
+  Ein Tipp auf die Zeile öffnet die Meldung: Foto groß, Zwischenstand mit einem Tipp („Gesehen“,
+  „Bestellt“, „Fachfirma“), ein interner Vermerk (sehen alle mit Übersicht, nicht das Kollegium),
+  Löschen mit Rückfrage. Ziehen zum Aktualisieren.
+- **Export:** „Exportieren“ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
+  erledigt, auf Wunsch nur ein Bereich; nach Bereichen gegliedert, mit kleinen Fotos, zum Drucken oder
+  für den Schulträger), oder eine Excel-Tabelle mit allen gespeicherten Meldungen (echte Datumszellen,
+  feste Kopfzeile, Filter). Beide ohne Namen der Meldenden.
 - **Zwei Ebenen, live:** Alle mit Übersicht wechseln oben in der Kopfleiste
   zwischen „Übersicht“ und „Melden“, denn auch sie melden Schäden. Die Übersicht aktualisiert sich
   sofort, wenn jemand meldet oder einen Stand setzt (Server-Sent Events), ohne Neuladen.
 - **Farbe je Art:** Licht, Heizung, Wasser … leuchten beim Antippen in ihrer eigenen, gedämpften
-  Farbe (M3 „custom colors“, zur Grundfarbe hin harmonisiert); dieselbe Farbe trägt die Karte in der
+  Farbe (M3 „custom colors“, zur Grundfarbe hin harmonisiert); dieselbe Farbe trägt die Zeile in der
   Übersicht.
 - **Mail an den Hausmeister, ohne Stress:** Dringendes sofort, alles andere als Sammelmail Mo–Fr um
   7 und 12 Uhr (einstellbar), jede Meldung nur einmal. In der Mail stehen die Knöpfe „Gesehen“ und
@@ -33,8 +41,10 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   selbst an oder ab; außer dem Hausmeister bekommt niemand ohne eigene Wahl welche.
 - **„Gesehen“ statt „In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass Bescheid gesagt ist – ohne
   Zusage, wann. Angezeigt wird der Stand, nicht der Zeitpunkt.
-- **Verwaltung:** Räume per Liste einfügen (auch aus einer Tabelle), QR-Aufkleber drucken
-  (12 je A4-Blatt), Personen und Rollen.
+- **Einstellungen** (Kontomenü): Räume per Liste einfügen (auch aus Excel oder CSV), umbenennen,
+  ohne dass der QR-Aufkleber ungültig wird, QR-Aufkleber drucken (12 je A4-Blatt); Arten ein- und
+  ausschalten (Medientechnik ist zu Beginn aus, weil die IT dafür ein eigenes Ticketsystem hat; die
+  übrigen Kacheln rücken zusammen); Personen und Rollen.
 - **Funkloch-fest:** Die App startet sofort, auch ohne Netz (Service Worker), zeigt den letzten
   Stand, und Meldungen aus dem Keller gehen samt Foto automatisch raus, sobald wieder Netz da ist.
 - **Anmeldung mit dem Schul-Postfach** (IMAP, wie Bibliothek und schul-orga). Das Handy bleibt
@@ -69,7 +79,7 @@ APP_ENV=local IMAP_HOST=mock \
 ```
 
 Dann `http://localhost:8090` öffnen. Mit `IMAP_HOST=mock` gilt jedes Passwort (nur zusammen mit
-`APP_ENV=local`, sonst startet der Server nicht). Als `admin` anmelden, unter „Räume & Personen“
+`APP_ENV=local`, sonst startet der Server nicht). Als `admin` anmelden, unter „Einstellungen“
 Räume einfügen und z. B. `hausmeister` die Rolle Hausmeister geben; jeder andere Name meldet. Die
 Mails an den Hausmeister landen in Mailpit unter `http://localhost:8025`. Ein Handy im selben WLAN erreicht die App unter
 `http://<IP des Rechners>:8090`; der Offline-Betrieb braucht https und läuft deshalb erst auf dem
@@ -90,7 +100,7 @@ Datenbank hängt nur am internen Netz des Stacks.
    `docker compose up -d --build` dasselbe Image auf dem Server.
 3. Den Abschnitt aus `Caddyfile.beispiel` in den Caddy übernehmen, Namen eintragen, `caddy reload`.
    Für den Namen braucht es einen DNS-Eintrag auf den Server; das Zertifikat holt Caddy selbst.
-4. Als Verwaltung anmelden, unter „Räume & Personen“ Räume einfügen und den Hausmeister eintragen,
+4. Als Admin anmelden, unter „Einstellungen“ Räume einfügen und den Hausmeister eintragen,
    dann die QR-Aufkleber drucken. Dafür die Seite über die echte Adresse öffnen, denn die Codes
    führen auf die Adresse, unter der sie erzeugt werden.
 
@@ -138,7 +148,8 @@ Eingebaut:
   Anmelde-Cookie, technisch notwendig).
 - Das Passwort geht nur an den Mailserver; in der Datenbank steht nur der Hash des Sitzungsschlüssels.
 - Fotos werden verkleinert und neu geschrieben, dabei fallen GPS-Ort und Gerätedaten weg.
-- Wer gemeldet hat, sehen nur Hausmeister und Verwaltung (für Rückfragen).
+- Wer gemeldet hat, sehen nur Hausmeister, Leitung, Verwaltung und Admins (für Rückfragen); in den
+  Export (PDF, Excel) kommt der Name nicht, und auch nicht, wann „Gesehen“ gesetzt wurde.
 - Fehlversuchsbremse bei der Anmeldung: 5 Fehlversuche je Konto bzw. 20 je Adresse in 15 Minuten.
   Ein Ausfall des Mailservers zählt nicht als Fehlversuch.
 - Löschfristen laufen stündlich von selbst. Die Datenschutzseite in der App nennt sie.
@@ -162,8 +173,10 @@ Datenbanktests fehl, statt still grün zu überspringen; wer bewusst ohne testet
 
 Browserprüfungen im Handyformat liegen in `frontend/e2e/` (Playwright): `npm run pruefen:ablauf`
 (QR, Rollen, Mail-Knopf; braucht frische Testdaten aus `e2e/testdaten.sh` und Mailpit),
-`npm run pruefen:tippflaechen` (jede Tippfläche ≥ 48 px), `npm run pruefen:tippen` (Tipps neben die Ränder)
-und `npm run pruefen:live` (neue Meldung und neuer Stand erscheinen ohne Neuladen, unter 2 Sekunden).
+`npm run pruefen:tippflaechen` (jede Tippfläche ≥ 48 px, auch in Blättern und Menüs, ohne
+Überlappung), `npm run pruefen:tippen` (Tipps neben die Ränder) und `npm run pruefen:live` (neue
+Meldung und neuer Stand erscheinen ohne Neuladen, unter 2 Sekunden). `ablauf` prüft außerdem Liste,
+Detailseite, Häkchen mit Rückgängig, Räume umbenennen und Arten an- und ausschalten.
 
 ## Aufbau
 
@@ -179,6 +192,9 @@ und `npm run pruefen:live` (neue Meldung und neuer Stand erscheinen ohne Neulade
 | `rollen.go` | Rollen: wer mehr sieht als das Meldeformular |
 | `benachrichtigung.go` | Mail an den Hausmeister: sofort, Sammelmail, Knöpfe in der Mail |
 | `aufraeumen.go` | Löschfristen |
+| `einstellungen.go` | Einstellungen für die Oberfläche, Namen der Arten und Stati, Arten an und aus |
+| `export.go`, `export_pdf*.go` | Export als Excel-Tabelle und PDF (gofpdf wie in der Bibliothek) |
+| `xlsx.go`, `xlsx_schreiben.go` | Excel lesen (Raumimport) und schreiben, ohne fremde Bibliothek |
 | `frontend/` | Svelte 5, Tailwind 4, Material 3 (Rollen in `src/styles/rollen.css`, Bausteine in `src/components/ui/`) |
 | `frontend/public/sw.js` | Service Worker (Start ohne Netz) |
 | `frontend/src/lib/ausgang.js` | Ausgang für Meldungen aus dem Funkloch (IndexedDB) |

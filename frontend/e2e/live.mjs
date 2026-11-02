@@ -25,7 +25,8 @@ await hm.goto(B + '/');
 await hm.getByRole('group', { name: 'Ansicht' }).waitFor();
 await hm.waitForTimeout(500);
 await hm.evaluate(() => (window.__ohneNeuladen = true));
-const vorher = await hm.locator('article').count();
+const zeilen = (s) => s.getByRole('list', { name: 'Meldungen' }).getByRole('listitem');
+const vorher = await zeilen(hm).count();
 pruefe(hmStroeme.length === 1, 'Hausmeister öffnet einen Ereignisstrom');
 
 // Eine Lehrkraft meldet von ihrem Handy aus; gemessen wird bis zur Karte beim Hausmeister.
@@ -38,9 +39,9 @@ const was = 'Live-Probe ' + Date.now().toString(36);
 const start = Date.now();
 const antwort = await lk.request.post(`${B}/api/meldungen`, { headers: { 'X-Schaden': '1' }, multipart: { raumId: String(aula.id), kategorie: 'licht', was } });
 const neu = await antwort.json();
-await hm.locator('article', { hasText: was }).waitFor({ timeout: 5000 });
+await zeilen(hm).filter({ hasText: was }).waitFor({ timeout: 5000 });
 const dauer = Date.now() - start;
-pruefe((await hm.locator('article').count()) === vorher + 1, `Neue Meldung erscheint beim Hausmeister nach ${dauer} ms`);
+pruefe((await zeilen(hm).count()) === vorher + 1, `Neue Meldung erscheint beim Hausmeister nach ${dauer} ms`);
 pruefe(dauer < 2000, 'schneller als 2 Sekunden');
 pruefe(await hm.evaluate(() => window.__ohneNeuladen === true), '… ohne die Seite neu zu laden');
 pruefe(lehrerinStroeme.length === 0, 'Kollegium öffnet keinen Ereignisstrom');
@@ -48,7 +49,7 @@ pruefe(lehrerinStroeme.length === 0, 'Kollegium öffnet keinen Ereignisstrom');
 // Die Leitung sieht den neuen Stand, sobald der Hausmeister „Gesehen“ setzt.
 const [, leitung] = await kontext('direktorin');
 await leitung.goto(B + '/');
-const karte = leitung.locator('article', { hasText: was });
+const karte = zeilen(leitung).filter({ hasText: was });
 await karte.waitFor();
 const start2 = Date.now();
 await hm.context().request.post(`${B}/api/meldungen/${neu.id}/status`, { headers: { 'X-Schaden': '1' }, data: { status: 'gesehen' } });
@@ -61,10 +62,10 @@ await hm.getByRole('button', { name: 'Licht & Strom' }).waitFor();
 pruefe(new URL(hm.url()).pathname === '/melden', 'Umschalter „Melden“ öffnet das Formular');
 await bild(hm, 'live-01-melden-umschalter');
 await hm.getByRole('button', { name: 'Licht & Strom' }).click();
-await hm.getByRole('button', { name: 'Licht & Strom' }).scrollIntoViewIfNeeded();
+await hm.getByRole('button', { name: /Licht & Strom.*Ändern/s }).waitFor();
 await bild(hm, 'live-02-melden-licht-gewaehlt');
 await hm.getByRole('button', { name: 'Übersicht' }).click();
-await hm.locator('article').first().waitFor();
+await zeilen(hm).first().waitFor();
 pruefe(new URL(hm.url()).pathname === '/', 'Umschalter „Übersicht“ führt zurück');
 await bild(hm, 'live-03-uebersicht');
 await bild(lehrerin, 'live-04-kollegium-ohne-umschalter');
@@ -72,11 +73,11 @@ await bild(lehrerin, 'live-04-kollegium-ohne-umschalter');
 // Dasselbe dunkel.
 const [, dunkel] = await kontext('hausmeister', 'dark');
 await dunkel.goto(B + '/');
-await dunkel.locator('article').first().waitFor();
+await zeilen(dunkel).first().waitFor();
 await bild(dunkel, 'live-05-uebersicht-dunkel');
 await dunkel.goto(B + '/melden');
 await dunkel.getByRole('button', { name: 'Wasser & WC' }).click();
-await dunkel.getByRole('button', { name: 'Wasser & WC' }).scrollIntoViewIfNeeded();
+await dunkel.getByRole('button', { name: /Wasser & WC.*Ändern/s }).waitFor();
 await bild(dunkel, 'live-06-melden-wasser-dunkel');
 
 await browser.close();
