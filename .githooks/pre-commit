@@ -25,6 +25,20 @@ if [ -n "$treffer" ]; then
 	exit 1
 fi
 
+# Compose-Dateien liest Docker selbst (Syntax, doppelte Schlüssel), in der gestagten Fassung und ohne
+# etwas zu starten; die .env bleibt dabei außen vor.
+for datei in $(git diff --cached --name-only --diff-filter=ACM | grep -E '^docker-compose[^/]*\.ya?ml$' || true); do
+	probe=$(mktemp -d)
+	git show ":$datei" >"$probe/docker-compose.yml"
+	touch "$probe/.env"
+	if ! (cd "$probe" && POSTGRES_PASSWORD=probe docker compose config --quiet); then
+		echo "$datei ist ungültig (siehe oben)." >&2
+		rm -rf "$probe"
+		exit 1
+	fi
+	rm -rf "$probe"
+done
+
 if git diff --cached --name-only | grep -q '^frontend/'; then
 	log=$(mktemp)
 	(cd frontend && npm run build >"$log" 2>&1) || { cat "$log" >&2; exit 1; }
