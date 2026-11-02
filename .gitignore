@@ -7,3 +7,5 @@ frontend/dist/*
 .DS_Store
 # Nur lokal: Server-Zugänge, Interna und das Aufspiel-Skript, nie ins Repo
 *.lokal.*
+# Sicherungen von update.sh auf dem Server
+backups/

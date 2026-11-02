@@ -94,10 +94,11 @@ Datenbank hängt nur am internen Netz des Stacks.
 
 1. `.env` aus `.env.example` anlegen: Datenbankpasswort (`openssl rand -hex 24`), Mailserver für
    die Anmeldung (IMAP) und für den Versand (SMTP), Domain, feste Verwaltung (`ADMINS`).
-2. Einmal an der GitHub-Registry anmelden (Token mit `read:packages`): `docker login ghcr.io -u uuuxy`.
-   Dann `docker compose pull && docker compose up -d`. Das Image baut GitHub nach jedem Push auf
-   `main`, erst wenn alle Prüfungen grün sind (`.github/workflows/docker.yml`). Ohne Registry baut
-   `docker compose up -d --build` dasselbe Image auf dem Server.
+2. `./update.sh` im Projektordner, wie in der Bibliothek: Es sichert die Datenbank nach `backups/`
+   (7 Tage), holt den Stand von `origin/main`, baut, startet und wartet, bis die App antwortet; geht
+   etwas schief, nennt es den Weg zurück. Dasselbe für jedes spätere Update. Das fertige Image von
+   GitHub (`.github/workflows/docker.yml`, erst nach grünen Prüfungen) ginge auch:
+   `docker login ghcr.io -u uuuxy`, dann `docker compose pull && docker compose up -d`.
 3. Den Abschnitt aus `Caddyfile.beispiel` in den Caddy übernehmen, Namen eintragen, `caddy reload`.
    Für den Namen braucht es einen DNS-Eintrag auf den Server; das Zertifikat holt Caddy selbst.
 4. Als Admin anmelden, unter „Einstellungen“ Räume einfügen und den Hausmeister eintragen,

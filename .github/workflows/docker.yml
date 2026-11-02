@@ -2,7 +2,7 @@ name: Prüfen und Docker-Image veröffentlichen (ghcr.io)
 
 # Bei jedem Push auf main: erst prüfen (gofmt, go vet, Go-Tests gegen PostgreSQL 18, Bau der
 # Oberfläche ohne Warnung), dann das Image bauen und als ghcr.io/uuuxy/schaden veröffentlichen. Auf
-# dem Server genügt danach `docker compose pull && docker compose up -d`; dort wird nichts gebaut.
+# dem Server baut ./update.sh selbst; `docker compose pull && docker compose up -d` ginge auch.
 #
 #   - Push auf main  → Tags `latest` und `main-<kurz-sha>`
 #   - Git-Tag v1.2.3 → Tags `1.2.3` und `1.2` (nicht latest: latest ist immer der neueste main)
@@ -16,10 +16,11 @@ on:
     tags: ['v*.*.*']
   workflow_dispatch:
 
-# Nur der neueste Lauf je Ref zählt, ältere werden abgebrochen.
+# Läufe je Ref nacheinander statt abbrechen: Ein abgebrochener Lauf stünde als rotes Kreuz am
+# Commit, obwohl nichts kaputt ist. Wartende ersetzt GitHub weiterhin durch den neuesten.
 concurrency:
   group: docker-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
