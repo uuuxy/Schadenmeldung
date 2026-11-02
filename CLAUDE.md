@@ -56,6 +56,11 @@ Keine fremden Dienste, CDNs oder Schriften von außen. Keine Namen oder Freitext
 Neue Felder mit Personenbezug brauchen eine Löschfrist (`aufraeumen.go`) und eine Zeile auf der
 Datenschutzseite.
 
+## Git
+
+Privat auf GitHub (`uuuxy/schaden`), Zweig `main`. Commit-Nachrichten auf Deutsch, ohne
+Werkzeug-Hinweis, wie in der Bibliothek.
+
 ## Prüfen
 
 - `docker compose -f docker-compose.local.yml up -d`, dann

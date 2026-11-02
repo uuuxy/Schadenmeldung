@@ -94,11 +94,12 @@ laufen, schaltet der Caddy-Abschnitt das mit `SCHULNETZ` ein (zwei Zeilen, siehe
 | Variable | Bedeutung | Vorgabe |
 |---|---|---|
 | `DATABASE_URL` | PostgreSQL; im Compose-Stack aus `POSTGRES_PASSWORD` gebaut | **Pflicht** |
-| `IMAP_HOST` | Mailserver der Schule für die Anmeldung; `mock` nur lokal | **Pflicht** |
+| `IMAP_HOST` | Mailserver der Schule für die Anmeldung; der Name muss im Zertifikat des Servers stehen; `mock` nur lokal | **Pflicht** |
 | `IMAP_PORT` | IMAP über TLS | `993` |
 | `ANMELDE_DOMAINS` | erlaubte Maildomains, durch Komma getrennt; bei genau einer genügt der Name vor dem @ | alle, die der Mailserver kennt |
-| `ADMINS` | feste Verwaltung; weitere Rollen vergibt sie in der App | – |
-| `SMTP_HOST`, `SMTP_PORT` | Mailserver für den Versand an den Hausmeister; ohne Host keine Mails | –, `587` |
+| `ALIAS_DOMAINS` | Kurzdomains derselben Postfächer, etwa `kurz.example`; die App schreibt sie beim Anmelden auf die eine Domain aus `ANMELDE_DOMAINS` um | – |
+| `ADMINS` | feste Verwaltung, auch als Name oder in Kurzform; weitere Rollen vergibt sie in der App | – |
+| `SMTP_HOST`, `SMTP_PORT` | Mailserver für den Versand an den Hausmeister; Name wie im Zertifikat; ohne Host keine Mails | –, `587` |
 | `SMTP_BENUTZER`, `SMTP_PASSWORT` | Anmeldung am Mailserver (nur über TLS) | – |
 | `MAIL_ABSENDER` | Absender der Mails | Pflicht mit SMTP |
 | `OEFFENTLICHE_ADRESSE` | Adresse der App für die Knöpfe in der Mail | Pflicht mit SMTP |

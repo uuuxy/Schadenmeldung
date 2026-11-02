@@ -96,13 +96,14 @@ func (p *testPost) alle() []testMail {
 var berlin, _ = time.LoadLocation("Europe/Berlin")
 
 // neueTestUmgebung: Montag, 2. November 2026, 9 Uhr in Berlin. hm@schule.de ist Hausmeister,
-// admin@schule.de fest Verwaltung (ADMINS), Mail ist an.
+// admin@schule.de fest Verwaltung (ADMINS), kurz.de die Kurzform von schule.de, Mail ist an.
 func neueTestUmgebung(t *testing.T) *testUmgebung {
 	t.Helper()
 	konf := konfiguration{
 		Lokal:               true,
 		IMAPHost:            "mock",
 		Domains:             []string{"schule.de"},
+		Aliase:              []string{"kurz.de"},
 		Admins:              map[string]bool{"admin@schule.de": true},
 		FotoTage:            30,
 		AufbewahrungTage:    365,
@@ -231,6 +232,68 @@ func TestFremdeDomainKommtNichtHinein(t *testing.T) {
 	}
 	if status, _ := n.json("GET", "/api/ich", nil); status != http.StatusUnauthorized {
 		t.Fatalf("ohne Anmeldung: Status %d, erwartet 401", status)
+	}
+}
+
+// Die Schul-IT nennt die volle Adresse als Benutzernamen, im Kollegium ist die kurze geläufig.
+func TestKurzdomainWirdUmgeschrieben(t *testing.T) {
+	k := konfiguration{Domains: []string{"schule.example"}, Aliase: []string{"kurz.example"}}
+	for ein, erwartet := range map[string]string{
+		"p.muster":                        "p.muster@schule.example",
+		" p.muster@kurz.example ":           "p.muster@schule.example",
+		"P.Muster@Kurz.Example":             "P.Muster@schule.example",
+		"p.muster@schule.example": "p.muster@schule.example",
+		"p.muster@gmail.com":              "p.muster@gmail.com",
+		"p.muster@neben.kurz.example":       "p.muster@neben.kurz.example",
+		"@kurz.example":                     "@kurz.example",
+		"":                                "",
+	} {
+		if aus := k.vervollstaendige(ein); aus != erwartet {
+			t.Errorf("vervollstaendige(%q) = %q, erwartet %q", ein, aus, erwartet)
+		}
+	}
+}
+
+func TestKurzadresseMeldetMitDerVollenAn(t *testing.T) {
+	u := neueTestUmgebung(t)
+	var amMailserver string
+	u.app.pruefeZugang = func(_ context.Context, email, _ string) error {
+		amMailserver = email
+		return nil
+	}
+	n := u.anonym()
+	status, ich := n.json("POST", "/api/anmelden", map[string]string{"email": "Lehrer@Kurz.de", "passwort": "p"})
+	if status != 200 || ich["email"] != "lehrer@schule.de" || amMailserver != "Lehrer@schule.de" {
+		t.Fatalf("Status %d, %v, am Mailserver %q; erwartet lehrer@schule.de", status, ich, amMailserver)
+	}
+	// Auch die Verwaltung darf die Kurzform eintragen; die Rolle hängt an der vollen Adresse.
+	v := u.nutzer("admin")
+	if status, antwort := v.json("POST", "/api/rollen", map[string]string{"email": "lehrer@kurz.de", "rolle": "leitung"}); status != 200 {
+		t.Fatalf("Rolle setzen: Status %d, %v", status, antwort)
+	}
+	if _, ich := n.json("GET", "/api/ich", nil); ich["rolle"] != "leitung" {
+		t.Errorf("Rolle nach Eintrag in Kurzform: %v, erwartet leitung", ich["rolle"])
+	}
+}
+
+// Wer sich selbst in der Kurzform in ADMINS einträgt, darf sich damit nicht aussperren.
+func TestAdminsDuerfenKurzGeschriebenSein(t *testing.T) {
+	for _, name := range []string{"SMTP_HOST", "FOTO_TAGE", "AUFBEWAHRUNG_TAGE", "SAMMELMAIL_ZEITEN", "ZEITZONE"} {
+		t.Setenv(name, "")
+	}
+	t.Setenv("DATABASE_URL", "postgres://schaden@localhost/schaden")
+	t.Setenv("IMAP_HOST", "mail.schule.example")
+	t.Setenv("ANMELDE_DOMAINS", "schule.example")
+	t.Setenv("ALIAS_DOMAINS", "kurz.example")
+	t.Setenv("ADMINS", "Chefin@kurz.example, verwaltung")
+	k, err := ladeKonfiguration()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, adresse := range []string{"chefin@schule.example", "verwaltung@schule.example"} {
+		if !k.Admins[adresse] {
+			t.Errorf("%s fehlt in ADMINS: %v", adresse, k.Admins)
+		}
 	}
 }
 
@@ -472,6 +535,11 @@ func TestKonfigurationVerweigertOffeneTueren(t *testing.T) {
 		"ohne Datenbank":        {konfiguration{IMAPHost: "mail.schule.de"}, false},
 		"mock lokal":            {konfiguration{DatenbankURL: db, IMAPHost: "mock", Lokal: true}, true},
 		"Mailserver der Schule": {konfiguration{DatenbankURL: db, IMAPHost: "mail.schule.de"}, true},
+		"Kurzdomain ohne Ziel":  {konfiguration{DatenbankURL: db, IMAPHost: "mail.schule.de", Aliase: []string{"kurz.de"}}, false},
+		"Kurzdomain, zwei Ziele": {konfiguration{DatenbankURL: db, IMAPHost: "mail.schule.de",
+			Domains: []string{"schule.de", "andere.de"}, Aliase: []string{"kurz.de"}}, false},
+		"Kurzdomain mit Ziel": {konfiguration{DatenbankURL: db, IMAPHost: "mail.schule.de",
+			Domains: []string{"schule.de"}, Aliase: []string{"kurz.de"}}, true},
 	} {
 		if err := fall.k.pruefe(); (err == nil) != fall.ok {
 			t.Errorf("%s: pruefe() = %v, erwartet ok=%v", name, err, fall.ok)

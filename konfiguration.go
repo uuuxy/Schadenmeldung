@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ type konfiguration struct {
 	IMAPHost         string
 	IMAPPort         string
 	Domains          []string
+	Aliase           []string // Kurzdomains derselben Postfächer, etwa kurz.example (siehe vervollstaendige)
 	Admins           map[string]bool
 	Schulname        string
 	ProxyVertrauen   bool
@@ -47,9 +49,15 @@ func ladeKonfiguration() (konfiguration, error) {
 		IMAPHost:       strings.TrimSpace(os.Getenv("IMAP_HOST")),
 		IMAPPort:       wert("IMAP_PORT", "993"),
 		Domains:        liste(os.Getenv("ANMELDE_DOMAINS")),
-		Admins:         menge(os.Getenv("ADMINS")),
+		Aliase:         liste(os.Getenv("ALIAS_DOMAINS")),
 		Schulname:      wert("SCHULNAME", ""),
 		ProxyVertrauen: os.Getenv("PROXY_VERTRAUEN") == "1",
+	}
+	// ADMINS geht durch dieselbe Ergänzung wie die Anmeldung: Wer sich als Name oder mit der
+	// Kurzdomain einträgt, wird sonst nie erkannt und sperrt sich aus.
+	k.Admins = map[string]bool{}
+	for _, adresse := range liste(os.Getenv("ADMINS")) {
+		k.Admins[k.vervollstaendige(adresse)] = true
 	}
 	var err error
 	if k.FotoTage, err = zahl("FOTO_TAGE", 30); err != nil {
@@ -84,6 +92,9 @@ func (k konfiguration) pruefe() error {
 	if k.IMAPHost == "mock" && !k.Lokal {
 		return errors.New("IMAP_HOST=mock nimmt jedes Passwort an und gilt nur zusammen mit APP_ENV=local")
 	}
+	if len(k.Aliase) > 0 && len(k.Domains) != 1 {
+		return errors.New("ALIAS_DOMAINS braucht genau eine Domain in ANMELDE_DOMAINS: auf sie werden die Kurzadressen umgeschrieben")
+	}
 	if k.SMTPHost != "" && (k.MailAbsender == "" || k.OeffentlicheAdresse == "") {
 		return errors.New("mit SMTP_HOST braucht es auch MAIL_ABSENDER und OEFFENTLICHE_ADRESSE (für die Knöpfe in der Mail)")
 	}
@@ -109,12 +120,20 @@ func leseUhrzeiten(roh string) ([]uhrzeit, error) {
 	return zeiten, nil
 }
 
-// vervollstaendige hängt die Schuldomain an, wenn nur der Name vor dem @ eingegeben wurde und es
-// genau eine Domain gibt. Das spart auf dem Handy die meiste Tipparbeit beim Anmelden.
+// vervollstaendige macht aus der Eingabe die volle Adresse, die der Mailserver als Benutzernamen
+// kennt: Bei genau einer Schuldomain genügt der Name vor dem @, und eine Kurzdomain aus
+// ALIAS_DOMAINS wird ersetzt. Das spart Tipparbeit, und die gewohnte kurze Adresse führt trotzdem hinein.
 func (k konfiguration) vervollstaendige(email string) string {
 	email = strings.TrimSpace(email)
-	if email != "" && !strings.Contains(email, "@") && len(k.Domains) == 1 {
+	if email == "" || len(k.Domains) != 1 {
+		return email
+	}
+	at := strings.LastIndex(email, "@")
+	switch {
+	case at < 0:
 		return email + "@" + k.Domains[0]
+	case at > 0 && slices.Contains(k.Aliase, strings.ToLower(email[at+1:])):
+		return email[:at+1] + k.Domains[0]
 	}
 	return email
 }
@@ -175,12 +194,4 @@ func liste(roh string) []string {
 		}
 	}
 	return aus
-}
-
-func menge(roh string) map[string]bool {
-	m := map[string]bool{}
-	for _, e := range liste(roh) {
-		m[e] = true
-	}
-	return m
 }
