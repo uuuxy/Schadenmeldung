@@ -7,7 +7,7 @@ name: Prüfen und Docker-Image veröffentlichen (ghcr.io)
 #   - Push auf main  → Tags `latest` und `main-<kurz-sha>`
 #   - Git-Tag v1.2.3 → Tags `1.2.3` und `1.2` (nicht latest: latest ist immer der neueste main)
 #
-# Das Package ist privat wie das Repo. Der Server meldet sich einmal an der Registry an, mit einem
+# Das Package ist privat, auch wenn das Repo öffentlich ist. Der Server meldet sich einmal an der Registry an, mit einem
 # Token, das packages:read darf: docker login ghcr.io -u uuuxy
 
 on:

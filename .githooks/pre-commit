@@ -1,0 +1,35 @@
+#!/bin/bash
+# Vor jedem Commit die schnellen Prüfungen von GitHub, damit ein Fehler gar nicht erst hochgeht:
+# gofmt, go vet, Größe und Komplexität, gleiche Namen in Server und Oberfläche, bei Änderungen an
+# der Oberfläche der Bau ohne Warnung, und keine Server-Angaben in Dateien fürs Repo. Die Tests
+# gegen PostgreSQL laufen mit `go test ./...` und auf GitHub.
+# Einmal je Klon einschalten: git config core.hooksPath .githooks
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+unformatiert=$(gofmt -l .)
+if [ -n "$unformatiert" ]; then
+	echo "Nicht mit gofmt formatiert: $unformatiert (gofmt -w . ausführen)" >&2
+	exit 1
+fi
+go vet ./...
+OHNE_DB=1 go test -count=1 -run 'TestKeine|TestNamen' . >/dev/null
+
+# Das Repo ist öffentlich: Zugänge und Adressen des Servers gehören nach SERVER.lokal.md. Diese Datei
+# selbst ist ausgenommen, denn sie enthält die Suchmuster.
+neu=$(git diff --cached -U0 -- . ':(exclude).githooks/pre-commit' | grep -E '^\+' || true)
+treffer=$(printf '%s\n' "$neu" | grep -E 'root@|/root/|(^|[^0-9.])([0-9]{1,3}\.){3}[0-9]{1,3}([^0-9.]|$)' |
+	grep -v -E '127\.0\.0\.1|0\.0\.0\.0|10\.20\.0\.0|192\.168\.5\.0' || true)
+if [ -n "$treffer" ]; then
+	printf 'Im Commit stehen Server-Angaben (IP, root@, /root/), bitte nach SERVER.lokal.md:\n%s\n' "$treffer" >&2
+	exit 1
+fi
+
+if git diff --cached --name-only | grep -q '^frontend/'; then
+	log=$(mktemp)
+	(cd frontend && npm run build >"$log" 2>&1) || { cat "$log" >&2; exit 1; }
+	if grep -i -E "warn|\(!\)" "$log" >&2; then
+		echo "Der Bau der Oberfläche meldet Warnungen." >&2
+		exit 1
+	fi
+fi

@@ -36,7 +36,8 @@ Wo der Stack liegt, wie Caddy eingehängt ist und welche Fallen es gibt, steht n
 `SERVER.lokal.md` (von Git ausgenommen): Das Repo soll öffentlich werden können, ohne dass darin
 Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fragen.
 
-- **Git:** privat auf GitHub, `https://github.com/uuuxy/schaden`, Zweig `main`. Commit-Nachrichten
+- **Git:** auf GitHub, `https://github.com/uuuxy/schaden`, Zweig `main`, zum Veröffentlichen gedacht
+  (Geschichte am 2. November bereinigt: keine Server-Angaben mehr in alten Fassungen). Commit-Nachrichten
   auf Deutsch, ohne Werkzeug-Hinweis, wie in der Bibliothek.
 - **Technik:** Go (`net/http`, pgx) mit eingebetteter Oberfläche (Svelte 5 + Tailwind 4,
   `frontend/dist`) und eingebetteten Migrationen (`migrations/001_grundlage.sql`,
@@ -71,7 +72,8 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
   - Live: Eine neue Meldung erscheint beim Hausmeister nach rund 0,2–0,4 s, „Gesehen“ bei der
     Leitung genauso, ohne Neuladen; das Kollegium öffnet keinen Strom.
 - Mailversand über Mailpit; Docker-Build und Compose-Probe.
-- Handy-Screenshots für den Nutzer: https://claude.ai/artifact/MmpdCqftLEHp4qr2hc7t75 (privat).
+- Handy-Screenshots für den Nutzer: https://claude.ai/artifact/MmpdCqftLEHp4qr2hc7t75 (privat), vorher
+  und nachher der M3-Durchsicht: https://claude.ai/artifact/UMRmh6j4WRnX1F9QyNm73R (privat).
 
 ## Mailserver der Schule
 

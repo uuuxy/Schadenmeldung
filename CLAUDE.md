@@ -70,7 +70,8 @@ Datenschutzseite.
 
 ## Git
 
-Privat auf GitHub (`uuuxy/schaden`), Zweig `main`. Commit-Nachrichten auf Deutsch, ohne
+Auf GitHub (`uuuxy/schaden`), Zweig `main`, zum Veröffentlichen gedacht: Zugänge, Adressen und Pfade
+des Servers stehen nur in `SERVER.lokal.md` (von Git ausgenommen), nie im Repo. Commit-Nachrichten auf Deutsch, ohne
 Werkzeug-Hinweis, wie in der Bibliothek.
 
 ## Prüfen
@@ -78,4 +79,6 @@ Werkzeug-Hinweis, wie in der Bibliothek.
 - `docker compose -f docker-compose.local.yml up -d`, dann
   `TEST_DATABASE_URL='postgres://schaden:schaden@localhost:5435/schaden?sslmode=disable' go test ./...`
 - `go vet ./...` und `cd frontend && npm run build` (0 Warnungen)
+- Die schnellen Prüfungen laufen vor jedem Commit von selbst, wenn der Hook eingeschaltet ist:
+  einmal je Klon `chmod +x .githooks/pre-commit && git config core.hooksPath .githooks`.
 - Code auf Deutsch benennen wie in der Bibliothek; Kommentare erklären in ein, zwei Sätzen das Warum.
