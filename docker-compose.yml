@@ -3,8 +3,11 @@
 # Einstellungen stehen in der .env daneben (Vorlage: .env.example).
 services:
   schaden:
+    # Fertiges Image von GitHub (.github/workflows/docker.yml, erst nach grünen Tests):
+    # docker compose pull && docker compose up -d. build bleibt als Ausweg ohne Registry:
+    # docker compose up -d --build baut dasselbe Image hier.
+    image: ghcr.io/uuuxy/schaden:latest
     build: .
-    image: schadenmeldung:latest
     restart: unless-stopped
     env_file: .env
     environment:

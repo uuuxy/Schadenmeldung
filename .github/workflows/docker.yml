@@ -1,0 +1,132 @@
+name: Prüfen und Docker-Image veröffentlichen (ghcr.io)
+
+# Bei jedem Push auf main: erst prüfen (gofmt, go vet, Go-Tests gegen PostgreSQL 18, Bau der
+# Oberfläche ohne Warnung), dann das Image bauen und als ghcr.io/uuuxy/schaden veröffentlichen. Auf
+# dem Server genügt danach `docker compose pull && docker compose up -d`; dort wird nichts gebaut.
+#
+#   - Push auf main  → Tags `latest` und `main-<kurz-sha>`
+#   - Git-Tag v1.2.3 → Tags `1.2.3` und `1.2` (nicht latest: latest ist immer der neueste main)
+#
+# Das Package ist privat wie das Repo. Der Server meldet sich einmal an der Registry an, mit einem
+# Token, das packages:read darf: docker login ghcr.io -u uuuxy
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+# Nur der neueste Lauf je Ref zählt, ältere werden abgebrochen.
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Actions per Commit-SHA wie in der Bibliothek: Ein verschobener Versions-Tag kann so keinen fremden
+# Code mit Schreibrecht auf die Registry laufen lassen.
+jobs:
+  pruefen:
+    runs-on: ubuntu-26.04
+    env:
+      # Der Name enthält „test“; jeder Test legt darin ein eigenes Schema an und räumt es ab.
+      TEST_DATABASE_URL: postgres://postgres@localhost:5432/schaden_test?sslmode=disable
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          # trust statt Wegwerf-Passwort: Die Datenbank lebt nur für diesen Job und ist nur über
+          # localhost des Runners erreichbar; ein Passwort hier wäre nur ein Geheimnis im Repo.
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: schaden_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Quellcode auschecken
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Go einrichten
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      - name: Go prüfen (gofmt, vet, Tests samt Größe und Komplexität)
+        shell: bash
+        run: |
+          go mod verify
+          unformatiert=$(gofmt -l .)
+          if [ -n "$unformatiert" ]; then echo "::error::Nicht mit gofmt formatiert: $unformatiert"; exit 1; fi
+          go vet ./...
+          go test -count=1 ./...
+
+      - name: Node einrichten
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26 # wie im Dockerfile
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Oberfläche bauen (0 Warnungen)
+        working-directory: frontend
+        shell: bash
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build 2>&1 | tee bau.log
+          if grep -i -E "warn|\(!\)" bau.log; then echo "::error::Der Bau meldet Warnungen."; exit 1; fi
+
+  veroeffentlichen:
+    needs: pruefen
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Quellcode auschecken
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: An der GitHub Container Registry anmelden
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tags und Labels bestimmen
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        # Mit Herkunftsnachweis geht das Image als Index hinaus; ghcr.io liest die Beschreibung der
+        # Paketseite dann aus dessen Annotationen.
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
+        with:
+          images: ghcr.io/uuuxy/schaden
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=main-,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Buildx einrichten
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Image bauen und veröffentlichen
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          # Der Hetzner läuft auf x86-64; arm64 verdoppelte nur die Bauzeit.
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
