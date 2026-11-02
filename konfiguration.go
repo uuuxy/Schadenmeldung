@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 	// Die Zeitzonen stecken im Programm: Das schlanke Docker-Abbild bringt keine mit.
 	_ "time/tzdata"
 )
