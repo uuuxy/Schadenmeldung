@@ -78,6 +78,8 @@
 	--color-papier-akzent: #0061a4;
 	--color-papier-leise: #525252;
 	--color-papier-leiser: #737373;
+	/* Schnittlinie und Etikettenrand in der Vorschau, so hell wie der frühere Bogen. */
+	--color-papier-linie: #bbbbbb;
 }
 
 /* Das dunkle Schema. public/schema.js setzt die Klasse vor dem ersten Bild: nach der Wahl im
