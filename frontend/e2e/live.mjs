@@ -4,7 +4,8 @@ import { chromium } from 'playwright-core';
 // Farben der Arten, hell und dunkel, in den Ordner aus argv[2] (sonst Temp-Ordner).
 // Braucht den lokalen Server mit Testdaten aus e2e/testdaten.sh.
 const ziel = process.argv[2] ?? (await import('node:os')).tmpdir();
-const B = 'http://127.0.0.1:8090';
+// ADRESSE: dieselbe Prüfung durch einen Proxy, etwa Caddy mit encode davor.
+const B = process.env.ADRESSE ?? 'http://127.0.0.1:8090';
 const browser = await chromium.launch();
 const fehler = [];
 const pruefe = (bed, text) => { console.log((bed ? '✓ ' : '✗ ') + text); if (!bed) fehler.push('Prüfung: ' + text); };
@@ -32,10 +33,12 @@ const [lk, lehrerin, lehrerinStroeme] = await kontext('s.schmidt');
 await lehrerin.goto(B + '/');
 await lehrerin.getByRole('heading', { name: 'Schaden melden' }).waitFor();
 const aula = (await (await lk.request.get(B + '/api/raeume')).json()).find((r) => r.name === 'Aula');
+// Eindeutiger Text je Lauf, damit die Prüfung auch auf schon benutzten Testdaten misst.
+const was = 'Live-Probe ' + Date.now().toString(36);
 const start = Date.now();
-const antwort = await lk.request.post(`${B}/api/meldungen`, { headers: { 'X-Schaden': '1' }, multipart: { raumId: String(aula.id), kategorie: 'licht', was: 'Lampe defekt' } });
+const antwort = await lk.request.post(`${B}/api/meldungen`, { headers: { 'X-Schaden': '1' }, multipart: { raumId: String(aula.id), kategorie: 'licht', was } });
 const neu = await antwort.json();
-await hm.locator('article', { hasText: 'Aula' }).filter({ hasText: 'Lampe defekt' }).waitFor({ timeout: 5000 });
+await hm.locator('article', { hasText: was }).waitFor({ timeout: 5000 });
 const dauer = Date.now() - start;
 pruefe((await hm.locator('article').count()) === vorher + 1, `Neue Meldung erscheint beim Hausmeister nach ${dauer} ms`);
 pruefe(dauer < 2000, 'schneller als 2 Sekunden');
@@ -45,7 +48,7 @@ pruefe(lehrerinStroeme.length === 0, 'Kollegium öffnet keinen Ereignisstrom');
 // Die Leitung sieht den neuen Stand, sobald der Hausmeister „Gesehen“ setzt.
 const [, leitung] = await kontext('direktorin');
 await leitung.goto(B + '/');
-const karte = leitung.locator('article', { hasText: 'Aula' }).filter({ hasText: 'Lampe defekt' });
+const karte = leitung.locator('article', { hasText: was });
 await karte.waitFor();
 const start2 = Date.now();
 await hm.context().request.post(`${B}/api/meldungen/${neu.id}/status`, { headers: { 'X-Schaden': '1' }, data: { status: 'gesehen' } });
