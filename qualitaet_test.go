@@ -23,8 +23,8 @@ const (
 // bestand ist eine Arbeitsliste, kein Freibrief: Eine Datei darf hier nur schrumpfen, und wer sie
 // unter die Grenze bringt, trägt sie aus.
 var bestand = map[string]int{
-	"frontend/src/views/Melden.svelte":     420,
-	"frontend/src/styles/komponenten.css":  235,
+	"frontend/src/views/Melden.svelte":    420,
+	"frontend/src/styles/komponenten.css": 235,
 }
 
 // quellOrdner und quellEndungen: was wir selbst schreiben. symbole.js erzeugt npm run symbole.
