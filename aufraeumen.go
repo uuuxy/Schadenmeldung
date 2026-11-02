@@ -14,6 +14,9 @@ func (a *app) raeumeAuf(ctx context.Context) {
 	if err != nil {
 		slog.Error("Aufräumen: Meldungen nicht gelöscht", "fehler", err)
 	}
+	if meldungen > 0 {
+		a.verteiler.melde()
+	}
 	fotos, err := a.sp.loescheAlteFotos(ctx, jetzt.AddDate(0, 0, -a.konf.FotoTage), jetzt)
 	if err != nil {
 		slog.Error("Aufräumen: Fotos nicht gelöscht", "fehler", err)

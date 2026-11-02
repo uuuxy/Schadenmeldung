@@ -64,6 +64,7 @@ func starte() error {
 		WriteTimeout:      2 * time.Minute,
 		IdleTimeout:       2 * time.Minute,
 	}
+	srv.RegisterOnShutdown(a.verteiler.schliesse)
 	go func() {
 		<-ctx.Done()
 		ende, cancel := context.WithTimeout(context.Background(), 10*time.Second)

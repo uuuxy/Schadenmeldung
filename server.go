@@ -25,6 +25,7 @@ type app struct {
 	ipBremse     *bremse
 	jetzt        func() time.Time
 	versender    versender
+	verteiler    *verteiler
 	// hintergrund zählt laufende Mails, damit Tests und das Herunterfahren auf sie warten können.
 	hintergrund sync.WaitGroup
 }
@@ -37,6 +38,7 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		kontoBremse: neueBremse(5, 15*time.Minute),
 		ipBremse:    neueBremse(20, 15*time.Minute),
 		jetzt:       time.Now,
+		verteiler:   neuerVerteiler(),
 	}
 	a.pruefeZugang = a.pruefeIMAP
 	if konf.mailAktiv() {
@@ -65,6 +67,7 @@ func (a *app) routen() http.Handler {
 	mux.HandleFunc("POST /api/meldungen", a.mitBenutzer(a.meldungAnlegen))
 	mux.HandleFunc("POST /api/meldungen/{id}/status", a.mitBenutzer(a.nurBearbeiter(a.statusSetzen)))
 	mux.HandleFunc("DELETE /api/meldungen/{id}", a.mitBenutzer(a.nurAdmin(a.meldungLoeschen)))
+	mux.HandleFunc("GET /api/ereignisse", a.mitBenutzer(a.nurBackend(a.ereignisse)))
 	mux.HandleFunc("GET /api/rollen", a.mitBenutzer(a.nurAdmin(a.rollenListe)))
 	mux.HandleFunc("POST /api/rollen", a.mitBenutzer(a.nurAdmin(a.rolleSetzen)))
 	mux.HandleFunc("DELETE /api/rollen/{email}", a.mitBenutzer(a.nurAdmin(a.rolleLoeschen)))
@@ -283,6 +286,7 @@ func (a *app) meldungAnlegen(w http.ResponseWriter, r *http.Request, b benutzer)
 		return
 	}
 	slog.Info("Neue Meldung", "id", neu.ID, "kategorie", neu.Kategorie, "dringend", neu.Dringend)
+	a.verteiler.melde()
 	a.benachrichtigeSofort(neu)
 	schreibeJSON(w, http.StatusCreated, fuerAnsicht(neu, b))
 }
@@ -316,6 +320,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 		nichtGefundenOderIntern(w, err)
 		return
 	}
+	a.verteiler.melde()
 	schreibeJSON(w, http.StatusOK, fuerAnsicht(neu, b))
 }
 
@@ -328,6 +333,7 @@ func (a *app) meldungLoeschen(w http.ResponseWriter, r *http.Request, _ benutzer
 		nichtGefundenOderIntern(w, err)
 		return
 	}
+	a.verteiler.melde()
 	w.WriteHeader(http.StatusNoContent)
 }
 

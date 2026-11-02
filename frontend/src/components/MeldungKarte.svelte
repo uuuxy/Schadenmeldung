@@ -82,8 +82,9 @@
 
 <article class={['rounded-xl bg-surface-container-low p-4', meldung.dringend && !erledigt && 'border-l-4 border-error']}>
 	<div class="flex gap-4">
-		<span class={['grid size-10 shrink-0 place-items-center rounded-full', erledigt ? 'bg-success-container text-on-success-container' : 'bg-primary-container text-on-primary-container']}>
-			<Icon name={erledigt ? 'check' : art.icon} groesse={22} />
+		<!-- Dieselbe Farbe der Art wie im Formular: Beim Rundgang erkennt man Licht, Wasser … am Blick. -->
+		<span class={['grid size-10 shrink-0 place-items-center rounded-full', erledigt ? 'bg-success-container text-on-success-container' : art.farbe.flaeche]}>
+			<Icon name={erledigt ? 'check' : art.icon} groesse={22} class={erledigt ? '' : art.farbe.symbol} />
 		</span>
 
 		<div class="min-w-0 flex-1">

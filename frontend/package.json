@@ -10,7 +10,8 @@
 		"symbole": "node scripts/symbole.mjs",
 		"pruefen:tippflaechen": "node e2e/tippflaechen.mjs",
 		"pruefen:tippen": "node e2e/tippen.mjs",
-		"pruefen:ablauf": "node e2e/ablauf.mjs"
+		"pruefen:ablauf": "node e2e/ablauf.mjs",
+		"pruefen:live": "node e2e/live.mjs"
 	},
 	"devDependencies": {
 		"@fontsource/roboto": "5.3.0",

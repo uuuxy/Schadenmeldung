@@ -13,8 +13,14 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   sonst wird die Fläche abgeschnitten. Nachmessen: Abstände und Größen im Handyformat (390 px).
 - **Bausteine statt Handarbeit:** Knöpfe, Schalter, Chips, Segmente, Felder, Suche, Reiter und
   Status-Chips kommen aus `frontend/src/components/ui/`, gebaut wie die gleichnamigen Bausteine der
-  Bibliothek (dort steht jeweils die M3-Begründung). Auswahl liegt immer auf secondary-container,
-  Knöpfe tragen keinen Schatten, Chips brechen um statt seitlich zu scrollen.
+  Bibliothek (dort steht jeweils die M3-Begründung). Auswahl liegt auf secondary-container; nur die
+  Kacheln der Arten leuchten in ihrer eigenen Farbe (`kat-*`, M3 „custom colors“, Fläche in
+  Buntheit 24, damit es ruhig bleibt). Knöpfe tragen keinen Schatten, Chips brechen um statt
+  seitlich zu scrollen.
+- **Zwei Ebenen:** Wer die Übersicht sieht (Hausmeister, Leitung, Verwaltung), wechselt in der
+  Kopfleiste per Segmented Button zwischen „Übersicht“ und „Melden“ (`KopfLeiste ebene=…`), nicht
+  per Switch: M3 nimmt Switches nur für Ein/Aus. Die Übersicht aktualisiert sich live über
+  `/api/ereignisse`; jeder neue Schreibweg für Meldungen ruft `a.verteiler.melde()`.
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
   Wert im hellen und im dunklen Schema. Einzige Ausnahme: der QR-Bogen, denn Papier ist weiß.
@@ -47,8 +53,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 ## Doppelte Stellen
 
 Arten (`kategorien`) und Stati stehen im Server (`server.go`) und in der Oberfläche
-(`frontend/src/lib/kategorien.js`, `status.js`); die Stati zusätzlich im CHECK der Migration. Eine
-Änderung braucht alle Stellen.
+(`frontend/src/lib/kategorien.js`, `status.js`); die Stati zusätzlich im CHECK der Migration, die
+Arten zusätzlich mit ihren Farbrollen `kat-<key>` in `rollen.css` (hell und dunkel). Eine Änderung
+braucht alle Stellen.
 
 ## Datenschutz
 

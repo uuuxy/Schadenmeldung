@@ -28,8 +28,42 @@
 	});
 	const raumCode = $derived(weg.pfad.startsWith('/r/') ? decodeURIComponent(weg.pfad.slice(3)) : '');
 
-	// Neue Meldungen kommen ohne Neuladen: alle 30 Sekunden, sobald die App wieder sichtbar wird und
-	// sobald das Netz zurück ist. Dabei geht auch der Ausgang raus.
+	// Live für alle mit Übersicht: Der Server meldet jede Änderung über /api/ereignisse, die App holt
+	// dann den Stand. Nur solange sie sichtbar ist, denn ein offener Strom hält das Funkmodul wach.
+	$effect(() => {
+		if (!zustand.benutzer || !darfSehen()) return;
+		let strom = null;
+		let warte = 0;
+		let ersteVerbindung = true;
+		// Mehrere Änderungen kurz hintereinander holen den Stand nur einmal.
+		const nachladen = () => {
+			clearTimeout(warte);
+			warte = setTimeout(auffrischen, 150);
+		};
+		const oeffne = () => {
+			if (strom || document.visibilityState !== 'visible') return;
+			strom = new EventSource('/api/ereignisse');
+			strom.addEventListener('meldungen', nachladen);
+			// Nach einer Lücke (Funkloch, Hintergrund) holt die neue Verbindung nach, was dazwischen kam.
+			strom.addEventListener('open', () => (ersteVerbindung ? (ersteVerbindung = false) : nachladen()));
+		};
+		const schliesse = () => {
+			strom?.close();
+			strom = null;
+		};
+		const sichtbarkeit = () => (document.visibilityState === 'visible' ? (oeffne(), nachladen()) : schliesse());
+		oeffne();
+		document.addEventListener('visibilitychange', sichtbarkeit);
+		return () => {
+			schliesse();
+			clearTimeout(warte);
+			document.removeEventListener('visibilitychange', sichtbarkeit);
+		};
+	});
+
+	// Ohne Strom (Kollegium, oder ein Proxy schluckt ihn) kommen neue Meldungen trotzdem: alle 30
+	// Sekunden, sobald die App wieder sichtbar wird und sobald das Netz zurück ist. Dabei geht auch der
+	// Ausgang raus.
 	$effect(() => {
 		if (!zustand.benutzer) return;
 		const sichtbar = () => document.visibilityState === 'visible' && auffrischen();

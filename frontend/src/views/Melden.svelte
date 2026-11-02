@@ -220,7 +220,7 @@
 	</button>
 {/snippet}
 
-<KopfLeiste titel="Schaden melden" zurueck={darfSehen() ? () => gehe('/') : null} />
+<KopfLeiste titel="Schaden melden" ebene="melden" />
 
 {#if fertig}
 	<!-- Bestätigung statt Formular: Die Meldung ist sicher angekommen (oder sicher gespeichert). -->
@@ -242,7 +242,7 @@
 		<div class="mt-10 flex flex-col gap-3 self-stretch">
 			<Button size="lg" onclick={() => (fertig = null)}><Icon name="add" />Noch etwas melden</Button>
 			{#if darfSehen()}
-				<Button variant="ghost" onclick={() => gehe('/')}>Zu den Aufgaben</Button>
+				<Button variant="ghost" onclick={() => gehe('/')}>Zur Übersicht</Button>
 			{/if}
 		</div>
 	</main>
@@ -308,14 +308,14 @@
 					<ul>
 						{#each hierWartend as a (a.id)}
 							<li class="flex items-center gap-3 px-4 py-3">
-								<Icon name={kategorieNach(a.kategorie).icon} groesse={20} class="text-on-surface-variant" />
+								<Icon name={kategorieNach(a.kategorie).icon} groesse={20} class={kategorieNach(a.kategorie).farbe.symbol} />
 								<span class="min-w-0 flex-1 truncate text-body-large text-on-surface">{a.was}</span>
 								<span class="inline-flex h-6 items-center gap-1 rounded-sm bg-surface-container px-2 text-label-medium text-on-surface-variant"><Icon name="schedule_send" groesse={16} />Wartet auf Netz</span>
 							</li>
 						{/each}
 						{#each hierGemeldet as m (m.id)}
 							<li class="flex items-center gap-3 px-4 py-3">
-								<Icon name={kategorieNach(m.kategorie).icon} groesse={20} class="text-on-surface-variant" />
+								<Icon name={kategorieNach(m.kategorie).icon} groesse={20} class={kategorieNach(m.kategorie).farbe.symbol} />
 								<span class="min-w-0 flex-1">
 									<span class="block truncate text-body-large text-on-surface">{m.was}</span>
 									<span class="block text-body-small text-on-surface-variant">{wann(m.gemeldetAm)}</span>
@@ -328,7 +328,8 @@
 			{/if}
 		</section>
 
-		<!-- Was ist kaputt? Auswahl in secondary-container, wie überall in M3. -->
+		<!-- Was ist kaputt? Jede Art leuchtet ausgewählt in ihrer eigenen Farbe (kat-* in rollen.css),
+		     wie Geräte-Kacheln in Google Home; das Symbol trägt die Farbe schon vorher. -->
 		<section>
 			{@render ueberschrift('Was ist kaputt?', was !== '')}
 			<div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="group" aria-label="Art des Schadens">
@@ -337,14 +338,14 @@
 					<button
 						class={[
 							'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl p-4 text-left transition-colors duration-200 active:scale-[0.98]',
-							aktiv ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-low text-on-surface'
+							aktiv ? k.farbe.flaeche : 'bg-surface-container-low text-on-surface'
 						]}
 						aria-pressed={aktiv}
 						onclick={() => waehleKategorie(k.key)}
 					>
-						<Icon name={k.icon} gefuellt={aktiv} groesse={28} class={aktiv ? '' : 'text-primary'} />
+						<Icon name={k.icon} gefuellt={aktiv} groesse={28} class={k.farbe.symbol} />
 						<span class="text-title-medium leading-tight">{k.name}</span>
-						{#if aktiv}<Icon name="check_circle" gefuellt groesse={22} class="absolute top-3 right-3" />{/if}
+						{#if aktiv}<Icon name="check_circle" gefuellt groesse={22} class={['absolute top-3 right-3', k.farbe.symbol]} />{/if}
 					</button>
 				{/each}
 			</div>

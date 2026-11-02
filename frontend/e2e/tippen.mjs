@@ -50,8 +50,9 @@ pruefe((await karte.getByRole('button', { name: 'Gesehen' }).getAttribute('aria-
 wo = await tippeNeben(s, karte.getByRole('button', { name: 'Erledigt' }), 'unten', 3);
 await s.waitForTimeout(400);
 pruefe((await s.locator('article').first().locator('h3').textContent()) !== ortVorher || (await s.getByText(/Erledigt: /).isVisible()), `Hausmeister „Erledigt“ (${wo})`);
-wo = await tippeNeben(s, s.getByRole('button', { name: 'Erledigt', exact: true }).first(), 'unten', 3);
-pruefe((await s.getByRole('button', { name: 'Erledigt', exact: true }).first().getAttribute('aria-pressed')) === 'true', `Segment „Erledigt“ (${wo})`);
+wo = await tippeNeben(s, s.getByRole('group', { name: 'Ansicht' }).getByRole('button', { name: 'Melden' }), 'unten', 3);
+await s.waitForTimeout(300);
+pruefe(new URL(s.url()).pathname === '/melden', `Umschalter „Melden“ in der Kopfleiste (${wo})`);
 await k.close();
 
 [k, s] = await seite(null);

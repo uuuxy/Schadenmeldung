@@ -41,6 +41,31 @@
 	--color-on-warning: #ffffff;
 	--color-warning-container: #ffdcc2;
 	--color-on-warning-container: #6c3c00;
+	/* Die Arten als semantische Farben (M3 „custom colors“, Blog „Designing Harmony into Dynamic
+	   Color“): Grundton mit Blend.harmonize zur Primärfarbe gezogen, Symbol in Buntheit 48, Fläche in
+	   Buntheit 24 wie die tertiary-Familie, damit ausgewählte Kacheln leuchten, ohne grell zu werden.
+	   Gerechnet mit @material/material-color-utilities, Töne wie oben (40, 90/30 hell, 80, 30/90 dunkel). */
+	--color-kat-licht: #6c5e00;
+	--color-kat-licht-container: #f0e3a8;
+	--color-on-kat-licht-container: #4f471b;
+	--color-kat-heizung: #984718;
+	--color-kat-heizung-container: #ffdbcc;
+	--color-on-kat-heizung-container: #653d29;
+	--color-kat-wasser: #006782;
+	--color-kat-wasser-container: #c1e9fb;
+	--color-on-kat-wasser-container: #244c5b;
+	--color-kat-fenster: #00696c;
+	--color-kat-fenster-container: #bcebed;
+	--color-on-kat-fenster-container: #1e4e4f;
+	--color-kat-moebel: #216c2e;
+	--color-kat-moebel-container: #cbebc6;
+	--color-on-kat-moebel-container: #324d32;
+	--color-kat-technik: #734c9d;
+	--color-kat-technik-container: #efdbff;
+	--color-on-kat-technik-container: #504061;
+	--color-kat-reinigung: #95416d;
+	--color-kat-reinigung-container: #ffd8e7;
+	--color-on-kat-reinigung-container: #613b4d;
 	--color-inverse-surface: #2f3033;
 	--color-inverse-on-surface: #f1f0f4;
 	--color-inverse-primary: #9ccaff;
@@ -87,6 +112,27 @@
 	--color-on-warning: #4c2700;
 	--color-warning-container: #6c3c00;
 	--color-on-warning-container: #ffdcc2;
+	--color-kat-licht: #ddc74d;
+	--color-kat-licht-container: #4f471b;
+	--color-on-kat-licht-container: #f0e3a8;
+	--color-kat-heizung: #ffb693;
+	--color-kat-heizung-container: #653d29;
+	--color-on-kat-heizung-container: #ffdbcc;
+	--color-kat-wasser: #60d4fe;
+	--color-kat-wasser-container: #244c5b;
+	--color-on-kat-wasser-container: #c1e9fb;
+	--color-kat-fenster: #4cd9df;
+	--color-kat-fenster-container: #1e4e4f;
+	--color-on-kat-fenster-container: #bcebed;
+	--color-kat-moebel: #8cd88d;
+	--color-kat-moebel-container: #324d32;
+	--color-on-kat-moebel-container: #cbebc6;
+	--color-kat-technik: #dcb8ff;
+	--color-kat-technik-container: #504061;
+	--color-on-kat-technik-container: #efdbff;
+	--color-kat-reinigung: #ffafd3;
+	--color-kat-reinigung-container: #613b4d;
+	--color-on-kat-reinigung-container: #ffd8e7;
 	--color-inverse-surface: #e3e2e6;
 	--color-inverse-on-surface: #2f3033;
 	--color-inverse-primary: #0061a4;

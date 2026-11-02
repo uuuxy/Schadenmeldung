@@ -2,10 +2,22 @@
 	import { slide } from 'svelte/transition';
 	import Icon from './Icon.svelte';
 	import KontoKnopf from './KontoKnopf.svelte';
-	import { zustand } from '../lib/zustand.svelte.js';
+	import Segmente from './ui/Segmente.svelte';
+	import { zustand, darfSehen } from '../lib/zustand.svelte.js';
+	import { gehe } from '../lib/weg.svelte.js';
 
-	/** M3 Top App Bar (small). Beim Scrollen hebt sie sich mit surface-container vom Inhalt ab. */
-	let { titel, zurueck = null, konto = true, aktionen } = $props();
+	/**
+	 * M3 Top App Bar (small). Beim Scrollen hebt sie sich mit surface-container vom Inhalt ab.
+	 *
+	 * ebene ('uebersicht' | 'melden'): Wer die Übersicht sieht, wechselt hier zwischen ihr und dem
+	 * Meldeformular. M3 nimmt für zwei Ansichten einen Segmented Button, keinen Switch („Avoid using
+	 * switches to toggle between opposing options“); in der Kopfleiste bleibt er beim Scrollen da.
+	 */
+	let { titel, zurueck = null, konto = true, aktionen, ebene = null } = $props();
+	const ebenen = [
+		{ wert: 'uebersicht', text: 'Übersicht' },
+		{ wert: 'melden', text: 'Melden' }
+	];
 	let gescrollt = $state(false);
 
 	$effect(() => {
@@ -34,7 +46,14 @@
 		{:else}
 			<span class="w-3"></span>
 		{/if}
-		<h1 class="min-w-0 flex-1 truncate px-1 text-title-large text-on-surface">{titel}</h1>
+		{#if ebene && darfSehen()}
+			<h1 class="sr-only">{titel}</h1>
+			<div class="min-w-0 flex-1 px-1">
+				<Segmente etikett="Ansicht" klasse="w-full max-w-xs" optionen={ebenen} wert={ebene} onwahl={(w) => w !== ebene && gehe(w === 'melden' ? '/melden' : '/')} />
+			</div>
+		{:else}
+			<h1 class="min-w-0 flex-1 truncate px-1 text-title-large text-on-surface">{titel}</h1>
+		{/if}
 		{@render aktionen?.()}
 		{#if konto}<KontoKnopf />{/if}
 	</div>

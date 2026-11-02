@@ -436,6 +436,7 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 		nichtGefundenOderIntern(w, err)
 		return
 	}
+	a.verteiler.melde()
 	schreibeJSON(w, http.StatusOK, a.fuerAktion(neu, b, r.PathValue("token")))
 }
 

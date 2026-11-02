@@ -2,13 +2,12 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 	import { zustand, darfBearbeiten, auffrischen } from '../lib/zustand.svelte.js';
-	import { gehe } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
 	import MeldungKarte from '../components/MeldungKarte.svelte';
 	import Ziehen from '../components/Ziehen.svelte';
 	import FilterChips from '../components/ui/FilterChips.svelte';
-	import Segmente from '../components/ui/Segmente.svelte';
+	import Reiter from '../components/ui/Reiter.svelte';
 
 	/** Das Backend: Aufgaben für Hausmeister und Verwaltung, Übersicht (nur lesen) für die Leitung. */
 	let reiter = $state('offen');
@@ -22,28 +21,25 @@
 	$effect(() => {
 		if (bereich && !bereiche.includes(bereich)) bereich = null;
 	});
-
-	// Die Snackbar steht über dem Knopf „Melden“ (M3: Snackbars erscheinen über einem FAB).
-	$effect(() => {
-		document.body.style.setProperty('--snackbar-abstand', '4.5rem');
-		return () => document.body.style.removeProperty('--snackbar-abstand');
-	});
 </script>
 
-<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} />
+<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} ebene="uebersicht" />
 
 <Ziehen aktualisieren={auffrischen}>
-	<main class="mx-auto max-w-3xl px-4 pt-2 pb-28">
-		<Segmente
-			etikett="Meldungen"
-			klasse="w-full"
-			optionen={[
-				{ wert: 'offen', text: `Offen · ${zustand.offen.length}` },
-				{ wert: 'erledigt', text: 'Erledigt' }
-			]}
-			wert={reiter}
-			onwahl={(w) => (reiter = w)}
-		/>
+	<main class="mx-auto max-w-3xl px-4 pb-12">
+		<!-- Primary Tabs direkt unter der Kopfleiste (M3): zwei Datensätze derselben Ansicht. Sie sehen
+		     anders aus als der Umschalter der Ebene darüber, damit die Rangfolge auf einen Blick klar ist. -->
+		<div class="-mx-4">
+			<Reiter
+				etikett="Meldungen"
+				reiter={[
+					{ id: 'offen', label: `Offen · ${zustand.offen.length}` },
+					{ id: 'erledigt', label: 'Erledigt' }
+				]}
+				aktiv={reiter}
+				onwahl={(w) => (reiter = w)}
+			/>
+		</div>
 
 		{#if bereiche.length > 1}
 			<div class="mt-4">
@@ -72,11 +68,3 @@
 		{/if}
 	</main>
 </Ziehen>
-
-<!-- M3 Extended FAB: die eine Hauptaktion dieser Seite, rechts unten in Daumenreichweite. -->
-<button
-	class="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-20 flex h-14 items-center gap-3 rounded-lg bg-primary-container pr-5 pl-4 text-label-large text-on-primary-container shadow-3 transition-transform duration-200 active:scale-95"
-	onclick={() => gehe('/melden')}
->
-	<Icon name="add" />Melden
-</button>

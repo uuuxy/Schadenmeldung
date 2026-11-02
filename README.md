@@ -19,7 +19,13 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   `ADMINS` sind immer Verwaltung, damit sich niemand aussperren kann.
 - **Hausmeister:** offene Aufgaben, Dringendes zuerst, Filter nach Bereich; Zwischenstand mit einem
   Tipp („Gesehen“, „Bestellt“, „Fachfirma“), Antwort mit Schnelltexten, „Erledigt“ mit Rückgängig,
-  Ziehen zum Aktualisieren, Knopf „Melden“ für eigene Meldungen.
+  Ziehen zum Aktualisieren.
+- **Zwei Ebenen, live:** Hausmeister, Leitung und Verwaltung wechseln oben in der Kopfleiste
+  zwischen „Übersicht“ und „Melden“, denn auch sie melden Schäden. Die Übersicht aktualisiert sich
+  sofort, wenn jemand meldet oder einen Stand setzt (Server-Sent Events), ohne Neuladen.
+- **Farbe je Art:** Licht, Heizung, Wasser … leuchten beim Antippen in ihrer eigenen, gedämpften
+  Farbe (M3 „custom colors“, zur Grundfarbe hin harmonisiert); dieselbe Farbe trägt die Karte in der
+  Übersicht.
 - **Mail an den Hausmeister, ohne Stress:** Dringendes sofort, alles andere als Sammelmail Mo–Fr um
   7 und 12 Uhr (einstellbar), jede Meldung nur einmal. In der Mail stehen die Knöpfe „Gesehen“ und
   „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
@@ -153,7 +159,8 @@ Datenbanktests fehl, statt still grün zu überspringen; wer bewusst ohne testet
 
 Browserprüfungen im Handyformat liegen in `frontend/e2e/` (Playwright): `npm run pruefen:ablauf`
 (QR, Rollen, Mail-Knopf; braucht frische Testdaten aus `e2e/testdaten.sh` und Mailpit),
-`npm run pruefen:tippflaechen` (jede Tippfläche ≥ 48 px) und `npm run pruefen:tippen` (Tipps neben die Ränder).
+`npm run pruefen:tippflaechen` (jede Tippfläche ≥ 48 px), `npm run pruefen:tippen` (Tipps neben die Ränder)
+und `npm run pruefen:live` (neue Meldung und neuer Stand erscheinen ohne Neuladen, unter 2 Sekunden).
 
 ## Aufbau
 
