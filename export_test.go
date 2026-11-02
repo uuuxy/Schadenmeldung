@@ -79,6 +79,20 @@ func TestExportPDFNachListeMitFoto(t *testing.T) {
 	if !strings.Contains(kopf.Get("Content-Disposition"), "Schadenmeldungen-erledigt") || !strings.Contains(pdfInhalt(t, roh), "(Keine Meldungen.)") {
 		t.Errorf("PDF erledigt, Bereich ohne Meldungen: %v", kopf)
 	}
+	// Die Art filtert wie in der Übersicht; eine unbekannte filtert gar nicht.
+	nurArt := func(art string) string {
+		_, _, roh := hm.holeDatei("/api/export.pdf?art=" + art)
+		return pdfInhalt(t, roh)
+	}
+	if text := nurArt("licht"); !strings.Contains(text, "(Lampe defekt)") || !strings.Contains(text, "nur Licht & Strom") {
+		t.Errorf("PDF nur Licht: Meldung oder Unterzeile fehlt")
+	}
+	if text := nurArt("wasser"); !strings.Contains(text, "(Keine Meldungen.)") {
+		t.Errorf("PDF nur Wasser zeigt eine Meldung einer anderen Art")
+	}
+	if text := nurArt("quatsch"); !strings.Contains(text, "(Lampe defekt)") {
+		t.Errorf("PDF mit unbekannter Art filtert")
+	}
 	if status, _, _ := lehrer.holeDatei("/api/export.pdf"); status != http.StatusForbidden {
 		t.Errorf("Kollegium lädt das PDF: Status %d", status)
 	}

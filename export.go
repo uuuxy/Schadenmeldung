@@ -50,9 +50,13 @@ func jaOderLeer(b bool) string {
 }
 
 // exportPDF: die Liste der Übersicht, wie sie gerade zu sehen ist (offen oder erledigt, auf Wunsch
-// nur ein Bereich), zum Drucken oder Weiterschicken.
+// nur ein Bereich und eine Art), zum Drucken oder Weiterschicken. Eine unbekannte Art filtert nicht.
 func (a *app) exportPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
-	auswahl := pdfAuswahl{erledigt: r.URL.Query().Get("liste") == "erledigt", bereich: r.URL.Query().Get("bereich")}
+	q := r.URL.Query()
+	auswahl := pdfAuswahl{erledigt: q.Get("liste") == "erledigt", bereich: q.Get("bereich")}
+	if artName(q.Get("art")) != "" {
+		auswahl.art = q.Get("art")
+	}
 	liste, err := a.pdfListe(r.Context(), auswahl)
 	if err != nil {
 		intern(w, err)
@@ -73,6 +77,7 @@ func (a *app) exportPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
 type pdfAuswahl struct {
 	erledigt bool
 	bereich  string
+	art      string
 }
 
 // pdfListe ordnet nach Bereichen wie die Raumliste, darin nach Räumen (9 vor 10): So geht ein
@@ -100,7 +105,7 @@ func (a *app) pdfListe(ctx context.Context, aus pdfAuswahl) ([]meldung, error) {
 	}
 	gefiltert := []meldung{}
 	for _, m := range liste {
-		if aus.bereich == "" || m.Bereich == aus.bereich {
+		if (aus.bereich == "" || m.Bereich == aus.bereich) && (aus.art == "" || m.Kategorie == aus.art) {
 			gefiltert = append(gefiltert, m)
 		}
 	}

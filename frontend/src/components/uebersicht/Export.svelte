@@ -1,21 +1,23 @@
 <script>
 	import { zustand } from '../../lib/zustand.svelte.js';
+	import { kategorieNach } from '../../lib/kategorien.js';
 	import Icon from '../Icon.svelte';
 	import Blatt from '../Blatt.svelte';
 	import Button from '../ui/Button.svelte';
 
 	/**
 	 * Export für alle mit Übersicht. Das PDF zeigt die Liste, wie sie gerade steht (Reiter und
-	 * Bereich), zum Drucken oder Weiterschicken; die Excel-Tabelle alle gespeicherten Meldungen zum
+	 * Filter), zum Drucken oder Weiterschicken; die Excel-Tabelle alle gespeicherten Meldungen zum
 	 * Sortieren und Filtern. Beide ohne Namen der Meldenden: Die Dateien verlassen die App.
 	 */
-	let { liste, bereich, anzahl } = $props();
+	let { liste, bereich, art = null, anzahl } = $props();
 	let offen = $state(false);
 
-	const pdf = $derived(`/api/export.pdf?liste=${liste}${bereich ? `&bereich=${encodeURIComponent(bereich)}` : ''}`);
+	const pdf = $derived(`/api/export.pdf?liste=${liste}${bereich ? `&bereich=${encodeURIComponent(bereich)}` : ''}${art ? `&art=${art}` : ''}`);
+	const filter = $derived([bereich, art && kategorieNach(art).name].filter(Boolean).join(', '));
 	const pdfText = $derived.by(() => {
 		const menge = liste === 'offen' ? (anzahl === 1 ? '1 offene Meldung' : `${anzahl} offene Meldungen`) : anzahl === 1 ? '1 erledigte Meldung der letzten 30 Tage' : `${anzahl} erledigte Meldungen der letzten 30 Tage`;
-		return `${menge}${bereich ? `, nur ${bereich}` : ''}, wie hier zu sehen – zum Drucken oder Weiterschicken.`;
+		return `${menge}${filter ? `, nur ${filter}` : ''}, wie hier zu sehen – zum Drucken oder Weiterschicken.`;
 	});
 </script>
 

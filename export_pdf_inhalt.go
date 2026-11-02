@@ -20,6 +20,9 @@ func (a *app) pdfUnterzeile(anzahl int, aus pdfAuswahl) string {
 	if aus.bereich != "" {
 		text += " · nur " + aus.bereich
 	}
+	if aus.art != "" {
+		text += " · nur " + artName(aus.art)
+	}
 	if anzahl == 1 {
 		return text + " · 1 Meldung"
 	}
