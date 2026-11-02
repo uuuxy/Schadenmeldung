@@ -38,7 +38,7 @@ const seiten = [
 	['Melden (Art gewählt)', 's.schmidt', async (s) => { await s.goto(B + '/melden'); await s.getByRole('button', { name: '101' }).click(); await s.getByRole('button', { name: 'Licht & Strom' }).click(); await s.waitForTimeout(500); }],
 	['Aufgaben', 'hausmeister', async (s) => s.goto(B + '/')],
 	['Kontomenü', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: 'Konto und Einstellungen' }).click(); await s.waitForTimeout(400); }],
-	['Personen', 'verwaltung', async (s) => { await s.goto(B + '/verwaltung'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }]
+	['Personen', 'admin', async (s) => { await s.goto(B + '/verwaltung'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }]
 ];
 let gesamt = 0, zuKlein = 0;
 for (const [titel, name, hin] of seiten) {

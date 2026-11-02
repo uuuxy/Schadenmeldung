@@ -9,7 +9,7 @@
 	import FilterChips from '../components/ui/FilterChips.svelte';
 	import Reiter from '../components/ui/Reiter.svelte';
 
-	/** Das Backend: Aufgaben für Hausmeister und Verwaltung, Übersicht (nur lesen) für die Leitung. */
+	/** Das Backend: Aufgaben für Hausmeister, Leitung und Admins, Übersicht (nur lesen) für die Verwaltung. */
 	let reiter = $state('offen');
 	let bereich = $state(null);
 

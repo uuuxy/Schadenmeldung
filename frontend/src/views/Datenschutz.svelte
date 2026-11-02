@@ -23,8 +23,8 @@
 			<ul class="list-disc space-y-1 pl-5 text-on-surface-variant">
 				<li>Ort, Art und Beschreibung des Schadens, auf Wunsch ein Foto</li>
 				<li>Zeitpunkt der Meldung und der Bearbeitung, Status und Antwort des Hausmeisters</li>
-				<li>wer gemeldet hat – sichtbar nur für Hausmeister, Schulleitung und Verwaltung, für Rückfragen</li>
-				<li>wer welche Rolle hat (Hausmeister, Leitung, Verwaltung) und wer welche Mails bekommt</li>
+				<li>wer gemeldet hat – sichtbar nur für Hausmeister, Schulleitung, Sekretariat und Admins, für Rückfragen</li>
+				<li>wer welche Rolle hat (Hausmeister, Leitung, Verwaltung, Admin) und wer welche Mails bekommt</li>
 			</ul>
 		</section>
 		<section>

@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import { slide, fade } from 'svelte/transition';
 	import { api } from '../lib/api.js';
-	import { zustand, uebernimm, istAdmin, darfSehen, legeInAusgang } from '../lib/zustand.svelte.js';
+	import { zustand, uebernimm, darfBearbeiten, darfSehen, legeInAusgang } from '../lib/zustand.svelte.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
 	import { rueckmeldung } from '../lib/haptik.js';
@@ -270,7 +270,7 @@
 				<Feld etikett="Wo ist der Schaden?" placeholder="z. B. Schulhof, Treppenhaus Nord" bind:wert={ortFrei} autocomplete="off" enterkeyhint="next" maxlength="80" />
 				{#if zustand.raeume.length}
 					<Button variant="ghost" class="mt-2 -ml-4" onclick={() => (freierOrt = false)}><Icon name="meeting_room" groesse={18} />Doch einen Raum wählen</Button>
-				{:else if istAdmin()}
+				{:else if darfBearbeiten()}
 					<p class="mt-2 text-body-small text-on-surface-variant">Tipp: Unter „Räume & Personen“ (Kontomenü) die Raumliste anlegen – dann genügt hier ein Tipp.</p>
 				{/if}
 			{:else}

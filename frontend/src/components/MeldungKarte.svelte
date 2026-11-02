@@ -5,14 +5,14 @@
 	import Feld from './ui/Feld.svelte';
 	import StatusChip from './ui/StatusChip.svelte';
 	import { api } from '../lib/api.js';
-	import { zustand, darfBearbeiten, istAdmin, setzeStatus, uebernimm } from '../lib/zustand.svelte.js';
+	import { zustand, darfBearbeiten, setzeStatus, uebernimm } from '../lib/zustand.svelte.js';
 	import { kategorieNach } from '../lib/kategorien.js';
-	import { stati, zwischenstati, schnellantworten } from '../lib/status.js';
+	import { stati, zwischenstati, schnellvermerke } from '../lib/status.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
 	import { rueckmeldung } from '../lib/haptik.js';
 
-	/** Eine Meldung als M3-Karte. Hausmeister und Verwaltung bearbeiten sie, die Leitung liest nur. */
+	/** Eine Meldung als M3-Karte. Hausmeister, Leitung und Admins bearbeiten sie, die Verwaltung liest nur. */
 	let { meldung } = $props();
 
 	const art = $derived(kategorieNach(meldung.kategorie));
@@ -63,7 +63,7 @@
 	}
 
 	async function antwortSpeichern() {
-		await setze({ antwort }, 'Antwort gespeichert');
+		await setze({ antwort }, 'Vermerk gespeichert');
 		antwortOffen = false;
 	}
 
@@ -118,7 +118,7 @@
 
 			{#if meldung.antwort}
 				<p class="mt-3 rounded-md bg-surface-container-high px-3 py-2 text-body-medium text-on-surface">
-					<span class="text-on-surface-variant">Hausmeister:</span>
+					<span class="text-on-surface-variant">Vermerk:</span>
 					{meldung.antwort}
 				</p>
 			{/if}
@@ -129,7 +129,7 @@
 		<div class="mt-4 border-t border-outline-variant pt-3">
 			{#if erledigt}
 				<div class="flex items-center justify-end gap-1">
-					{#if istAdmin()}<Button variant="symbol" aria-label="Meldung löschen" onclick={loeschen}><Icon name="delete" /></Button>{/if}
+					{#if darfBearbeiten()}<Button variant="symbol" aria-label="Meldung löschen" onclick={loeschen}><Icon name="delete" /></Button>{/if}
 					<Button variant="ghost" disabled={laeuft} onclick={() => setze({ status: 'offen' }, 'Wieder offen')}><Icon name="undo" groesse={18} />Wieder öffnen</Button>
 				</div>
 			{:else}
@@ -154,8 +154,8 @@
 					{/each}
 				</div>
 				<div class="mt-3 flex items-center gap-1">
-					<Button variant="ghost" class="-ml-2" onclick={antwortSchreiben}><Icon name="add_comment" groesse={18} />Antwort</Button>
-					{#if istAdmin()}<Button variant="symbol" aria-label="Meldung löschen" onclick={loeschen}><Icon name="delete" /></Button>{/if}
+					<Button variant="ghost" class="-ml-2" onclick={antwortSchreiben}><Icon name="add_comment" groesse={18} />Vermerk</Button>
+					{#if darfBearbeiten()}<Button variant="symbol" aria-label="Meldung löschen" onclick={loeschen}><Icon name="delete" /></Button>{/if}
 					<Button variant="success" class="ml-auto pr-5 pl-4" onclick={abhaken}><Icon name="check" groesse={20} />Erledigt</Button>
 				</div>
 			{/if}
@@ -171,14 +171,16 @@
 {/if}
 
 {#if darfBearbeiten()}
-	<Blatt bind:offen={antwortOffen} titel="Antwort ans Kollegium">
+	<!-- Ein Vermerk ist intern: Das Kollegium sieht ihn nicht, und es geht keine Mail raus. -->
+	<Blatt bind:offen={antwortOffen} titel="Vermerk zur Meldung">
 		<div class="flex flex-col gap-4 px-6 pb-6">
+			<p class="text-body-medium text-on-surface-variant">Sehen alle mit Übersicht: Hausmeister, Leitung, Verwaltung, Admins. Das Kollegium sieht ihn nicht, und es geht keine Mail raus.</p>
 			<div class="flex flex-wrap gap-x-2 gap-y-4">
-				{#each schnellantworten as text (text)}
+				{#each schnellvermerke as text (text)}
 					<button class="treffer h-8 rounded-sm border border-outline px-3 text-label-large text-on-surface-variant" onclick={() => (antwort = text)}>{text}</button>
 				{/each}
 			</div>
-			<Feld etikett="Antwort" bind:wert={antwort} mehrzeilig maxlength="300" />
+			<Feld etikett="Vermerk" bind:wert={antwort} mehrzeilig maxlength="300" />
 			<div class="flex justify-end gap-2">
 				<Button variant="ghost" onclick={() => (antwortOffen = false)}>Abbrechen</Button>
 				<Button disabled={laeuft} onclick={antwortSpeichern}>Speichern</Button>

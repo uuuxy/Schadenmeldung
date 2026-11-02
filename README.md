@@ -13,14 +13,14 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   „Dringend / Gefahr“ sind freiwillig.
 - **Keine Doppelmeldungen:** Im gewählten Raum steht sofort, was dort schon gemeldet ist und wie
   weit es ist.
-- **Rollen:** Das Kollegium sieht nur „Schaden melden“, sonst nichts. **Hausmeister** bearbeiten die
-  Aufgaben, die **Leitung** (z. B. Schulleitung) sieht alles und ändert nichts, die **Verwaltung**
-  darf alles, auch Räume und Personen. Rollen vergibt die Verwaltung in der App; die Adressen aus
-  `ADMINS` sind immer Verwaltung, damit sich niemand aussperren kann.
-- **Hausmeister:** offene Aufgaben, Dringendes zuerst, Filter nach Bereich; Zwischenstand mit einem
-  Tipp („Gesehen“, „Bestellt“, „Fachfirma“), Antwort mit Schnelltexten, „Erledigt“ mit Rückgängig,
-  Ziehen zum Aktualisieren.
-- **Zwei Ebenen, live:** Hausmeister, Leitung und Verwaltung wechseln oben in der Kopfleiste
+- **Rollen:** Das Kollegium sieht nur „Schaden melden“, sonst nichts. **Hausmeister**, **Leitung**
+  und **Admin** dürfen alles: Meldungen bearbeiten und löschen, Räume, Personen und Rollen. Die
+  **Verwaltung** (Sekretariat) sieht die Übersicht und druckt QR-Aufkleber, ändert aber nichts. Die
+  Adressen aus `ADMINS` sind immer Admin, damit sich niemand aussperren kann.
+- **Bearbeiten:** offene Aufgaben, Dringendes zuerst, Filter nach Bereich; Zwischenstand mit einem
+  Tipp („Gesehen“, „Bestellt“, „Fachfirma“), ein interner Vermerk mit Schnelltexten (sehen alle mit
+  Übersicht, nicht das Kollegium), „Erledigt“ mit Rückgängig, Ziehen zum Aktualisieren.
+- **Zwei Ebenen, live:** Alle mit Übersicht wechseln oben in der Kopfleiste
   zwischen „Übersicht“ und „Melden“, denn auch sie melden Schäden. Die Übersicht aktualisiert sich
   sofort, wenn jemand meldet oder einen Stand setzt (Server-Sent Events), ohne Neuladen.
 - **Farbe je Art:** Licht, Heizung, Wasser … leuchten beim Antippen in ihrer eigenen, gedämpften
@@ -30,7 +30,7 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   7 und 12 Uhr (einstellbar), jede Meldung nur einmal. In der Mail stehen die Knöpfe „Gesehen“ und
   „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
   (Virenscanner, die Links vorab öffnen, lösen nichts aus). Jeder schaltet seine Mails im Kontomenü
-  selbst an oder ab; Leitung und Verwaltung bekommen ohne eigene Wahl keine.
+  selbst an oder ab; außer dem Hausmeister bekommt niemand ohne eigene Wahl welche.
 - **„Gesehen“ statt „In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass Bescheid gesagt ist – ohne
   Zusage, wann. Angezeigt wird der Stand, nicht der Zeitpunkt.
 - **Verwaltung:** Räume per Liste einfügen (auch aus einer Tabelle), QR-Aufkleber drucken
@@ -62,14 +62,14 @@ docker compose -f docker-compose.local.yml up -d     # PostgreSQL (5435) und Mai
 cd frontend && npm ci && npm run build && cd ..
 APP_ENV=local IMAP_HOST=mock \
   DATABASE_URL='postgres://schaden:schaden@localhost:5435/schaden?sslmode=disable' \
-  ANMELDE_DOMAINS=schule.de ADMINS=verwaltung@schule.de \
+  ANMELDE_DOMAINS=schule.de ADMINS=admin@schule.de \
   SMTP_HOST=localhost SMTP_PORT=1025 MAIL_ABSENDER=schaden@schule.de \
   OEFFENTLICHE_ADRESSE=http://localhost:8090 \
   go run .
 ```
 
 Dann `http://localhost:8090` öffnen. Mit `IMAP_HOST=mock` gilt jedes Passwort (nur zusammen mit
-`APP_ENV=local`, sonst startet der Server nicht). Als `verwaltung` anmelden, unter „Räume & Personen“
+`APP_ENV=local`, sonst startet der Server nicht). Als `admin` anmelden, unter „Räume & Personen“
 Räume einfügen und z. B. `hausmeister` die Rolle Hausmeister geben; jeder andere Name meldet. Die
 Mails an den Hausmeister landen in Mailpit unter `http://localhost:8025`. Ein Handy im selben WLAN erreicht die App unter
 `http://<IP des Rechners>:8090`; der Offline-Betrieb braucht https und läuft deshalb erst auf dem

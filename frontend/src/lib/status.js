@@ -13,10 +13,11 @@ export const stati = {
 // Was der Hausmeister zwischen „offen“ und „erledigt“ antippen kann.
 export const zwischenstati = ['gesehen', 'bestellt', 'fachfirma'];
 
-// Antworten zum Antippen, damit niemand mit kalten Fingern im Flur tippen muss.
-export const schnellantworten = [
-	'War nur ausgehängt – geht wieder.',
-	'Bitte genauer beschreiben, wo.',
+// Vermerke zum Antippen, damit niemand mit kalten Fingern im Flur tippen muss. Ohne Zeitzusage: Der
+// Hausmeister soll sich nicht festlegen müssen.
+export const schnellvermerke = [
 	'Ersatzteil ist bestellt.',
-	'Kümmere mich heute darum.'
+	'Fachfirma ist beauftragt.',
+	'Wartet auf den Schulträger.',
+	'War nur ausgehängt – geht wieder.'
 ];

@@ -1,12 +1,13 @@
 #!/bin/bash
-# Testdaten für die lokale App (Mock-Login, Domain schule.de, ADMINS=verwaltung@schule.de):
+# Testdaten für die lokale App (Mock-Login, Domain schule.de, ADMINS=admin@schule.de):
 # Rollen, Räume, Meldungen, Stati. Erwartet eine frische Datenbank und Mailpit.
 HIER=$(cd "$(dirname "$0")" && pwd); SP=$(mktemp -d); B=http://127.0.0.1:8090; H='X-Schaden: 1'; J='Content-Type: application/json'
 for i in $(seq 1 40); do curl -sf $B/healthz >/dev/null && break; sleep 0.3; done
 login() { curl -s -c $SP/$1.txt -H "$H" -H "$J" -d "{\"email\":\"$2\",\"passwort\":\"x\"}" $B/api/anmelden; echo; }
-login admin verwaltung
+login admin admin
 curl -s -b $SP/admin.txt -H "$H" -H "$J" -d '{"email":"hausmeister","rolle":"hausmeister"}' $B/api/rollen >/dev/null
 curl -s -b $SP/admin.txt -H "$H" -H "$J" -d '{"email":"direktorin","rolle":"leitung"}' $B/api/rollen | head -c 200; echo
+curl -s -b $SP/admin.txt -H "$H" -H "$J" -d '{"email":"sekretariat","rolle":"verwaltung"}' $B/api/rollen >/dev/null
 login lehrer m.mustermann; login lehrerin s.schmidt; login hm hausmeister; login leitung direktorin
 curl -s -b $SP/admin.txt -H "$H" -H "$J" -d '{"text":"101; Hauptgebäude · EG\n102; Hauptgebäude · EG\nAula; Hauptgebäude · EG\nLehrerzimmer; Hauptgebäude · 1. OG\nWC Mädchen 1. OG; Hauptgebäude · 1. OG\n204; Hauptgebäude · 2. OG\n205; Hauptgebäude · 2. OG\nBio 1; Neubau · Naturwissenschaften\nChemie 2; Neubau · Naturwissenschaften\nTurnhalle; Sport"}' $B/api/raeume | head -c 40; echo
 id() { curl -s -b $SP/admin.txt $B/api/raeume | python3 -c "import json,sys; print([r['id'] for r in json.load(sys.stdin) if r['name']==sys.argv[1]][0])" "$1"; }

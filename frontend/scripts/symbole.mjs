@@ -9,7 +9,7 @@ const namen = [
 	// Bedienung
 	'add_circle', 'checklist', 'meeting_room', 'location_on', 'search', 'photo_camera', 'close', 'check',
 	'check_circle', 'send', 'warning', 'edit_note', 'schedule', 'construction', 'local_shipping', 'engineering',
-	'chat', 'undo', 'delete', 'print', 'qr_code_2', 'logout', 'privacy_tip', 'arrow_back', 'task_alt',
+	'chat', 'undo', 'delete', 'print', 'qr_code_2', 'upload_file', 'logout', 'privacy_tip', 'arrow_back', 'task_alt',
 	'dark_mode', 'light_mode', 'contrast', 'visibility', 'visibility_off', 'build', 'add_comment', 'history',
 	'person', 'keyboard_arrow_down', 'cloud_off', 'schedule_send', 'arrow_downward', 'add', 'group', 'mail', 'settings', 'admin_panel_settings', 'mark_email_read', 'open_in_new', 'task_alt'
 ];

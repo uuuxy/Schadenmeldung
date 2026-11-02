@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { zustand, starte, auffrischen, darfSehen, istAdmin } from './lib/zustand.svelte.js';
+	import { zustand, starte, auffrischen, darfSehen, darfBearbeiten } from './lib/zustand.svelte.js';
 	import { weg } from './lib/weg.svelte.js';
 	import Anmelden from './views/Anmelden.svelte';
 	import Melden from './views/Melden.svelte';
@@ -14,16 +14,16 @@
 	// Nach dem Start gleich nachreichen, was im Funkloch liegen geblieben ist.
 	onMount(() => starte().then(auffrischen));
 
-	// Wer wohin kommt: Das Kollegium sieht nur „Schaden melden“. Hausmeister und Leitung landen bei
-	// den Meldungen, die Verwaltung zusätzlich bei Räumen und Personen. Der QR-Code (/r/…) führt
-	// jeden direkt ins Formular, mit dem Raum schon gewählt.
+	// Wer wohin kommt: Das Kollegium sieht nur „Schaden melden“. Alle mit Übersicht landen bei den
+	// Meldungen und drucken QR-Aufkleber; wer alles darf, kommt auch zu Räumen und Personen. Der
+	// QR-Code (/r/…) führt jeden direkt ins Formular, mit dem Raum schon gewählt.
 	const ansicht = $derived.by(() => {
 		const p = weg.pfad;
 		if (p.startsWith('/aktion/')) return 'aktion';
 		if (p === '/datenschutz') return 'datenschutz';
 		if (p.startsWith('/r/') || p === '/melden') return 'melden';
-		if (p === '/verwaltung' && istAdmin()) return 'verwaltung';
-		if (p === '/raeume/qr' && istAdmin()) return 'qr';
+		if (p === '/verwaltung' && darfBearbeiten()) return 'verwaltung';
+		if (p === '/raeume/qr' && darfSehen()) return 'qr';
 		return darfSehen() ? 'uebersicht' : 'melden';
 	});
 	const raumCode = $derived(weg.pfad.startsWith('/r/') ? decodeURIComponent(weg.pfad.slice(3)) : '');

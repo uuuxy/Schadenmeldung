@@ -61,7 +61,7 @@ func TestKurzadresseMeldetMitDerVollenAn(t *testing.T) {
 	}
 	n := u.anonym()
 	status, ich := n.json("POST", "/api/anmelden", map[string]string{"email": "Lehrer@Kurz.de", "passwort": "p"})
-	if status != 200 || ich["email"] != "lehrer@schule.de" || amMailserver != "Lehrer@schule.de" {
+	if status != 200 || ich["email"] != "lehrer@schule.de" || amMailserver != "lehrer@schule.de" {
 		t.Fatalf("Status %d, %v, am Mailserver %q; erwartet lehrer@schule.de", status, ich, amMailserver)
 	}
 	// Auch die Verwaltung darf die Kurzform eintragen; die Rolle hängt an der vollen Adresse.

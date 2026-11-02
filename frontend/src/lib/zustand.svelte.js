@@ -16,11 +16,10 @@ export const zustand = $state({
 	ausgang: []
 });
 
-// Kollegium meldet nur. Hausmeister bearbeitet, Leitung sieht alles (ändert nichts), Verwaltung darf
-// alles. Der Server prüft dasselbe noch einmal.
-export const darfBearbeiten = () => ['hausmeister', 'admin'].includes(zustand.benutzer?.rolle);
-export const darfSehen = () => ['hausmeister', 'leitung', 'admin'].includes(zustand.benutzer?.rolle);
-export const istAdmin = () => zustand.benutzer?.rolle === 'admin';
+// Kollegium meldet nur. Hausmeister, Leitung und Admin dürfen alles, auch Räume und Rollen; die
+// Verwaltung (Sekretariat) sieht die Übersicht und druckt QR-Aufkleber. Der Server prüft dasselbe.
+export const darfBearbeiten = () => ['hausmeister', 'leitung', 'admin'].includes(zustand.benutzer?.rolle);
+export const darfSehen = () => ['hausmeister', 'leitung', 'verwaltung', 'admin'].includes(zustand.benutzer?.rolle);
 
 // ── Letzter Stand auf dem Gerät ──────────────────────────────────────────────
 // Damit die App im Funkloch nicht leer oder mit der Anmeldung startet. Beim Abmelden gelöscht.

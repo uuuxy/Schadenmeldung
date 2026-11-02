@@ -1,6 +1,6 @@
 <script>
 	import { renderSVG } from 'uqr';
-	import { zustand } from '../lib/zustand.svelte.js';
+	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
 
@@ -13,7 +13,7 @@
 
 <div class="sticky top-0 z-10 flex items-center gap-2 bg-surface px-2 pt-[env(safe-area-inset-top)] print:hidden">
 	<div class="mx-auto flex h-16 w-full max-w-5xl items-center gap-2">
-		<button class="icon-btn text-on-surface" aria-label="Zurück" onclick={() => gehe('/verwaltung')}><Icon name="arrow_back" /></button>
+		<button class="icon-btn text-on-surface" aria-label="Zurück" onclick={() => gehe(darfBearbeiten() ? '/verwaltung' : '/')}><Icon name="arrow_back" /></button>
 		<h1 class="flex-1 text-title-large text-on-surface">QR-Aufkleber</h1>
 		<button class="inline-flex h-10 items-center gap-2 rounded-full bg-primary pr-6 pl-4 text-label-large text-on-primary" onclick={() => window.print()}>
 			<Icon name="print" groesse={18} /> Drucken

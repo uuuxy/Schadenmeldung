@@ -19,7 +19,7 @@ const bild = async (s, d, ganz = false) => { await s.waitForTimeout(600); await 
 // 1. QR-Code ohne Anmeldung → anmelden → Raum ist erkannt
 let [k, s] = await kontext(null);
 const raeume = await (await browser.newContext()).request.get(B + '/api/raeume').catch(() => null);
-const admin = await browser.newContext(); await admin.request.post(`${B}/api/anmelden`, { headers: { 'X-Schaden': '1' }, data: { email: 'verwaltung', passwort: 'x' } });
+const admin = await browser.newContext(); await admin.request.post(`${B}/api/anmelden`, { headers: { 'X-Schaden': '1' }, data: { email: 'admin', passwort: 'x' } });
 const liste = await (await admin.request.get(B + '/api/raeume')).json();
 const r204 = liste.find((r) => r.name === '204');
 await s.goto(`${B}/r/${r204.code}`);
@@ -68,16 +68,30 @@ await k.close();
 [k, s] = await kontext('hausmeister', 'dark');
 await s.goto(B + '/'); await bild(s, '08-aufgaben-dunkel'); await k.close();
 
-// 4. Leitung: sieht alles, ändert nichts
+// 4. Leitung darf alles, die Verwaltung (Sekretariat) sieht alles und ändert nichts
+const knoepfe = /Erledigt|Vermerk|Gesehen|Bestellt|Fachfirma|löschen/;
 [k, s] = await kontext('direktorin');
-await s.goto(B + '/'); await bild(s, '09-leitung');
-pruefe(await s.getByRole('heading', { name: 'Übersicht' }).isVisible() && (await s.locator('article').count()) > 0 && (await s.locator('article').getByRole('button', { name: /Erledigt|Antwort|Gesehen|Bestellt|Fachfirma|löschen/ }).count()) === 0 && (await s.locator('article').count()) >= 6, 'Leitung: Übersicht, Karten ohne Bearbeiten-Knöpfe');
+await s.goto(B + '/'); await s.locator('article').first().waitFor(); await bild(s, '09-leitung');
+pruefe((await s.locator('article').getByRole('button', { name: knoepfe }).count()) > 0, 'Leitung: Karten mit Bearbeiten-Knöpfen');
+await k.close();
+[k, s] = await kontext('sekretariat');
+await s.goto(B + '/'); await s.locator('article').first().waitFor(); await bild(s, '09b-verwaltung');
+pruefe((await s.locator('article').count()) >= 6 && (await s.locator('article').getByRole('button', { name: knoepfe }).count()) === 0, 'Verwaltung: alle Karten, ohne Bearbeiten-Knöpfe');
+await s.getByRole('button', { name: /Konto/ }).click();
+pruefe(await s.getByRole('button', { name: 'QR-Aufkleber drucken' }).isVisible() && !(await s.getByRole('button', { name: 'Räume & Personen' }).isVisible()), 'Verwaltung: QR-Aufkleber im Kontomenü, keine Räume & Personen');
 await k.close();
 
-// 5. Verwaltung: Personen
-[k, s] = await kontext('verwaltung');
+// 5. Admin: Personen
+[k, s] = await kontext('admin');
 await s.goto(B + '/verwaltung'); await s.getByRole('tab', { name: 'Personen' }).click(); await bild(s, '10-personen');
 await s.getByRole('tab', { name: 'Räume' }).click(); await bild(s, '11-raeume');
+// Räume aus einer Datei: Die Zeilen landen zum Prüfen im Feld, angelegt wird erst mit „Hinzufügen“.
+await s.locator('input[type=file]').setInputFiles({ name: 'raeume.csv', mimeType: 'text/csv', buffer: Buffer.from('Raum;Gebäude\nProbe 1;Erprobung\nProbe 2;Erprobung\n') });
+await s.getByText('2 Räume gelesen').waitFor();
+pruefe((await s.getByLabel('Räume', { exact: true }).inputValue()).includes('Probe 1; Erprobung'), 'Räume aus CSV: Zeilen stehen zum Prüfen im Feld');
+await s.getByRole('button', { name: 'Hinzufügen', exact: true }).click();
+await s.getByText('2 Räume angelegt').waitFor();
+pruefe(await s.getByText('Probe 2', { exact: true }).isVisible(), 'Räume aus CSV angelegt');
 await k.close();
 
 // 6. Die Mail an den Hausmeister und ihr Knopf „Erledigt“

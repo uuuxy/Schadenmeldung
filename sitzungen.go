@@ -84,27 +84,18 @@ func (a *app) mitBenutzer(h benutzerHandler) http.HandlerFunc {
 func (a *app) nurBackend(h benutzerHandler) benutzerHandler {
 	return func(w http.ResponseWriter, r *http.Request, b benutzer) {
 		if !b.darfSehen() {
-			fehler(w, http.StatusForbidden, "Das sehen nur Hausmeister, Leitung und Verwaltung.")
+			fehler(w, http.StatusForbidden, "Das sehen nur Hausmeister, Leitung, Verwaltung und Admins.")
 			return
 		}
 		h(w, r, b)
 	}
 }
 
+// nurBearbeiter schützt jede ändernde Tür außer dem Melden: Stand, Löschen, Räume, Personen, Rollen.
 func (a *app) nurBearbeiter(h benutzerHandler) benutzerHandler {
 	return func(w http.ResponseWriter, r *http.Request, b benutzer) {
 		if !b.darfBearbeiten() {
-			fehler(w, http.StatusForbidden, "Das darf nur der Hausmeister.")
-			return
-		}
-		h(w, r, b)
-	}
-}
-
-func (a *app) nurAdmin(h benutzerHandler) benutzerHandler {
-	return func(w http.ResponseWriter, r *http.Request, b benutzer) {
-		if b.Rolle != rolleAdmin {
-			fehler(w, http.StatusForbidden, "Das darf nur die Verwaltung.")
+			fehler(w, http.StatusForbidden, "Das dürfen nur Hausmeister, Leitung und Admins.")
 			return
 		}
 		h(w, r, b)

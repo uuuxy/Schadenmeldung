@@ -96,7 +96,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	if ein.Antwort != nil {
 		t := strings.TrimSpace(*ein.Antwort)
 		if utf8.RuneCountInString(t) > 300 {
-			fehler(w, http.StatusBadRequest, "Die Antwort darf höchstens 300 Zeichen lang sein.")
+			fehler(w, http.StatusBadRequest, "Der Vermerk darf höchstens 300 Zeichen lang sein.")
 			return
 		}
 		ein.Antwort = &t

@@ -100,8 +100,8 @@ func TestKnopfAusDerMail(t *testing.T) {
 		t.Fatalf("Erledigt aus der Mail: %d, %v", status, m)
 	}
 
-	// Wer die Rolle verliert, kann auch mit einem alten Link nichts mehr ändern.
-	if err := u.app.sp.setzeRolle(context.Background(), "hm@schule.de", rolleLeitung, "test"); err != nil {
+	// Wer nur noch lesen darf (Verwaltung), kann auch mit einem alten Link nichts mehr ändern.
+	if err := u.app.sp.setzeRolle(context.Background(), "hm@schule.de", rolleVerwaltung, "test"); err != nil {
 		t.Fatal(err)
 	}
 	if status, _ := gast.json("POST", pfad, map[string]string{"status": "offen"}); status != http.StatusForbidden {

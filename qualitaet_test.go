@@ -24,7 +24,6 @@ const (
 // unter die Grenze bringt, trägt sie aus.
 var bestand = map[string]int{
 	"frontend/src/views/Melden.svelte":     420,
-	"frontend/src/views/Verwaltung.svelte": 204,
 	"frontend/src/styles/komponenten.css":  235,
 }
 

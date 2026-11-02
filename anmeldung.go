@@ -31,10 +31,13 @@ type benutzer struct {
 	Rolle string `json:"rolle"`
 }
 
-// darfBearbeiten: Status setzen und antworten. darfSehen: das Backend mit allen Meldungen und wer
-// gemeldet hat. Das Kollegium sieht nur das Meldeformular.
-func (b benutzer) darfBearbeiten() bool { return b.Rolle == rolleHausmeister || b.Rolle == rolleAdmin }
-func (b benutzer) darfSehen() bool      { return b.darfBearbeiten() || b.Rolle == rolleLeitung }
+// darfBearbeiten heißt alles: Stand setzen, antworten, löschen, Räume, Personen und Rollen; so wollen
+// es Hausmeister, Leitung und Admin. darfSehen: die Übersicht samt wer gemeldet hat und die
+// QR-Aufkleber; dazu kommt die Verwaltung, die nur liest. Das Kollegium sieht nur das Formular.
+func (b benutzer) darfBearbeiten() bool {
+	return b.Rolle == rolleHausmeister || b.Rolle == rolleLeitung || b.Rolle == rolleAdmin
+}
+func (b benutzer) darfSehen() bool { return b.darfBearbeiten() || b.Rolle == rolleVerwaltung }
 
 func (a *app) anmelden(w http.ResponseWriter, r *http.Request) {
 	var ein struct {
@@ -44,14 +47,16 @@ func (a *app) anmelden(w http.ResponseWriter, r *http.Request) {
 	if !leseJSON(w, r, &ein) {
 		return
 	}
-	email := a.konf.vervollstaendige(ein.Email)
-	konto := strings.ToLower(email)
+	// Klein geschrieben auch an den Mailserver: Gespeicherte Zugangsdaten bringen manchmal einen großen
+	// Anfangsbuchstaben mit, und mancher Mailserver kennt den Namen nur klein.
+	konto := strings.ToLower(a.konf.vervollstaendige(ein.Email))
 	if konto == "" || ein.Passwort == "" {
 		fehler(w, http.StatusBadRequest, "Bitte E-Mail und Passwort eingeben.")
 		return
 	}
 	ip, jetzt := a.clientIP(r), a.jetzt()
 	if rest := max(a.kontoBremse.gesperrt(konto, jetzt), a.ipBremse.gesperrt(ip, jetzt)); rest > 0 {
+		slog.Info("Anmeldung abgelehnt", "grund", "zu viele Fehlversuche")
 		fehler(w, http.StatusTooManyRequests,
 			fmt.Sprintf("Zu viele Fehlversuche. Bitte in %d Minuten erneut versuchen.", int(rest.Minutes())+1))
 		return
@@ -59,13 +64,16 @@ func (a *app) anmelden(w http.ResponseWriter, r *http.Request) {
 	// Vor dem Mailserver geprüft, damit die App nicht als Prüfstelle für fremde Postfächer dient.
 	if !a.konf.domainErlaubt(konto) {
 		a.ipBremse.fehlversuch(ip, jetzt)
+		slog.Info("Anmeldung abgelehnt", "grund", "fremde Domain")
 		fehler(w, http.StatusForbidden, "Anmelden geht nur mit einem Postfach der Schule.")
 		return
 	}
-	switch err := a.pruefeZugang(r.Context(), email, ein.Passwort); {
+	// Abgelehnte Versuche nur mit Grund ins Log, ohne Adresse: So sieht man, woran es hakt.
+	switch err := a.pruefeZugang(r.Context(), konto, ein.Passwort); {
 	case errors.Is(err, errAbgelehnt):
 		a.kontoBremse.fehlversuch(konto, jetzt)
 		a.ipBremse.fehlversuch(ip, jetzt)
+		slog.Info("Anmeldung abgelehnt", "grund", "Mailserver lehnt Zugangsdaten ab")
 		fehler(w, http.StatusUnauthorized, "E-Mail oder Passwort stimmt nicht.")
 		return
 	case err != nil:

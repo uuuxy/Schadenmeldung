@@ -2,7 +2,8 @@
 	import Icon from './Icon.svelte';
 	import Switch from './ui/Switch.svelte';
 	import { api } from '../lib/api.js';
-	import { zustand, vergissAlles, darfSehen, istAdmin } from '../lib/zustand.svelte.js';
+	import { zustand, vergissAlles, darfSehen, darfBearbeiten } from '../lib/zustand.svelte.js';
+	import { rollenNamen } from '../lib/rollen.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import { darstellung } from '../lib/darstellung.svelte.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
@@ -11,7 +12,7 @@
 	 * Kontomenü (M3 Menu). „Dunkles Design“ steht als Schalter darin, wie bei Google (Gemini: „Dark
 	 * theme“ im Menü) und in der Bibliothek. Wer das Backend sieht, stellt hier auch seine Mails ein.
 	 */
-	const rollen = { admin: 'Verwaltung', hausmeister: 'Hausmeister', leitung: 'Leitung', kollegium: 'Kollegium' };
+	const rollen = { ...rollenNamen, kollegium: 'Kollegium' };
 	let menue;
 	let mail = $state(null);
 	const initial = $derived((zustand.benutzer?.email ?? '?').charAt(0).toUpperCase());
@@ -83,9 +84,14 @@
 
 	<hr class="border-outline-variant" />
 	<div class="py-1">
-		{#if istAdmin()}
+		{#if darfBearbeiten()}
 			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/verwaltung')}>
 				<Icon name="admin_panel_settings" class="text-on-surface-variant" /> Räume & Personen
+			</button>
+		{:else if darfSehen()}
+			<!-- Die Verwaltung druckt Aufkleber, ohne Räume zu ändern; die übrigen finden sie unter Räume & Personen. -->
+			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/raeume/qr')}>
+				<Icon name="qr_code_2" class="text-on-surface-variant" /> QR-Aufkleber drucken
 			</button>
 		{/if}
 		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/datenschutz')}>
