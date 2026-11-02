@@ -27,7 +27,8 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`), nie über `confirm()`.
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
-  Wert im hellen und im dunklen Schema. Einzige Ausnahme: der QR-Bogen, denn Papier ist weiß.
+  Wert im hellen und im dunklen Schema. Einzige Ausnahme: die Papier-Rollen (`papier`, `auf-papier`,
+  `papier-akzent` …) für den QR-Bogen bleiben fest, denn Papier ist weiß.
 - **Schrift über die M3-Stufen** aus `mass.css` (`text-title-medium`, `text-body-large`,
   `text-label-large` …), Formen über die M3-Radien (`rounded-sm` = Chip, `rounded-xl` = Karte,
   `rounded-2xl` = Kachel/Blatt).

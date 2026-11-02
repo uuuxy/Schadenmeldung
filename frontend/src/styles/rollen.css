@@ -71,6 +71,13 @@
 	--color-inverse-primary: #9ccaff;
 	--color-scrim: #000000;
 	--color-shadow: #000000;
+	/* Papier ist weiß, auch im dunklen Schema: Die QR-Aufkleber tragen feste Rollen, die das dunkle
+	   Schema bewusst nicht überschreibt. So sieht der Bogen am Bildschirm aus wie gedruckt. */
+	--color-papier: #ffffff;
+	--color-auf-papier: #000000;
+	--color-papier-akzent: #0061a4;
+	--color-papier-leise: #525252;
+	--color-papier-leiser: #737373;
 }
 
 /* Das dunkle Schema. public/schema.js setzt die Klasse vor dem ersten Bild: nach der Wahl im

@@ -26,12 +26,12 @@
 
 <div class="bogen mx-auto grid max-w-5xl grid-cols-2 gap-3 px-4 pb-10 sm:grid-cols-3 print:max-w-none print:gap-0 print:p-0">
 	{#each raeume as r (r.id)}
-		<div class="etikett flex flex-col items-center justify-center rounded-xl bg-white p-4 text-center text-black print:rounded-none">
-			<p class="text-[11px] font-medium tracking-wide text-[#0061a4] uppercase">Schaden melden</p>
+		<div class="etikett flex flex-col items-center justify-center rounded-xl bg-papier p-4 text-center text-auf-papier print:rounded-none">
+			<p class="text-[11px] font-medium tracking-wide text-papier-akzent uppercase">Schaden melden</p>
 			<div class="qr my-2 w-full max-w-40">{@html qr(r)}</div>
 			<p class="text-xl leading-tight font-medium">{r.name}</p>
-			{#if r.bereich}<p class="text-xs text-neutral-600">{r.bereich}</p>{/if}
-			<p class="mt-1 text-[10px] text-neutral-500">Mit dem Handy scannen</p>
+			{#if r.bereich}<p class="text-xs text-papier-leise">{r.bereich}</p>{/if}
+			<p class="mt-1 text-[10px] text-papier-leiser">Mit dem Handy scannen</p>
 		</div>
 	{/each}
 </div>
