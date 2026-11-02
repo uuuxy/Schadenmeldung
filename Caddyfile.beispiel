@@ -1,0 +1,17 @@
+# Abschnitt für den vorhandenen Caddy. Das Zertifikat holt Caddy selbst (Let's Encrypt).
+schaden.example.de {
+	encode zstd gzip
+
+	# Nur im Schulnetz erreichbar machen (wie die Bibliothek): die nächsten zwei Zeilen einkommentieren
+	# und SCHULNETZ im Caddy-Container setzen, z. B. SCHULNETZ=10.20.0.0/16 192.168.5.0/24.
+	# @draussen not remote_ip {$SCHULNETZ}
+	# respond @draussen "Die Schadenmeldung ist nur im Schulnetz erreichbar." 403
+
+	reverse_proxy schaden:8090 {
+		header_up X-Real-IP {remote_host}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+}

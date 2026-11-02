@@ -1,0 +1,235 @@
+@layer base {
+	html {
+		-webkit-tap-highlight-color: transparent;
+		-webkit-text-size-adjust: 100%;
+		/* Das eigene Ziehen-zum-Aktualisieren ersetzt das des Browsers (sonst lädt Chrome die ganze Seite neu). */
+		overscroll-behavior-y: contain;
+	}
+	body {
+		@apply bg-surface font-sans text-on-surface antialiased;
+		text-rendering: optimizeLegibility;
+	}
+	button,
+	a,
+	label {
+		touch-action: manipulation;
+	}
+	button:not(:disabled) {
+		cursor: pointer;
+	}
+	/* M3-Fokusring: 3 px in secondary, mit Abstand zum Bauteil. */
+	:focus-visible {
+		outline: 3px solid var(--color-secondary);
+		outline-offset: 2px;
+	}
+	/* Suchfelder bringen ihren eigenen Leeren-Knopf mit; der browsereigene käme doppelt. */
+	input[type='search']::-webkit-search-cancel-button,
+	input[type='search']::-webkit-search-decoration {
+		-webkit-appearance: none;
+		appearance: none;
+	}
+	/* Unter 16 px zoomt iOS beim Antippen in ein Feld hinein. */
+	input,
+	textarea,
+	select {
+		font-size: max(1rem, 16px);
+	}
+}
+
+@layer components {
+	/* M3-State-Layer: Rückmeldung als durchscheinende Schicht in der Textfarbe (8 % Hover, 10 % Fokus
+	   und Drücken), statt die Fläche umzufärben. So passt sie zu jeder Rolle von selbst. */
+	button:not(.ohne-schicht),
+	.schicht {
+		position: relative;
+		isolation: isolate;
+	}
+	button:not(.ohne-schicht)::after,
+	.schicht::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background-color: currentColor;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 100ms var(--ease-standard);
+	}
+	@media (hover: hover) {
+		button:not(.ohne-schicht):hover:not(:disabled)::after,
+		.schicht:hover::after,
+		.group:hover .schicht::after {
+			opacity: 0.08;
+		}
+	}
+	button:not(.ohne-schicht):focus-visible:not(:disabled)::after,
+	button:not(.ohne-schicht):active:not(:disabled)::after,
+	.schicht:active::after,
+	.group:active .schicht::after {
+		opacity: 0.1;
+	}
+
+	/* Symbolknopf: 40 px sichtbar, 48 px Trefferfläche (M3, Icon buttons). */
+	.icon-btn {
+		display: inline-grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 9999px;
+		flex-shrink: 0;
+	}
+	.icon-btn::before {
+		content: '';
+		position: absolute;
+		inset: 50% auto auto 50%;
+		width: 3rem;
+		height: 3rem;
+		transform: translate(-50%, -50%);
+	}
+
+	/* Trefferfläche nach M3 („touch target 48dp“): Sichtbar darf ein Bauteil kleiner sein (Chip
+	   32 px, Knopf 40 px), getroffen wird es auf mindestens 48 px Höhe. Die Fläche ragt unsichtbar
+	   über den Rand und verschiebt nichts; Chip-Gruppen haben deshalb 16 px Zeilenabstand, damit sich
+	   die Flächen übereinanderliegender Chips berühren, aber nicht überlappen. */
+	.treffer::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 50%;
+		height: max(100%, 3rem);
+		transform: translateY(-50%);
+	}
+
+	/* Bottom Sheet (M3): unten angedockt, oben 28 px rund, gleitet mit der betonten Kurve herein. Ab
+	   600 px Breite wird daraus ein Dialog in der Mitte. */
+	dialog.blatt {
+		margin: auto 0 0;
+		width: 100%;
+		max-width: 100%;
+		max-height: 88dvh;
+		padding: 0 0 env(safe-area-inset-bottom);
+		border: 0;
+		border-radius: 1.75rem 1.75rem 0 0;
+		background: var(--color-surface-container-low);
+		color: var(--color-on-surface);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		transition:
+			translate 350ms var(--ease-emphasized-decelerate),
+			opacity 350ms var(--ease-emphasized-decelerate),
+			overlay 350ms allow-discrete,
+			display 350ms allow-discrete;
+		translate: 0 0;
+	}
+	dialog.blatt:not([open]) {
+		translate: 0 100%;
+	}
+	@starting-style {
+		dialog.blatt[open] {
+			translate: 0 100%;
+		}
+	}
+	dialog.blatt::backdrop {
+		background: rgb(0 0 0 / 0);
+		transition:
+			background 350ms var(--ease-standard),
+			overlay 350ms allow-discrete,
+			display 350ms allow-discrete;
+	}
+	dialog.blatt[open]::backdrop {
+		background: rgb(0 0 0 / 0.32);
+	}
+	@starting-style {
+		dialog.blatt[open]::backdrop {
+			background: rgb(0 0 0 / 0);
+		}
+	}
+	@media (min-width: 600px) {
+		dialog.blatt {
+			margin: auto;
+			max-width: 32rem;
+			border-radius: 1.75rem;
+			padding-bottom: 0;
+		}
+		dialog.blatt:not([open]) {
+			translate: 0 2rem;
+			opacity: 0;
+		}
+		@starting-style {
+			dialog.blatt[open] {
+				translate: 0 2rem;
+				opacity: 0;
+			}
+		}
+	}
+
+	/* Menü über die Popover-Schnittstelle: schließt beim Tippen daneben von selbst. */
+	.menue {
+		inset: auto;
+		margin: 0;
+		border: 0;
+		padding: 0.5rem 0;
+		min-width: 14rem;
+		border-radius: 0.25rem;
+		background: var(--color-surface-container);
+		color: var(--color-on-surface);
+		box-shadow: var(--shadow-2);
+		opacity: 0;
+		translate: 0 -0.5rem;
+		transition:
+			opacity 200ms var(--ease-standard),
+			translate 200ms var(--ease-standard),
+			overlay 200ms allow-discrete,
+			display 200ms allow-discrete;
+	}
+	.menue:popover-open {
+		opacity: 1;
+		translate: 0 0;
+	}
+	@starting-style {
+		.menue:popover-open {
+			opacity: 0;
+			translate: 0 -0.5rem;
+		}
+	}
+}
+
+/* Seitenwechsel als M3 „fade through“: die alte Seite blendet schnell aus, die neue kommt mit leichtem
+   Zoom. Die Navigationsleiste hat einen eigenen Namen und bleibt dabei stehen. */
+::view-transition-old(root) {
+	animation: 90ms var(--ease-emphasized-accelerate) both ausblenden;
+}
+::view-transition-new(root) {
+	animation: 210ms var(--ease-emphasized-decelerate) 90ms both einblenden;
+}
+::view-transition-group(navleiste) {
+	animation: none;
+}
+@keyframes ausblenden {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes einblenden {
+	from {
+		opacity: 0;
+		transform: scale(0.98);
+	}
+}
+
+/* Solange ein Blatt offen ist, scrollt der Hintergrund nicht mit (sonst auf iOS spürbar). */
+html:has(dialog[open]) {
+	overflow: hidden;
+}
+
+/* Bewegung reduzieren (Systemeinstellung). Der Ladekreis dreht weiter: Er zeigt, dass etwas läuft. */
+@media (prefers-reduced-motion: reduce) {
+	*:not(.ladekreis),
+	*:not(.ladekreis)::before,
+	*:not(.ladekreis)::after {
+		animation-duration: 0s !important;
+		transition-duration: 0s !important;
+		scroll-behavior: auto !important;
+	}
+}

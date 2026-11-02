@@ -1,0 +1,44 @@
+# App und PostgreSQL. Die App hängt am Netz des Caddy, der schon Bibliothek und schul-orga bedient
+# (caddy_global_net); die Datenbank nur am internen Netz dieses Stacks.
+# Einstellungen stehen in der .env daneben (Vorlage: .env.example).
+services:
+  schaden:
+    build: .
+    image: schadenmeldung:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://schaden:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}@db:5432/schaden?sslmode=disable
+      # Caddy setzt X-Real-IP; erst damit bremst die Fehlversuchsbremse die richtige Adresse.
+      PROXY_VERTRAUEN: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - intern
+      - caddy_global_net
+
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: schaden
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
+      POSTGRES_DB: schaden
+    volumes:
+      - datenbank:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U schaden -d schaden"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intern
+
+volumes:
+  datenbank:
+
+networks:
+  intern:
+  caddy_global_net:
+    external: true

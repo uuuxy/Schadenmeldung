@@ -1,0 +1,23 @@
+# Nur für die Entwicklung: eine Datenbank für App und Tests auf Port 5435 (die Bibliothek nutzt 5434)
+# und Mailpit als Test-Mailserver: Mails an SMTP_HOST=localhost, SMTP_PORT=1025 landen unter
+# http://localhost:8025 statt bei echten Menschen.
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: schaden-db-local
+    environment:
+      POSTGRES_USER: schaden
+      POSTGRES_PASSWORD: schaden
+      POSTGRES_DB: schaden
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - db-local:/var/lib/postgresql
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: schaden-mailpit-local
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+volumes:
+  db-local:

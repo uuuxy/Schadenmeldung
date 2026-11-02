@@ -1,0 +1,98 @@
+<script>
+	import Icon from './Icon.svelte';
+	import Switch from './ui/Switch.svelte';
+	import { api } from '../lib/api.js';
+	import { zustand, vergissAlles, darfSehen, istAdmin } from '../lib/zustand.svelte.js';
+	import { gehe } from '../lib/weg.svelte.js';
+	import { darstellung } from '../lib/darstellung.svelte.js';
+	import { zeige } from '../lib/snackbar.svelte.js';
+
+	/**
+	 * Kontomenü (M3 Menu). „Dunkles Design“ steht als Schalter darin, wie bei Google (Gemini: „Dark
+	 * theme“ im Menü) und in der Bibliothek. Wer das Backend sieht, stellt hier auch seine Mails ein.
+	 */
+	const rollen = { admin: 'Verwaltung', hausmeister: 'Hausmeister', leitung: 'Leitung', kollegium: 'Kollegium' };
+	let menue;
+	let mail = $state(null);
+	const initial = $derived((zustand.benutzer?.email ?? '?').charAt(0).toUpperCase());
+
+	async function geoeffnet(e) {
+		if (e.newState !== 'open' || !darfSehen()) return;
+		try {
+			mail = await api('/api/benachrichtigung');
+		} catch {
+			mail = null;
+		}
+	}
+
+	async function mailSetzen(aenderung) {
+		try {
+			mail = await api('/api/benachrichtigung', { methode: 'POST', json: aenderung });
+		} catch (e) {
+			zeige(e.message);
+		}
+	}
+
+	function zu(pfad) {
+		menue.hidePopover();
+		gehe(pfad);
+	}
+
+	async function abmelden() {
+		menue.hidePopover();
+		await api('/api/abmelden', { methode: 'POST' }).catch(() => {});
+		await vergissAlles();
+		zustand.benutzer = null;
+		gehe('/', { ersetzen: true });
+	}
+</script>
+
+{#snippet zeile(id, text, detail, checked, onchange)}
+	<div class="flex items-center gap-4 px-4 py-2">
+		<label for={id} class="min-w-0 flex-1">
+			<span class="block text-body-large text-on-surface">{text}</span>
+			{#if detail}<span class="block text-body-small text-on-surface-variant">{detail}</span>{/if}
+		</label>
+		<Switch {id} {checked} {onchange} />
+	</div>
+{/snippet}
+
+<button class="icon-btn size-12" popovertarget="konto-menue" aria-label="Konto und Einstellungen">
+	<span class="grid size-8 place-items-center rounded-full bg-primary text-title-small text-on-primary">{initial}</span>
+</button>
+
+<div id="konto-menue" popover bind:this={menue} ontoggle={geoeffnet} class="menue fixed top-[calc(env(safe-area-inset-top)+3.75rem)] right-2 w-[min(20rem,calc(100vw-1rem))]">
+	<div class="px-4 pt-2 pb-3">
+		<p class="truncate text-body-large text-on-surface">{zustand.benutzer?.email}</p>
+		<p class="text-body-small text-on-surface-variant">{rollen[zustand.benutzer?.rolle] ?? ''}</p>
+	</div>
+	<hr class="border-outline-variant" />
+
+	<div class="py-1">
+		{@render zeile('dunkles-design', 'Dunkles Design', '', darstellung.dunkel, (an) => darstellung.schalte(an))}
+	</div>
+
+	{#if darfSehen() && mail?.mailAktiv}
+		<hr class="border-outline-variant" />
+		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mail an mich</p>
+		<div class="pb-1">
+			{@render zeile('mail-dringend', 'Dringendes sofort', '', mail.dringendSofort, (an) => mailSetzen({ dringendSofort: an }))}
+			{@render zeile('mail-sammel', 'Sammelmail', `Mo–Fr um ${mail.zeiten.join(' und ')} Uhr`, mail.sammelmail, (an) => mailSetzen({ sammelmail: an }))}
+		</div>
+	{/if}
+
+	<hr class="border-outline-variant" />
+	<div class="py-1">
+		{#if istAdmin()}
+			<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/verwaltung')}>
+				<Icon name="admin_panel_settings" class="text-on-surface-variant" /> Räume & Personen
+			</button>
+		{/if}
+		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/datenschutz')}>
+			<Icon name="privacy_tip" class="text-on-surface-variant" /> Datenschutz
+		</button>
+		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={abmelden}>
+			<Icon name="logout" class="text-on-surface-variant" /> Abmelden
+		</button>
+	</div>
+</div>

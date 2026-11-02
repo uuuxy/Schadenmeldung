@@ -1,0 +1,73 @@
+/* Maßskalen nach Material 3: Schrift, Formen, Höhen, Bewegung. Die Klassen tragen die M3-Namen
+   (text-title-medium, rounded-2xl = extra-large …), damit Spezifikation und Code dieselbe Sprache
+   sprechen. */
+@theme {
+	--font-sans: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+	/* M3-Typoskala: je Stufe Größe, Zeilenhöhe, Laufweite und Schnitt. Roboto hat hier nur 400 und 500;
+	   Hierarchie entsteht wie bei M3 über Größe und Farbe, nicht über fettere Schrift. */
+	--text-display-small: 2.25rem;
+	--text-display-small--line-height: 2.75rem;
+	--text-headline-large: 2rem;
+	--text-headline-large--line-height: 2.5rem;
+	--text-headline-medium: 1.75rem;
+	--text-headline-medium--line-height: 2.25rem;
+	--text-headline-small: 1.5rem;
+	--text-headline-small--line-height: 2rem;
+	--text-title-large: 1.375rem;
+	--text-title-large--line-height: 1.75rem;
+	--text-title-medium: 1rem;
+	--text-title-medium--line-height: 1.5rem;
+	--text-title-medium--letter-spacing: 0.009375rem;
+	--text-title-medium--font-weight: 500;
+	--text-title-small: 0.875rem;
+	--text-title-small--line-height: 1.25rem;
+	--text-title-small--letter-spacing: 0.00625rem;
+	--text-title-small--font-weight: 500;
+	--text-body-large: 1rem;
+	--text-body-large--line-height: 1.5rem;
+	--text-body-large--letter-spacing: 0.03125rem;
+	--text-body-medium: 0.875rem;
+	--text-body-medium--line-height: 1.25rem;
+	--text-body-medium--letter-spacing: 0.015625rem;
+	--text-body-small: 0.75rem;
+	--text-body-small--line-height: 1rem;
+	--text-body-small--letter-spacing: 0.025rem;
+	--text-label-large: 0.875rem;
+	--text-label-large--line-height: 1.25rem;
+	--text-label-large--letter-spacing: 0.00625rem;
+	--text-label-large--font-weight: 500;
+	--text-label-medium: 0.75rem;
+	--text-label-medium--line-height: 1rem;
+	--text-label-medium--letter-spacing: 0.03125rem;
+	--text-label-medium--font-weight: 500;
+	--text-label-small: 0.6875rem;
+	--text-label-small--line-height: 1rem;
+	--text-label-small--letter-spacing: 0.03125rem;
+	--text-label-small--font-weight: 500;
+
+	/* M3-Formen: extra-small 4, small 8, medium 12, large 16, large-increased 20, extra-large 28,
+	   extra-large-increased 32, extra-extra-large 48. Chips 8, Karten 12, Kacheln und Blätter 28. */
+	--radius-xs: 0.25rem;
+	--radius-sm: 0.5rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.25rem;
+	--radius-2xl: 1.75rem;
+	--radius-3xl: 2rem;
+	--radius-4xl: 3rem;
+
+	/* M3-Höhenstufen 1 bis 3 (Schatten aus Kern- und Umgebungslicht). */
+	--shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+	--shadow-2: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+	--shadow-3: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+
+	/* M3-Bewegung: „standard" für Zustandswechsel, „emphasized" für Ein- und Ausblenden, dazu eine
+	   Federkurve im Stil von M3 Expressive für Rückmeldung beim Antippen. */
+	--ease-standard: cubic-bezier(0.2, 0, 0, 1);
+	--ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+	--ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+	--ease-spring: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+	--default-transition-duration: 200ms;
+	--default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
