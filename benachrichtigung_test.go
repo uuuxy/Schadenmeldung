@@ -26,8 +26,13 @@ func TestJedeMeldungGehtSofortRaus(t *testing.T) {
 		t.Fatalf("Mails %v, erwartet je Meldung eine eigene (nicht die selbst gemeldete): %v", betreffe(mails), erwartet)
 	}
 	for _, m := range mails {
-		if m.An != "hm@schule.de" || !strings.Contains(m.HTML, "https://schaden.schule.de/aktion/") || !strings.Contains(m.Text, "?tun=erledigt") {
-			t.Errorf("Mail an %q ohne Knöpfe „Gesehen“/„Erledigt“", m.An)
+		if m.An != "hm@schule.de" || !strings.Contains(m.HTML, "https://schaden.schule.de/aktion/") {
+			t.Errorf("Mail an %q ohne Knöpfe", m.An)
+		}
+		for _, tun := range []string{"gesehen", "fachfirma", "erledigt"} {
+			if !strings.Contains(m.HTML, "?tun="+tun) || !strings.Contains(m.Text, "?tun="+tun) {
+				t.Errorf("Mail an %q ohne Knopf %q", m.An, tun)
+			}
 		}
 	}
 }

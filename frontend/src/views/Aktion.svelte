@@ -4,7 +4,7 @@
 	import { api } from '../lib/api.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import { kategorieNach } from '../lib/kategorien.js';
-	import { stati } from '../lib/status.js';
+	import { stati, zwischenstati } from '../lib/status.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { rueckmeldung } from '../lib/haptik.js';
 	import Icon from '../components/Icon.svelte';
@@ -20,7 +20,9 @@
 	 */
 	let { token } = $props();
 	const vorschlag = new URLSearchParams(location.search).get('tun');
-	const angebote = ['gesehen', 'erledigt', 'bestellt', 'fachfirma'];
+	// Wie in der App: erst die Zwischenstati, dann „Erledigt“. Die drei Knöpfe der Mail stehen in
+	// derselben Reihenfolge, so findet der Hausmeister den angetippten an seinem Platz wieder.
+	const angebote = [...zwischenstati, 'erledigt'];
 
 	let meldung = $state(null);
 	let fehler = $state('');

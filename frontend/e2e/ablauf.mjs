@@ -142,6 +142,8 @@ const nachricht = post.messages.find((m) => m.Subject.startsWith('Dringend'));
 const voll = await (await fetch(`http://127.0.0.1:8025/api/v1/message/${nachricht.ID}`)).json();
 [k, s] = await kontext(null);
 await s.setContent(voll.HTML); await bild(s, '12-mail');
+const knoepfe = await Promise.all(['Gesehen', 'Fachfirma', 'Erledigt'].map((n) => s.getByRole('link', { name: n, exact: true }).isVisible()));
+pruefe(knoepfe.every(Boolean), 'Mail mit den Knöpfen Gesehen, Fachfirma und Erledigt');
 const token = voll.Text.match(/\/aktion\/([A-Za-z0-9_-]+)\?tun=erledigt/)[1];
 await s.goto(`${B}/aktion/${token}?tun=erledigt`);
 await s.getByRole('button', { name: 'Erledigt' }).waitFor();

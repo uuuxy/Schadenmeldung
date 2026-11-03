@@ -54,7 +54,7 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
   „Gesehen“ ersetzt „In Arbeit“: Der Hausmeister zeigt damit, dass er Bescheid weiß, ohne eine Zusage, wann.
 - **Mail an den Hausmeister** (`benachrichtigung.go`):
   - Jede neue Meldung geht sofort als eigene Mail hinaus; eine Sammelmail gibt es nicht (Entscheidung des Nutzers, 3. November). `mail_versand` ist der Postausgang (`postausgang.go`): Was scheitert, schickt der Server einen Tag lang alle 5 Minuten nach, und nichts kommt doppelt.
-  - Die Knöpfe „Gesehen“ und „Erledigt“ in der Mail öffnen `/aktion/<token>`. Das funktioniert ohne Anmeldung, 14 Tage lang, und erst ein Tipp auf der Seite löst etwas aus, damit Virenscanner beim Vorab-Öffnen nichts drücken.
+  - Die Knöpfe „Gesehen“, „Fachfirma“ und „Erledigt“ in der Mail öffnen `/aktion/<token>`. Das funktioniert ohne Anmeldung, 14 Tage lang, und erst ein Tipp auf der Seite löst etwas aus, damit Virenscanner beim Vorab-Öffnen nichts drücken.
   - Ein- und ausschalten lässt sich das je Person im Kontomenü.
 - **Offline:** Service Worker (`frontend/public/sw.js`); der Ausgang in IndexedDB reicht Meldungen aus dem Funkloch nach.
 - **Fotos:** liegen als `bytea` in Postgres und werden verkleinert, die Metadaten fallen weg.

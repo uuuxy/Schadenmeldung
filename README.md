@@ -36,7 +36,7 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   Übersicht.
 - **Mail an den Hausmeister:** Jede neue Meldung kommt sofort als eigene Mail, Dringendes mit
   „Dringend“ im Betreff, jede nur einmal. Antwortet der Mailserver nicht, schickt die App einen Tag
-  lang alle fünf Minuten nach. In der Mail stehen die Knöpfe „Gesehen“ und „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
+  lang alle fünf Minuten nach. In der Mail stehen die Knöpfe „Gesehen“, „Fachfirma“ und „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
   (Virenscanner, die Links vorab öffnen, lösen nichts aus). Jeder schaltet seine Mails im Kontomenü
   selbst an oder ab; außer dem Hausmeister bekommt niemand ohne eigene Wahl welche.
 - **„Gesehen“ statt „In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass Bescheid gesagt ist – ohne
