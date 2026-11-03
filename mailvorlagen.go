@@ -14,7 +14,7 @@ var mailHTML = htmlvorlage.Must(htmlvorlage.New("mail").Parse(`<!doctype html>
 <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
 <p style="margin:0 0 4px;font-size:14px;line-height:20px;color:#42474e;">Schadenmeldung{{if .Schule}} · {{.Schule}}{{end}}</p>
 <h1 style="margin:0 0 20px;font-size:24px;line-height:32px;font-weight:400;">{{.Ueberschrift}}</h1>
-{{range .Meldungen}}<div style="background:#f4f3f7;border-radius:12px;padding:16px;margin:0 0 12px;">
+{{with .Meldung}}<div style="background:#f4f3f7;border-radius:12px;padding:16px;margin:0 0 12px;">
 {{if .Dringend}}<p style="margin:0 0 8px;"><span style="display:inline-block;background:#ffdad6;color:#93000a;border-radius:8px;padding:2px 8px;font-size:12px;line-height:16px;font-weight:500;">Dringend</span></p>{{end}}
 <p style="margin:0;font-size:16px;line-height:24px;font-weight:500;">{{.Ort}}{{if .Bereich}}<span style="font-weight:400;color:#42474e;font-size:14px;"> · {{.Bereich}}</span>{{end}}</p>
 <p style="margin:2px 0 0;font-size:16px;line-height:24px;">{{.Was}}</p>
@@ -30,7 +30,7 @@ var mailHTML = htmlvorlage.Must(htmlvorlage.New("mail").Parse(`<!doctype html>
 </div></body></html>`))
 
 var mailText = textvorlage.Must(textvorlage.New("mail").Parse(`{{.Ueberschrift}}
-{{range .Meldungen}}
+{{with .Meldung}}
 {{if .Dringend}}[DRINGEND] {{end}}{{.Ort}}{{if .Bereich}} ({{.Bereich}}){{end}}
 {{.Was}}{{if .Notiz}}
 {{.Notiz}}{{end}}

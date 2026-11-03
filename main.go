@@ -54,7 +54,7 @@ func starte() error {
 	}
 	a := neueApp(konf, sp, statisch)
 	go a.raeumeRegelmaessigAuf(ctx)
-	go a.sammelmailTakt(ctx)
+	go a.postausgangTakt(ctx)
 
 	srv := &http.Server{
 		Addr:              ":" + konf.Port,
@@ -70,7 +70,6 @@ func starte() error {
 		ende, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(ende)
-		a.hintergrund.Wait()
 	}()
 
 	slog.Info("Schadenmeldung läuft", "port", konf.Port, "lokal", konf.Lokal)

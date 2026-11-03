@@ -4,7 +4,6 @@ import (
 	"context"
 	"io/fs"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -18,8 +17,8 @@ type app struct {
 	jetzt        func() time.Time
 	versender    versender
 	verteiler    *verteiler
-	// hintergrund zählt laufende Mails, damit Tests und das Herunterfahren auf sie warten können.
-	hintergrund sync.WaitGroup
+	// postWecker stößt den Postausgang an, sobald eine Meldung eingeht (Puffer 1, nichts geht verloren).
+	postWecker chan struct{}
 }
 
 func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
@@ -31,6 +30,7 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		ipBremse:    neueBremse(20, 15*time.Minute),
 		jetzt:       time.Now,
 		verteiler:   neuerVerteiler(),
+		postWecker:  make(chan struct{}, 1),
 	}
 	a.pruefeZugang = a.pruefeIMAP
 	if konf.mailAktiv() {

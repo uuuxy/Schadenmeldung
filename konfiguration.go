@@ -35,12 +35,9 @@ type konfiguration struct {
 	SMTPPasswort        string
 	MailAbsender        string
 	OeffentlicheAdresse string
-	SammelZeiten        []uhrzeit
-	Zeitzone            *time.Location
+	// Zeitzone für die Uhrzeiten in Mail und Export.
+	Zeitzone *time.Location
 }
-
-// uhrzeit ist eine Tageszeit für die Sammelmail, etwa 07:00.
-type uhrzeit struct{ Stunde, Minute int }
 
 func ladeKonfiguration() (konfiguration, error) {
 	k := konfiguration{
@@ -73,9 +70,6 @@ func ladeKonfiguration() (konfiguration, error) {
 	k.SMTPPasswort = os.Getenv("SMTP_PASSWORT")
 	k.MailAbsender = strings.TrimSpace(os.Getenv("MAIL_ABSENDER"))
 	k.OeffentlicheAdresse = strings.TrimRight(strings.TrimSpace(os.Getenv("OEFFENTLICHE_ADRESSE")), "/")
-	if k.SammelZeiten, err = leseUhrzeiten(wert("SAMMELMAIL_ZEITEN", "07:00,12:00")); err != nil {
-		return k, err
-	}
 	if k.Zeitzone, err = time.LoadLocation(wert("ZEITZONE", "Europe/Berlin")); err != nil {
 		return k, fmt.Errorf("ZEITZONE: %w", err)
 	}
@@ -103,23 +97,6 @@ func (k konfiguration) pruefe() error {
 }
 
 func (k konfiguration) mailAktiv() bool { return k.SMTPHost != "" }
-
-// leseUhrzeiten liest „07:00,12:00“. Eine leere Angabe schaltet die Sammelmail ab.
-func leseUhrzeiten(roh string) ([]uhrzeit, error) {
-	var zeiten []uhrzeit
-	for _, teil := range strings.Split(roh, ",") {
-		teil = strings.TrimSpace(teil)
-		if teil == "" || teil == "aus" {
-			continue
-		}
-		t, err := time.Parse("15:04", teil)
-		if err != nil {
-			return nil, fmt.Errorf("SAMMELMAIL_ZEITEN: %q ist keine Uhrzeit wie 07:00", teil)
-		}
-		zeiten = append(zeiten, uhrzeit{t.Hour(), t.Minute()})
-	}
-	return zeiten, nil
-}
 
 // vervollstaendige macht aus der Eingabe die volle Adresse, die der Mailserver als Benutzernamen
 // kennt: Bei genau einer Schuldomain genügt der Name vor dem @, und eine Kurzdomain aus

@@ -13,7 +13,7 @@
 	const gemeldet = $derived(fertig.art === 'gemeldet');
 	const text = $derived.by(() => {
 		if (!gemeldet) return 'Gerade ist kein Netz. Die Meldung geht automatisch raus, sobald wieder Verbindung besteht.';
-		if (fertig.dringend && zustand.einstellungen.mailAktiv) return 'Sie ist beim Hausmeister angekommen, als dringend auch sofort per Mail.';
+		if (zustand.einstellungen.mailAktiv) return 'Sie ist beim Hausmeister angekommen, auch per Mail.';
 		return 'Sie ist beim Hausmeister angekommen.';
 	});
 </script>
@@ -24,7 +24,7 @@
 	</span>
 	<h2 class="text-headline-small text-on-surface">{gemeldet ? 'Gemeldet – danke!' : 'Gespeichert'}</h2>
 	<p class="mt-2 text-body-large text-on-surface-variant">{fertig.was} · {fertig.ort}</p>
-	<p class="mt-4 max-w-sm text-body-medium text-on-surface-variant">{text}</p>
+	<p class="mt-4 max-w-sm text-balance text-body-medium text-on-surface-variant">{text}</p>
 	<div class="mt-10 flex flex-col gap-3 self-stretch">
 		<Button size="lg" onclick={onweiter}><Icon name="add" />Noch etwas melden</Button>
 		{#if darfSehen()}

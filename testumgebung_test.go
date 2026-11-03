@@ -66,10 +66,12 @@ type testUmgebung struct {
 	post *testPost
 }
 
-// testPost fängt die Mails ab, statt sie zu verschicken.
+// testPost fängt die Mails ab, statt sie zu verschicken. Mit stoerung spielt sie einen Mailserver,
+// der nicht antwortet.
 type testPost struct {
-	mu    sync.Mutex
-	mails []testMail
+	mu       sync.Mutex
+	mails    []testMail
+	stoerung error
 }
 
 type testMail struct{ An, Betreff, Text, HTML string }
@@ -77,8 +79,17 @@ type testMail struct{ An, Betreff, Text, HTML string }
 func (p *testPost) sende(_ context.Context, an, betreff, text, html string) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	if p.stoerung != nil {
+		return p.stoerung
+	}
 	p.mails = append(p.mails, testMail{an, betreff, text, html})
 	return nil
+}
+
+func (p *testPost) stoere(err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.stoerung = err
 }
 
 func (p *testPost) alle() []testMail {
@@ -104,7 +115,6 @@ func neueTestUmgebung(t *testing.T) *testUmgebung {
 		SMTPHost:            "smtp.test",
 		MailAbsender:        "schaden@schule.de",
 		OeffentlicheAdresse: "https://schaden.schule.de",
-		SammelZeiten:        []uhrzeit{{7, 0}, {12, 0}},
 		Zeitzone:            berlin,
 	}
 	statisch := fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>Schadenmeldung</title>")}}

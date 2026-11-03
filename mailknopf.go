@@ -1,47 +1,32 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 func (a *app) benachrichtigungLesen(w http.ResponseWriter, r *http.Request, b benutzer) {
-	e, err := a.sp.mailEinstellung(r.Context(), b.Email, vorgabeFuer(b.Rolle))
+	an, err := a.sp.mailAn(r.Context(), b.Email, mailVorgabe(b.Rolle))
 	if err != nil {
 		intern(w, err)
 		return
 	}
-	zeiten := make([]string, 0, len(a.konf.SammelZeiten))
-	for _, z := range a.konf.SammelZeiten {
-		zeiten = append(zeiten, fmt.Sprintf("%02d:%02d", z.Stunde, z.Minute))
-	}
-	schreibeJSON(w, http.StatusOK, map[string]any{
-		"mailAktiv": a.konf.mailAktiv(), "dringendSofort": e.DringendSofort, "sammelmail": e.Sammelmail, "zeiten": zeiten,
-	})
+	schreibeJSON(w, http.StatusOK, map[string]any{"mailAktiv": a.konf.mailAktiv(), "mail": an})
 }
 
+// benachrichtigungSetzen: Ohne Angabe bleibt alles, wie es ist; so stört ein alter, noch
+// zwischengespeicherter Stand der Oberfläche nicht.
 func (a *app) benachrichtigungSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	var ein struct {
-		DringendSofort *bool `json:"dringendSofort"`
-		Sammelmail     *bool `json:"sammelmail"`
+		Mail *bool `json:"mail"`
 	}
 	if !leseJSON(w, r, &ein) {
 		return
 	}
-	e, err := a.sp.mailEinstellung(r.Context(), b.Email, vorgabeFuer(b.Rolle))
-	if err != nil {
-		intern(w, err)
-		return
-	}
-	if ein.DringendSofort != nil {
-		e.DringendSofort = *ein.DringendSofort
-	}
-	if ein.Sammelmail != nil {
-		e.Sammelmail = *ein.Sammelmail
-	}
-	if err := a.sp.setzeMailEinstellung(r.Context(), b.Email, e); err != nil {
-		intern(w, err)
-		return
+	if ein.Mail != nil {
+		if err := a.sp.setzeMailAn(r.Context(), b.Email, *ein.Mail); err != nil {
+			intern(w, err)
+			return
+		}
 	}
 	a.benachrichtigungLesen(w, r, b)
 }

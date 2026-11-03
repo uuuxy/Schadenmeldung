@@ -35,7 +35,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Mail an den Hausmeister</h2>
 			<p class="text-on-surface-variant">
-				Der Hausmeister bekommt dringende Meldungen sofort und die übrigen gesammelt per Mail; beides lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie als gesehen markiert wurde.
+				Der Hausmeister bekommt jede neue Meldung sofort per Mail; das lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie als gesehen markiert wurde.
 			</p>
 		</section>
 		<section>

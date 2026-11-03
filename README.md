@@ -34,9 +34,9 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
 - **Farbe je Art:** Licht, Heizung, Wasser … leuchten beim Antippen in ihrer eigenen, gedämpften
   Farbe (M3 „custom colors“, zur Grundfarbe hin harmonisiert); dieselbe Farbe trägt die Zeile in der
   Übersicht.
-- **Mail an den Hausmeister, ohne Stress:** Dringendes sofort, alles andere als Sammelmail Mo–Fr um
-  7 und 12 Uhr (einstellbar), jede Meldung nur einmal. In der Mail stehen die Knöpfe „Gesehen“ und
-  „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
+- **Mail an den Hausmeister:** Jede neue Meldung kommt sofort als eigene Mail, Dringendes mit
+  „Dringend“ im Betreff, jede nur einmal. Antwortet der Mailserver nicht, schickt die App einen Tag
+  lang alle fünf Minuten nach. In der Mail stehen die Knöpfe „Gesehen“ und „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
   (Virenscanner, die Links vorab öffnen, lösen nichts aus). Jeder schaltet seine Mails im Kontomenü
   selbst an oder ab; außer dem Hausmeister bekommt niemand ohne eigene Wahl welche.
 - **„Gesehen“ statt „In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass Bescheid gesagt ist – ohne
@@ -123,8 +123,7 @@ laufen, schaltet der Caddy-Abschnitt das mit `SCHULNETZ` ein (zwei Zeilen, siehe
 | `SMTP_BENUTZER`, `SMTP_PASSWORT` | Anmeldung am Mailserver (nur über TLS) | – |
 | `MAIL_ABSENDER` | Absender der Mails | Pflicht mit SMTP |
 | `OEFFENTLICHE_ADRESSE` | Adresse der App für die Knöpfe in der Mail | Pflicht mit SMTP |
-| `SAMMELMAIL_ZEITEN` | Uhrzeiten der Sammelmail (Mo–Fr), `aus` schaltet sie ab | `07:00,12:00` |
-| `ZEITZONE` | für Sammelmail und Uhrzeiten in der Mail | `Europe/Berlin` |
+| `ZEITZONE` | für die Uhrzeiten in Mail und Export | `Europe/Berlin` |
 | `SCHULNAME` | Name auf Anmeldung und Datenschutzseite | – |
 | `FOTO_TAGE` | Fotos so viele Tage nach Erledigung löschen | `30` |
 | `AUFBEWAHRUNG_TAGE` | Meldungen so viele Tage nach Erledigung löschen | `365` |
@@ -191,7 +190,7 @@ Detailseite, Häkchen mit Rückgängig, Räume umbenennen und Arten an- und auss
 | `migrations/` | nummerierte SQL-Dateien, laufen beim Start in eigener Transaktion |
 | `fotos.go` | Fotos prüfen, verkleinern, Metadaten entfernen |
 | `rollen.go` | Rollen: wer mehr sieht als das Meldeformular |
-| `benachrichtigung.go` | Mail an den Hausmeister: sofort, Sammelmail, Knöpfe in der Mail |
+| `benachrichtigung.go`, `postausgang.go` | Mail an den Hausmeister: jede Meldung sofort, Nachholen bei Ausfall, Knöpfe in der Mail |
 | `aufraeumen.go` | Löschfristen |
 | `einstellungen.go` | Einstellungen für die Oberfläche, Namen der Arten und Stati, Arten an und aus |
 | `export.go`, `export_pdf*.go` | Export als Excel-Tabelle und PDF (gofpdf wie in der Bibliothek) |

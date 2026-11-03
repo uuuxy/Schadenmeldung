@@ -77,8 +77,7 @@
 		<hr class="border-outline-variant" />
 		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mail an mich</p>
 		<div class="pb-1">
-			{@render zeile('mail-dringend', 'Dringendes sofort', '', mail.dringendSofort, (an) => mailSetzen({ dringendSofort: an }))}
-			{@render zeile('mail-sammel', 'Sammelmail', `Mo–Fr um ${mail.zeiten.join(' und ')} Uhr`, mail.sammelmail, (an) => mailSetzen({ sammelmail: an }))}
+			{@render zeile('mail-neu', 'Bei jeder neuen Meldung', 'sofort, eine Mail je Meldung', mail.mail, (an) => mailSetzen({ mail: an }))}
 		</div>
 	{/if}
 

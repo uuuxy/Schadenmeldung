@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -68,7 +69,8 @@ func (a *app) meldungAnlegen(w http.ResponseWriter, r *http.Request, b benutzer)
 	}
 	slog.Info("Neue Meldung", "id", neu.ID, "kategorie", neu.Kategorie, "dringend", neu.Dringend)
 	a.verteiler.melde()
-	a.benachrichtigeSofort(neu)
+	// Die Meldung steht; reißt die Verbindung jetzt ab (Funkloch), soll die Mail trotzdem hinaus.
+	a.mailVormerken(context.WithoutCancel(r.Context()), neu)
 	schreibeJSON(w, http.StatusCreated, fuerAnsicht(neu, b))
 }
 

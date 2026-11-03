@@ -76,7 +76,7 @@ func TestKurzadresseMeldetMitDerVollenAn(t *testing.T) {
 
 // Wer sich selbst in der Kurzform in ADMINS einträgt, darf sich damit nicht aussperren.
 func TestAdminsDuerfenKurzGeschriebenSein(t *testing.T) {
-	for _, name := range []string{"SMTP_HOST", "FOTO_TAGE", "AUFBEWAHRUNG_TAGE", "SAMMELMAIL_ZEITEN", "ZEITZONE"} {
+	for _, name := range []string{"SMTP_HOST", "FOTO_TAGE", "AUFBEWAHRUNG_TAGE", "ZEITZONE"} {
 		t.Setenv(name, "")
 	}
 	t.Setenv("DATABASE_URL", "postgres://schaden@localhost/schaden")

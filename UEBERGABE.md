@@ -53,7 +53,7 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
 - **Stati:** `offen`, `gesehen`, `bestellt`, `fachfirma`, `erledigt` (CHECK in Migration 002).
   „Gesehen“ ersetzt „In Arbeit“: Der Hausmeister zeigt damit, dass er Bescheid weiß, ohne eine Zusage, wann.
 - **Mail an den Hausmeister** (`benachrichtigung.go`):
-  - Dringendes geht sofort raus, der Rest als Sammelmail Mo–Fr um 07:00 und 12:00 (`SAMMELMAIL_ZEITEN`). Keine Meldung geht doppelt (`mail_versand`).
+  - Jede neue Meldung geht sofort als eigene Mail hinaus; eine Sammelmail gibt es nicht (Entscheidung des Nutzers, 3. November). `mail_versand` ist der Postausgang (`postausgang.go`): Was scheitert, schickt der Server einen Tag lang alle 5 Minuten nach, und nichts kommt doppelt.
   - Die Knöpfe „Gesehen“ und „Erledigt“ in der Mail öffnen `/aktion/<token>`. Das funktioniert ohne Anmeldung, 14 Tage lang, und erst ein Tipp auf der Seite löst etwas aus, damit Virenscanner beim Vorab-Öffnen nichts drücken.
   - Ein- und ausschalten lässt sich das je Person im Kontomenü.
 - **Offline:** Service Worker (`frontend/public/sw.js`); der Ausgang in IndexedDB reicht Meldungen aus dem Funkloch nach.
@@ -102,7 +102,7 @@ nur in `SERVER.lokal.md`.
 
 ## Offene Entscheidungen des Nutzers (nicht vorwegnehmen)
 
-- „Gesehen“ statt „In Arbeit“ bestätigen; Sammelmail um 7 und 12 Uhr ok?
+- „Gesehen“ statt „In Arbeit“ bestätigen.
 - Hat der Hausmeister ein Schulpostfach? Vorschlag: Funktionspostfach `hausmeister@…`.
 - Haben Schüler Postfächer unter derselben Domain? Dann könnten sie melden. Gewollt?
 - Offen im Internet mit Anmeldung (empfohlen, Vorgabe) oder nur im Schulnetz (Caddy `SCHULNETZ`)?
