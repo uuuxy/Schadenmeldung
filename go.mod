@@ -6,7 +6,7 @@ require (
 	github.com/emersion/go-imap v1.2.1
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/phpdave11/gofpdf v1.4.3
-	github.com/uudashr/gocognit v1.2.0
+	github.com/uudashr/gocognit v1.3.0
 	golang.org/x/image v0.47.0
 )
 
