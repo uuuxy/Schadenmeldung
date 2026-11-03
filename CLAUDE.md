@@ -42,9 +42,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 
 ## Rollen und Mail
 
-- Kollegium sieht nur das Meldeformular; Hausmeister bearbeitet, Leitung liest, Verwaltung darf
-  alles (`rollen.go`, `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die
-  Oberfläche.
+- Kollegium sieht nur das Meldeformular; Hausmeister, Leitung und Admin dürfen alles, die
+  Verwaltung (Sekretariat) sieht und druckt QR-Aufkleber, ändert aber nichts (`rollen.go`,
+  `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die Oberfläche.
 - Mails sollen den Hausmeister nicht hetzen: keine Erinnerungen, keine Eskalation, keine Zeitstempel
   von „Gesehen“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
 - Lokal landen Mails in Mailpit (`docker-compose.local.yml`, http://localhost:8025).
@@ -71,7 +71,7 @@ Datenschutzseite.
 
 ## Git
 
-Auf GitHub (`uuuxy/schaden`), Zweig `main`, zum Veröffentlichen gedacht: Zugänge, Adressen und Pfade
+Auf GitHub (`uuuxy/Schadenmeldung`, öffentlich, EUPL-1.2), Zweig `main`: Zugänge, Adressen und Pfade
 des Servers stehen nur in `SERVER.lokal.md` (von Git ausgenommen), nie im Repo. Commit-Nachrichten auf Deutsch, ohne
 Werkzeug-Hinweis, wie in der Bibliothek.
 

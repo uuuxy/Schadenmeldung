@@ -36,8 +36,9 @@ Wo der Stack liegt, wie Caddy eingehängt ist und welche Fallen es gibt, steht n
 `SERVER.lokal.md` (von Git ausgenommen): Das Repo soll öffentlich werden können, ohne dass darin
 Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fragen.
 
-- **Git:** auf GitHub, `https://github.com/uuuxy/schaden`, Zweig `main`, zum Veröffentlichen gedacht
-  (Geschichte am 2. November bereinigt: keine Server-Angaben mehr in alten Fassungen). Commit-Nachrichten
+- **Git:** auf GitHub, `https://github.com/uuuxy/Schadenmeldung` (seit 3. November, vorher `uuuxy/schaden`),
+  Zweig `main`, öffentlich, Lizenz EUPL-1.2. Die Geschichte ist bereinigt: keine Server-Angaben,
+  keine Schuldaten, Beispielnamen wie `schule.example`. Image: `ghcr.io/uuuxy/schadenmeldung`. Commit-Nachrichten
   auf Deutsch, ohne Werkzeug-Hinweis, wie in der Bibliothek.
 - **Technik:** Go (`net/http`, pgx) mit eingebetteter Oberfläche (Svelte 5 + Tailwind 4,
   `frontend/dist`) und eingebetteten Migrationen (`migrations/001_grundlage.sql`,

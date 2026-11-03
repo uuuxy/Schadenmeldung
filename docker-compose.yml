@@ -6,7 +6,7 @@ services:
     # Fertiges Image von GitHub (.github/workflows/docker.yml, erst nach grünen Tests):
     # docker compose pull && docker compose up -d. build bleibt als Ausweg ohne Registry:
     # docker compose up -d --build baut dasselbe Image hier.
-    image: ghcr.io/uuuxy/schaden:latest
+    image: ghcr.io/uuuxy/schadenmeldung:latest
     build: .
     restart: unless-stopped
     env_file: .env

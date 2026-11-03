@@ -1,7 +1,7 @@
 name: Prüfen und Docker-Image veröffentlichen (ghcr.io)
 
 # Bei jedem Push auf main: erst prüfen (gofmt, go vet, Go-Tests gegen PostgreSQL 18, Bau der
-# Oberfläche ohne Warnung), dann das Image bauen und als ghcr.io/uuuxy/schaden veröffentlichen. Auf
+# Oberfläche ohne Warnung), dann das Image bauen und als ghcr.io/uuuxy/schadenmeldung veröffentlichen. Auf
 # dem Server baut ./update.sh selbst; `docker compose pull && docker compose up -d` ginge auch.
 #
 #   - Push auf main  → Tags `latest` und `main-<kurz-sha>`
@@ -106,7 +106,7 @@ jobs:
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: index
         with:
-          images: ghcr.io/uuuxy/schaden
+          images: ghcr.io/uuuxy/schadenmeldung
           flavor: |
             latest=false
           tags: |
