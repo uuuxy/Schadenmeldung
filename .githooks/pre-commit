@@ -24,6 +24,15 @@ if [ -n "$treffer" ]; then
 	printf 'Im Commit stehen Server-Angaben (IP, root@, /root/), bitte nach SERVER.lokal.md:\n%s\n' "$treffer" >&2
 	exit 1
 fi
+# Schule, Domains, Namen: Diese Wörter stehen nur lokal in .githooks/verboten.lokal.txt (eines je
+# Zeile, # für Kommentare), denn hier im Hook stünden sie selbst im öffentlichen Repo.
+if [ -f .githooks/verboten.lokal.txt ]; then
+	treffer=$(printf '%s\n' "$neu" | grep -i -F -f <(grep -v -e '^#' -e '^[[:space:]]*$' .githooks/verboten.lokal.txt) || true)
+	if [ -n "$treffer" ]; then
+		printf 'Im Commit steht, was nach .githooks/verboten.lokal.txt nicht ins Repo gehört:\n%s\n' "$treffer" >&2
+		exit 1
+	fi
+fi
 
 # Compose-Dateien liest Docker selbst (Syntax, doppelte Schlüssel), in der gestagten Fassung und ohne
 # etwas zu starten; die .env bleibt dabei außen vor.
