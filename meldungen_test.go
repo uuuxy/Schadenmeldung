@@ -53,7 +53,7 @@ func TestMeldenAbhakenWiederOeffnen(t *testing.T) {
 	if status, neu := hm.json("POST", pfad, map[string]string{"status": "erledigt"}); status != 200 || neu["erledigtAm"] == nil || neu["antwort"] != "Lampe kommt Freitag" {
 		t.Fatalf("Erledigt: %d, %v", status, neu)
 	}
-	_, alle := lehrer.json("GET", "/api/meldungen", nil)
+	_, alle := hm.json("GET", "/api/meldungen", nil)
 	if len(eintraege(alle, "offen")) != 0 || len(eintraege(alle, "erledigt")) != 1 {
 		t.Fatalf("nach Erledigt: %v", alle)
 	}

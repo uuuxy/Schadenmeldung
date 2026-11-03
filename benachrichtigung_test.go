@@ -137,7 +137,7 @@ func TestKnopfAusDerMail(t *testing.T) {
 	pfad := "/api/aktion/" + treffer[1]
 	gast := u.anonym()
 
-	if status, m := gast.json("GET", pfad, nil); status != 200 || m["was"] != "WC verstopft" || m["gemeldetVon"] != "lehrer@schule.de" {
+	if status, m := gast.json("GET", pfad, nil); status != 200 || m["was"] != "WC verstopft" || m["gemeldetVon"] != nil {
 		t.Fatalf("Link öffnen: %d, %v", status, m)
 	}
 	resp, err := http.Post(u.srv.URL+pfad, "application/json", strings.NewReader(`{"status":"erledigt"}`))
@@ -147,6 +147,10 @@ func TestKnopfAusDerMail(t *testing.T) {
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusForbidden {
 		t.Fatalf("ohne X-Schaden: Status %d, erwartet 403 (Schutz vor fremden Formularen)", resp.StatusCode)
+	}
+	// Zurück auf „offen“ geht nur in der App, nicht mit einem weitergeleiteten Link.
+	if status, _ := gast.json("POST", pfad, map[string]string{"status": "offen"}); status != http.StatusBadRequest {
+		t.Fatalf("offen aus der Mail: Status %d, erwartet 400", status)
 	}
 	if status, m := gast.json("POST", pfad, map[string]string{"status": "erledigt"}); status != 200 || m["status"] != "erledigt" {
 		t.Fatalf("Erledigt aus der Mail: %d, %v", status, m)

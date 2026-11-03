@@ -29,7 +29,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Anmeldung</h2>
 			<p class="text-on-surface-variant">
-				Die Anmeldung läuft über das Postfach der Schule. Das Passwort wird nur an den Mailserver der Schule weitergereicht und nirgends gespeichert. Ein technisch notwendiges Cookie hält das Gerät angemeldet.
+				Die Anmeldung läuft über das Postfach der Schule. Das Passwort wird nur an den Mailserver der Schule weitergereicht und nirgends gespeichert. Ein technisch notwendiges Cookie hält das Gerät angemeldet, höchstens ein Jahr lang.
 			</p>
 		</section>
 		<section>
@@ -53,7 +53,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Löschung</h2>
 			<p class="text-on-surface-variant">
-				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Vor jedem Update sichert der Server die Datenbank; diese Sicherung wird nach 7 Tagen gelöscht. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe, keine fremden Dienste und kein Tracking.
+				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Jede Nacht und vor jedem Update sichert der Server die Datenbank; jede Sicherung wird nach 7 Tagen gelöscht. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe, keine fremden Dienste und kein Tracking.
 			</p>
 		</section>
 		<section>

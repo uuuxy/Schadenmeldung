@@ -6,15 +6,18 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/netip"
 	"strings"
 	"time"
 )
 
 const (
-	cookieName      = "schaden_sitzung"
-	sitzungsDauer   = 180 * 24 * time.Hour
-	imapFrist       = 15 * time.Second
-	imapBefehlFrist = 5 * time.Second
+	cookieName    = "schaden_sitzung"
+	sitzungsDauer = 180 * 24 * time.Hour
+	// sitzungsHoechstdauer: so lange nach der Anmeldung verlängert sich eine Sitzung höchstens.
+	sitzungsHoechstdauer = 365 * 24 * time.Hour
+	imapFrist            = 15 * time.Second
+	imapBefehlFrist      = 5 * time.Second
 )
 
 var (
@@ -50,41 +53,39 @@ func (a *app) anmelden(w http.ResponseWriter, r *http.Request) {
 	// Klein geschrieben auch an den Mailserver: Gespeicherte Zugangsdaten bringen manchmal einen großen
 	// Anfangsbuchstaben mit, und mancher Mailserver kennt den Namen nur klein.
 	konto := strings.ToLower(a.konf.vervollstaendige(ein.Email))
-	if konto == "" || ein.Passwort == "" {
+	switch {
+	case konto == "" || ein.Passwort == "":
 		fehler(w, http.StatusBadRequest, "Bitte E-Mail und Passwort eingeben.")
 		return
-	}
-	ip, jetzt := a.clientIP(r), a.jetzt()
-	if rest := max(a.kontoBremse.gesperrt(konto, jetzt), a.ipBremse.gesperrt(ip, jetzt)); rest > 0 {
-		slog.Info("Anmeldung abgelehnt", "grund", "zu viele Fehlversuche")
-		fehler(w, http.StatusTooManyRequests,
-			fmt.Sprintf("Zu viele Fehlversuche. Bitte in %d Minuten erneut versuchen.", int(rest.Minutes())+1))
+	case len(konto) > 254 || len(ein.Passwort) > 512:
+		fehler(w, http.StatusBadRequest, "E-Mail oder Passwort ist zu lang.")
 		return
 	}
-	// Vor dem Mailserver geprüft, damit die App nicht als Prüfstelle für fremde Postfächer dient.
-	if !a.konf.domainErlaubt(konto) {
-		a.ipBremse.fehlversuch(ip, jetzt)
-		slog.Info("Anmeldung abgelehnt", "grund", "fremde Domain")
-		fehler(w, http.StatusForbidden, "Anmelden geht nur mit einem Postfach der Schule.")
+	ip, jetzt := netzVon(a.clientIP(r)), a.jetzt()
+	if !a.bremseLaesstDurch(w, konto, ip, jetzt) {
 		return
 	}
 	// Abgelehnte Versuche nur mit Grund ins Log, ohne Adresse: So sieht man, woran es hakt.
 	switch err := a.pruefeZugang(r.Context(), konto, ein.Passwort); {
 	case errors.Is(err, errAbgelehnt):
-		a.kontoBremse.fehlversuch(konto, jetzt)
-		a.ipBremse.fehlversuch(ip, jetzt)
+		// Beide Versuche bleiben verbucht.
 		slog.Info("Anmeldung abgelehnt", "grund", "Mailserver lehnt Zugangsdaten ab")
 		fehler(w, http.StatusUnauthorized, "E-Mail oder Passwort stimmt nicht.")
 		return
 	case err != nil:
+		// Ein Ausfall ist kein Fehlversuch, sonst sperrte er nach ein paar Versuchen alle aus.
+		a.kontoBremse.zuruecknehmen(konto, jetzt)
+		a.ipBremse.zuruecknehmen(ip, jetzt)
 		fehler(w, http.StatusServiceUnavailable, "Der Mailserver ist gerade nicht erreichbar. Bitte später erneut versuchen.")
 		return
 	}
 	a.kontoBremse.erfolg(konto)
+	// Nur den eigenen Versuch streichen: Im Schulnetz teilen sich alle eine Adresse.
+	a.ipBremse.zuruecknehmen(ip, jetzt)
 
 	token, hash := neuesToken()
 	ablauf := jetzt.Add(sitzungsDauer)
-	if err := a.sp.legeSitzungAn(r.Context(), hash, konto, ablauf); err != nil {
+	if err := a.sp.legeSitzungAn(r.Context(), hash, konto, jetzt, ablauf); err != nil {
 		intern(w, err)
 		return
 	}
@@ -97,9 +98,10 @@ func (a *app) anmelden(w http.ResponseWriter, r *http.Request) {
 	schreibeJSON(w, http.StatusOK, benutzer{Email: konto, Rolle: rolle})
 }
 
+// abmelden beendet diese Sitzung, mit ?ueberall=1 alle Sitzungen der Person (verlorenes Handy).
 func (a *app) abmelden(w http.ResponseWriter, r *http.Request) {
 	if c, err := r.Cookie(cookieName); err == nil && c.Value != "" {
-		if err := a.sp.loescheSitzung(r.Context(), tokenHash(c.Value)); err != nil {
+		if err := a.beendeSitzung(r.Context(), tokenHash(c.Value), r.URL.Query().Get("ueberall") == "1"); err != nil {
 			slog.Warn("Sitzung nicht gelöscht", "fehler", err)
 		}
 	}
@@ -124,4 +126,49 @@ func (a *app) clientIP(r *http.Request) string {
 		return r.RemoteAddr
 	}
 	return host
+}
+
+// bremseLaesstDurch verbucht den Versuch schon vor der Frage an den Mailserver (siehe
+// bremse.versuch) und antwortet selbst, wenn er nicht durchgeht.
+func (a *app) bremseLaesstDurch(w http.ResponseWriter, konto, ip string, jetzt time.Time) bool {
+	if rest := a.ipBremse.versuch(ip, jetzt); rest > 0 {
+		zuVieleVersuche(w, rest)
+		return false
+	}
+	// Vor dem Mailserver geprüft, damit die App nicht als Prüfstelle für fremde Postfächer dient; der
+	// Versuch bleibt bei der Adresse verbucht.
+	if !a.konf.domainErlaubt(konto) {
+		slog.Info("Anmeldung abgelehnt", "grund", "fremde Domain")
+		fehler(w, http.StatusForbidden, "Anmelden geht nur mit einem Postfach der Schule.")
+		return false
+	}
+	if rest := a.kontoBremse.versuch(konto, jetzt); rest > 0 {
+		// Ein gesperrtes Konto soll nicht die Versuche des ganzen Schulnetzes aufbrauchen.
+		a.ipBremse.zuruecknehmen(ip, jetzt)
+		zuVieleVersuche(w, rest)
+		return false
+	}
+	return true
+}
+
+func zuVieleVersuche(w http.ResponseWriter, rest time.Duration) {
+	slog.Info("Anmeldung abgelehnt", "grund", "zu viele Fehlversuche")
+	fehler(w, http.StatusTooManyRequests,
+		fmt.Sprintf("Zu viele Fehlversuche. Bitte in %d Minuten erneut versuchen.", int(rest.Minutes())+1))
+}
+
+// netzVon fasst IPv6-Adressen zum /64-Netz zusammen: Ein Anschluss bekommt meist ein ganzes /64 und
+// könnte der Bremse sonst mit jeder neuen Adresse ausweichen.
+func netzVon(ip string) string {
+	adresse, err := netip.ParseAddr(ip)
+	switch {
+	case err != nil:
+		return ip
+	case adresse.Is4() || adresse.Is4In6():
+		return adresse.Unmap().String()
+	}
+	if netz, err := adresse.Prefix(64); err == nil {
+		return netz.String()
+	}
+	return ip
 }

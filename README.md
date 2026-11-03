@@ -134,7 +134,15 @@ laufen, schaltet der Caddy-Abschnitt das mit `SCHULNETZ` ein (zwei Zeilen, siehe
 
 ## Sicherung
 
-Alles liegt in PostgreSQL, auch die Fotos. Eine Sicherung ist deshalb ein einziger Befehl:
+Alles liegt in PostgreSQL, auch die Fotos. Jede Nacht sichert `sicherung.sh` die Datenbank nach `backups/` und
+löscht Sicherungen nach sieben Tagen. Einmal auf dem Server einrichten (`crontab -e` als root):
+
+```
+30 2 * * * /pfad/zur/schadenmeldung/sicherung.sh 2>&1 | logger -t schadenmeldung
+```
+
+Ob es geklappt hat, zeigt `journalctl -t schadenmeldung`. Die Sicherungen liegen auf demselben Server; eine Kopie
+woanders schützt auch vor dessen Ausfall. Von Hand ist eine Sicherung ein einziger Befehl:
 
 ```bash
 docker compose exec -T db pg_dump -U schaden -Fc schaden > sicherung-$(date +%F).dump

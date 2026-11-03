@@ -14,6 +14,7 @@ const (
 	xlsxTeilGrenze = 20 << 20 // je Teil entpackt, damit eine Zip-Bombe den Speicher nicht füllt
 	xlsxZeilen     = 5000
 	xlsxSpalten    = 50
+	xlsxTiefe      = 50 // Verschachtelung; eine echte Tabelle ist kaum zehn Ebenen tief
 )
 
 func leseXLSX(roh []byte) ([][]string, error) {
@@ -58,12 +59,18 @@ func lese(f *zip.File, l xmlLeser) error {
 	}
 	defer func() { _ = rc.Close() }()
 	d := xml.NewDecoder(io.LimitReader(rc, xlsxTeilGrenze))
+	tiefe := 0
 	for {
 		t, err := d.Token()
 		switch e := t.(type) {
 		case xml.StartElement:
+			// Tausendfach verschachtelt füllte schon eine winzige Datei den Speicher.
+			if tiefe++; tiefe > xlsxTiefe {
+				return eingabeFehler("Die Excel-Datei ist beschädigt.")
+			}
 			l.start(e)
 		case xml.EndElement:
+			tiefe--
 			l.ende(e.Name.Local)
 		case xml.CharData:
 			l.text(e)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -55,6 +56,15 @@ func TestRechteJeRolle(t *testing.T) {
 		pruefe("Räume anlegen", fall.aendert, status, http.StatusOK)
 		status, _ = n.json("GET", "/api/rollen", nil)
 		pruefe("Rollen lesen", fall.aendert, status, http.StatusOK)
+		// Fotos und Notizen sieht das Kollegium nicht, auch nicht an der Oberfläche vorbei.
+		status, _, _ = n.holeDatei("/fotos/" + strings.Repeat("0", 32) + ".jpg")
+		pruefe("Fotos", fall.sieht, status, http.StatusNotFound)
+		_, liste := n.json("GET", "/api/meldungen", nil)
+		if offen, _ := liste["offen"].([]any); len(offen) == 0 {
+			t.Errorf("%s: keine offenen Meldungen in der Liste", fall.name)
+		} else if _, notiz := offen[0].(map[string]any)["notiz"]; notiz != fall.sieht {
+			t.Errorf("%s: Notiz in der Liste %v, erwartet %v", fall.name, notiz, fall.sieht)
+		}
 		status, _ = n.json("DELETE", "/api/meldungen/"+id, nil)
 		pruefe("Meldung löschen", fall.aendert, status, http.StatusNoContent)
 	}

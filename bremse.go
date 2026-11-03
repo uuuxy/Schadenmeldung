@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-// bremse sperrt einen Schlüssel (Konto oder Adresse) für ein Zeitfenster, wenn darin zu viele
-// Fehlversuche auflaufen. Sie bremst das Durchprobieren von Passwörtern über diese App.
+// bremse sperrt einen Schlüssel (Konto, Adresse oder meldende Person) für ein Zeitfenster, wenn
+// darin zu viele Versuche auflaufen. Sie bremst das Durchprobieren von Passwörtern und Fluten von
+// Meldungen.
 type bremse struct {
 	mu        sync.Mutex
 	eintraege map[string]*versuche
@@ -24,19 +25,15 @@ func neueBremse(grenze int, fenster time.Duration) *bremse {
 	return &bremse{eintraege: map[string]*versuche{}, grenze: grenze, fenster: fenster}
 }
 
-// gesperrt liefert die verbleibende Sperrzeit, sonst 0.
-func (b *bremse) gesperrt(schluessel string, jetzt time.Time) time.Duration {
+// versuch prüft und verbucht in einem Schritt und liefert die verbleibende Sperrzeit, sonst 0. Ein
+// Versuch zählt sofort und wird zurückgenommen, wenn er gelingt: Würde erst nach der Antwort des
+// Mailservers gezählt, kämen viele gleichzeitige Versuche alle an der Bremse vorbei.
+func (b *bremse) versuch(schluessel string, jetzt time.Time) time.Duration {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if v := b.eintraege[schluessel]; v != nil && jetzt.Before(v.gesperrtBis) {
 		return v.gesperrtBis.Sub(jetzt)
 	}
-	return 0
-}
-
-func (b *bremse) fehlversuch(schluessel string, jetzt time.Time) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
 	if len(b.eintraege) > 10000 {
 		b.vergiss(jetzt)
 	}
@@ -50,6 +47,23 @@ func (b *bremse) fehlversuch(schluessel string, jetzt time.Time) {
 		v.gesperrtBis = jetzt.Add(b.fenster)
 		v.anzahl = 0
 		v.seit = jetzt
+	}
+	return 0
+}
+
+// zuruecknehmen streicht einen mit versuch verbuchten Versuch wieder.
+func (b *bremse) zuruecknehmen(schluessel string, jetzt time.Time) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	v := b.eintraege[schluessel]
+	switch {
+	case v == nil:
+	case v.anzahl > 0:
+		v.anzahl--
+	case jetzt.Before(v.gesperrtBis):
+		// Dieser Versuch hatte die Sperre ausgelöst; sie fällt mit ihm weg.
+		v.gesperrtBis = time.Time{}
+		v.anzahl = b.grenze - 1
 	}
 }
 

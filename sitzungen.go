@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -43,19 +44,24 @@ func (a *app) loescheCookie(w http.ResponseWriter) {
 }
 
 // angemeldet liest die Sitzung aus dem Cookie. Wer die App nutzt, bleibt angemeldet: Ist der letzte
-// Besuch mehr als einen Tag her, beginnt die Frist von 180 Tagen neu.
+// Besuch mehr als einen Tag her, beginnt die Frist von 180 Tagen neu, aber nie über ein Jahr nach der
+// Anmeldung hinaus: So endet auch eine gestohlene oder vergessene Sitzung irgendwann.
 func (a *app) angemeldet(w http.ResponseWriter, r *http.Request) (benutzer, bool) {
 	c, err := r.Cookie(cookieName)
 	if err != nil || c.Value == "" {
 		return benutzer{}, false
 	}
 	hash := tokenHash(c.Value)
-	email, ablauf, err := a.sp.sitzung(r.Context(), hash)
+	email, ablauf, angelegt, err := a.sp.sitzung(r.Context(), hash)
 	jetzt := a.jetzt()
 	if err != nil || jetzt.After(ablauf) {
 		return benutzer{}, false
 	}
-	if neu := jetzt.Add(sitzungsDauer); neu.Sub(ablauf) > 24*time.Hour {
+	neu := jetzt.Add(sitzungsDauer)
+	if grenze := angelegt.Add(sitzungsHoechstdauer); neu.After(grenze) {
+		neu = grenze
+	}
+	if neu.Sub(ablauf) > 24*time.Hour {
 		if err := a.sp.verlaengereSitzung(r.Context(), hash, neu); err == nil {
 			a.setzeCookie(w, c.Value, neu)
 		}
@@ -102,14 +108,16 @@ func (a *app) nurBearbeiter(h benutzerHandler) benutzerHandler {
 	}
 }
 
-func (s *speicher) legeSitzungAn(ctx context.Context, hash, email string, ablauf time.Time) error {
-	_, err := s.db.Exec(ctx, "INSERT INTO sitzungen (token_hash, email, laeuft_ab) VALUES ($1, $2, $3)", hash, email, ablauf)
+func (s *speicher) legeSitzungAn(ctx context.Context, hash, email string, angelegt, ablauf time.Time) error {
+	_, err := s.db.Exec(ctx, "INSERT INTO sitzungen (token_hash, email, laeuft_ab, angelegt_am) VALUES ($1, $2, $3, $4)",
+		hash, email, ablauf, angelegt)
 	return err
 }
 
-func (s *speicher) sitzung(ctx context.Context, hash string) (email string, ablauf time.Time, err error) {
-	err = s.db.QueryRow(ctx, "SELECT email, laeuft_ab FROM sitzungen WHERE token_hash = $1", hash).Scan(&email, &ablauf)
-	return email, ablauf, nichtGefunden(err)
+func (s *speicher) sitzung(ctx context.Context, hash string) (email string, ablauf, angelegt time.Time, err error) {
+	err = s.db.QueryRow(ctx, "SELECT email, laeuft_ab, angelegt_am FROM sitzungen WHERE token_hash = $1", hash).
+		Scan(&email, &ablauf, &angelegt)
+	return email, ablauf, angelegt, nichtGefunden(err)
 }
 
 func (s *speicher) verlaengereSitzung(ctx context.Context, hash string, ablauf time.Time) error {
@@ -119,6 +127,26 @@ func (s *speicher) verlaengereSitzung(ctx context.Context, hash string, ablauf t
 
 func (s *speicher) loescheSitzung(ctx context.Context, hash string) error {
 	_, err := s.db.Exec(ctx, "DELETE FROM sitzungen WHERE token_hash = $1", hash)
+	return err
+}
+
+// beendeSitzung löscht die Sitzung zum Cookie oder, mit ueberall, jede Sitzung derselben Person.
+func (a *app) beendeSitzung(ctx context.Context, hash string, ueberall bool) error {
+	if !ueberall {
+		return a.sp.loescheSitzung(ctx, hash)
+	}
+	email, _, _, err := a.sp.sitzung(ctx, hash)
+	if errors.Is(err, errNichtGefunden) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return a.sp.loescheSitzungenVon(ctx, email)
+}
+
+func (s *speicher) loescheSitzungenVon(ctx context.Context, email string) error {
+	_, err := s.db.Exec(ctx, "DELETE FROM sitzungen WHERE email = $1", email)
 	return err
 }
 

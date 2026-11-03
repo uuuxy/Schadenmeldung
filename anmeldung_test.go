@@ -150,3 +150,15 @@ func TestKonfigurationVerweigertOffeneTueren(t *testing.T) {
 		}
 	}
 }
+
+// Nach einem verlorenen Handy: „Auf allen Geräten abmelden“ beendet auch die anderen Sitzungen.
+func TestUeberallAbmelden(t *testing.T) {
+	u := neueTestUmgebung(t)
+	handy, rechner := u.nutzer("lehrer"), u.nutzer("lehrer")
+	if status, _ := rechner.json("POST", "/api/abmelden?ueberall=1", nil); status != http.StatusNoContent {
+		t.Fatalf("Abmelden: Status %d", status)
+	}
+	if status, _ := handy.json("GET", "/api/ich", nil); status != http.StatusUnauthorized {
+		t.Errorf("Das Handy ist noch angemeldet (Status %d)", status)
+	}
+}

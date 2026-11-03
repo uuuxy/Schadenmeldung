@@ -20,6 +20,14 @@ func (a *app) pruefeIMAP(ctx context.Context, email, passwort string) error {
 	}
 	ctx, cancel := context.WithTimeout(ctx, imapFrist)
 	defer cancel()
+	// Höchstens vier Prüfungen zugleich: Der Mailserver der Schule soll die App bei vielen Anfragen
+	// nicht für einen Angreifer halten und sperren.
+	select {
+	case a.imapPlaetze <- struct{}{}:
+		defer func() { <-a.imapPlaetze }()
+	case <-ctx.Done():
+		return errMailserverWeg
+	}
 
 	adresse := net.JoinHostPort(a.konf.IMAPHost, a.konf.IMAPPort)
 	verbinder := &tls.Dialer{Config: &tls.Config{ServerName: a.konf.IMAPHost, MinVersion: tls.VersionTLS12}}

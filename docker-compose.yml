@@ -1,6 +1,13 @@
 # App und PostgreSQL. Die App hängt am Netz des Caddy, der schon Bibliothek und schul-orga bedient
 # (caddy_global_net); die Datenbank nur am internen Netz dieses Stacks.
 # Einstellungen stehen in der .env daneben (Vorlage: .env.example).
+# Docker-Logs je Dienst auf 3 × 10 MB begrenzen; ohne Grenze wachsen sie unbemerkt.
+x-logs: &logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   schaden:
     # Fertiges Image von GitHub (.github/workflows/docker.yml, erst nach grünen Tests):
@@ -14,6 +21,11 @@ services:
       DATABASE_URL: postgres://schaden:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}@db:5432/schaden?sslmode=disable
       # Caddy setzt X-Real-IP; erst damit bremst die Fehlversuchsbremse die richtige Adresse.
       PROXY_VERTRAUEN: "1"
+      # Go räumt vor der Grenze des Containers auf, statt an ihr zu scheitern.
+      GOMEMLIMIT: 400MiB
+    # Speichergrenze: Ein Fehler oder Angriff trifft nur diesen Dienst, nicht die Nachbarn auf dem Server.
+    mem_limit: 512m
+    logging: *logs
     depends_on:
       db:
         condition: service_healthy
@@ -35,6 +47,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging: *logs
     networks:
       - intern
 

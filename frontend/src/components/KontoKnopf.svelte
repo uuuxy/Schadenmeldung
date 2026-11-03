@@ -39,9 +39,10 @@
 		gehe(pfad);
 	}
 
-	async function abmelden() {
+	/** Mit ueberall enden auch die Sitzungen auf anderen Geräten, etwa nach einem verlorenen Handy. */
+	async function abmelden(ueberall = false) {
 		menue.hidePopover();
-		await api('/api/abmelden', { methode: 'POST' }).catch(() => {});
+		await api(ueberall ? '/api/abmelden?ueberall=1' : '/api/abmelden', { methode: 'POST' }).catch(() => {});
 		await vergissAlles();
 		zustand.benutzer = null;
 		gehe('/', { ersetzen: true });
@@ -96,8 +97,11 @@
 		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => zu('/datenschutz')}>
 			<Icon name="privacy_tip" class="text-on-surface-variant" /> Datenschutz
 		</button>
-		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={abmelden}>
+		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => abmelden()}>
 			<Icon name="logout" class="text-on-surface-variant" /> Abmelden
+		</button>
+		<button class="flex h-12 w-full items-center gap-3 px-4 text-body-large text-on-surface" onclick={() => abmelden(true)}>
+			<Icon name="devices" class="text-on-surface-variant" /> Auf allen Geräten abmelden
 		</button>
 	</div>
 </div>

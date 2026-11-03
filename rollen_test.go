@@ -30,7 +30,7 @@ func TestRaeumeNurDurchVerwaltung(t *testing.T) {
 	if status, _ := admin.json("DELETE", "/api/raeume/"+strconv.Itoa(raumID), nil); status != http.StatusNoContent {
 		t.Fatalf("Löschen: Status %d", status)
 	}
-	_, alle := lehrer.json("GET", "/api/meldungen", nil)
+	_, alle := admin.json("GET", "/api/meldungen", nil)
 	if offen := eintraege(alle, "offen"); len(offen) != 1 || offen[0]["ort"] != "204" || offen[0]["raumId"] != nil {
 		t.Fatalf("nach Löschen des Raums: %v", offen)
 	}
@@ -72,7 +72,11 @@ func TestRollenInDerApp(t *testing.T) {
 	if status, _ := admin.json("DELETE", "/api/rollen/sekretariat@schule.de", nil); status != 200 {
 		t.Fatalf("Rolle löschen: %d", status)
 	}
-	if _, ich := verwaltung.json("GET", "/api/ich", nil); ich["rolle"] != "kollegium" {
+	// Mit der Rolle enden die Sitzungen; nach neuer Anmeldung gilt das Kollegium.
+	if status, _ := verwaltung.json("GET", "/api/ich", nil); status != http.StatusUnauthorized {
+		t.Fatalf("alte Sitzung nach dem Löschen der Rolle: Status %d, erwartet 401", status)
+	}
+	if _, ich := u.nutzer("sekretariat").json("GET", "/api/ich", nil); ich["rolle"] != "kollegium" {
 		t.Fatalf("nach dem Löschen: %v, erwartet kollegium", ich)
 	}
 }

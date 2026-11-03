@@ -76,7 +76,9 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 	if !leseJSON(w, r, &ein) {
 		return
 	}
-	if statusNamen[ein.Status] == "" {
+	// Nur was die Seite anbietet: Zurück auf „offen“ geht nur in der App, nicht mit dem Link aus einer
+	// vielleicht weitergeleiteten Mail.
+	if statusNamen[ein.Status] == "" || ein.Status == "offen" {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
 		return
 	}
@@ -102,6 +104,9 @@ func (a *app) aktionFoto(w http.ResponseWriter, r *http.Request) {
 
 func (a *app) fuerAktion(m meldung, b benutzer, token string) meldung {
 	m = fuerAnsicht(m, b)
+	// Wer den Link hat, braucht weder die meldende Person noch den internen Vermerk: Mails werden
+	// weitergeleitet, etwa an eine Fachfirma.
+	m.GemeldetVon, m.Antwort = "", ""
 	if m.Foto != "" {
 		m.Foto = "/api/aktion/" + token + "/foto"
 	}

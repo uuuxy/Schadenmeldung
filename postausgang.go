@@ -90,7 +90,7 @@ func (a *app) versendeMeldung(ctx context.Context, m meldung, wer map[string]emp
 			continue
 		}
 		if err := a.verschicke(ctx, e, m); err != nil {
-			slog.Error("Mail nicht verschickt, neuer Versuch in fünf Minuten", "id", m.ID, "fehler", err)
+			slog.Error("Mail nicht verschickt, neuer Versuch in fünf Minuten", "id", m.ID, "fehler", fuersLog(err))
 		}
 	}
 }

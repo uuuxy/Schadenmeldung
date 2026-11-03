@@ -180,8 +180,8 @@ export async function sendeAusgang() {
 				zustand.offline = false;
 				zeige(`Nachgereicht: ${eintrag.anzeige.was} (${eintrag.anzeige.ort})`);
 			} catch (e) {
-				// Kein Netz, abgemeldet oder Server gestört: liegen lassen und später erneut versuchen.
-				if (e.status === 0 || e.status === 401 || e.status >= 500) throw e;
+				// Kein Netz, abgemeldet, gebremst oder Server gestört: liegen lassen und später erneut versuchen.
+				if (e.status === 0 || e.status === 401 || e.status === 429 || e.status >= 500) throw e;
 				// Abgelehnt (etwa weil der Raum inzwischen gelöscht ist): nicht endlos wiederholen.
 				await entferne(eintrag.id);
 				zeige(`Eine gespeicherte Meldung wurde abgelehnt: ${e.message}`);

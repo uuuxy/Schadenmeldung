@@ -16,12 +16,19 @@ import (
 )
 
 const (
-	fotoHoechstGroesse = 15 << 20
-	fotoHoechstPixel   = 60_000_000
-	fotoKante          = 1600
+	fotoHoechstGroesse = 8 << 20
+	// Die App schickt höchstens 1600 px Kante (2,6 Megapixel). 16 Megapixel lassen auch ein
+	// unverkleinertes Handyfoto durch und halten das Auspacken unter etwa 250 MB.
+	fotoHoechstPixel = 16_000_000
+	fotoKante        = 1600
 )
 
 var errKeinFoto = errors.New("keine lesbare Bilddatei")
+
+// fotoPlatz lässt nur ein Foto zur Zeit auspacken: Ein präpariertes Bild belegt dabei auch innerhalb
+// der Grenzen ein paar hundert MB, mehrere gleichzeitig brächten einen kleinen Server ins Straucheln.
+// Fotos aus der App sind klein und in Millisekunden durch.
+var fotoPlatz = make(chan struct{}, 1)
 
 // bereiteFotoAuf liest ein Bild, verkleinert es auf höchstens fotoKante Pixel und schreibt es neu als
 // JPEG. Beim Neuschreiben fallen alle Metadaten weg: GPS-Ort, Gerät und Aufnahmezeit bleiben nicht
@@ -31,6 +38,8 @@ func bereiteFotoAuf(quelle io.Reader) ([]byte, error) {
 	if err != nil || len(roh) > fotoHoechstGroesse {
 		return nil, errKeinFoto
 	}
+	fotoPlatz <- struct{}{}
+	defer func() { <-fotoPlatz }()
 	// Die Maße zuerst: Ein winziges PNG kann sich auf Gigabytes entpacken.
 	abmessung, _, err := image.DecodeConfig(bytes.NewReader(roh))
 	if err != nil || abmessung.Width*abmessung.Height > fotoHoechstPixel {

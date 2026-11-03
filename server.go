@@ -14,9 +14,12 @@ type app struct {
 	pruefeZugang func(ctx context.Context, email, passwort string) error
 	kontoBremse  *bremse
 	ipBremse     *bremse
-	jetzt        func() time.Time
-	versender    versender
-	verteiler    *verteiler
+	meldeBremse  *bremse
+	// imapPlaetze begrenzt die gleichzeitigen Prüfungen beim Mailserver der Schule.
+	imapPlaetze chan struct{}
+	jetzt       func() time.Time
+	versender   versender
+	verteiler   *verteiler
 	// postWecker stößt den Postausgang an, sobald eine Meldung eingeht (Puffer 1, nichts geht verloren).
 	postWecker chan struct{}
 }
@@ -28,6 +31,8 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		statisch:    statisch,
 		kontoBremse: neueBremse(5, 15*time.Minute),
 		ipBremse:    neueBremse(20, 15*time.Minute),
+		meldeBremse: neueBremse(20, time.Hour),
+		imapPlaetze: make(chan struct{}, 4),
 		jetzt:       time.Now,
 		verteiler:   neuerVerteiler(),
 		postWecker:  make(chan struct{}, 1),
@@ -70,7 +75,7 @@ func (a *app) routen() http.Handler {
 	mux.HandleFunc("GET /api/", func(w http.ResponseWriter, _ *http.Request) {
 		fehler(w, http.StatusNotFound, "Unbekannte Adresse.")
 	})
-	mux.HandleFunc("GET /fotos/{name}", a.mitBenutzer(a.foto))
+	mux.HandleFunc("GET /fotos/{name}", a.mitBenutzer(a.nurBackend(a.foto)))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte("ok"))
 	})

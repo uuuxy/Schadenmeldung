@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"mime"
 	"mime/quotedprintable"
 	"net"
 	"net/mail"
 	"net/smtp"
+	"net/textproto"
 	"strings"
 	"time"
 )
@@ -66,9 +68,14 @@ func (v smtpVersender) verbinde(ctx context.Context) (*smtp.Client, error) {
 // sichereUndMeldeAn schaltet ohne direktes TLS auf STARTTLS um und meldet sich an. PlainAuth
 // verweigert sich ohne TLS (außer auf localhost): Das Passwort geht nie im Klartext.
 func (v smtpVersender) sichereUndMeldeAn(c *smtp.Client, direktTLS bool, tlsKonfig *tls.Config) error {
-	if ok, _ := c.Extension("STARTTLS"); ok && !direktTLS {
-		if err := c.StartTLS(tlsKonfig); err != nil {
-			return err
+	if !direktTLS {
+		// Ohne STARTTLS gingen Mail und Knopf-Links im Klartext; das geht nur lokal (Mailpit).
+		if ok, _ := c.Extension("STARTTLS"); ok {
+			if err := c.StartTLS(tlsKonfig); err != nil {
+				return err
+			}
+		} else if !v.k.Lokal {
+			return errors.New("der Mailserver bietet kein STARTTLS an")
 		}
 	}
 	if v.k.SMTPBenutzer == "" {
@@ -122,4 +129,14 @@ func baueNachricht(von *mail.Address, an, betreff, text, html string) []byte {
 	}
 	fmt.Fprintf(&b, "--%s--\r\n", grenze)
 	return b.Bytes()
+}
+
+// fuersLog kürzt einen Versandfehler auf den SMTP-Code: Mailserver zitieren in der Antwort oft die
+// Empfängeradresse, und Namen gehören nicht ins Log.
+func fuersLog(err error) string {
+	var antwort *textproto.Error
+	if errors.As(err, &antwort) {
+		return fmt.Sprintf("SMTP %d", antwort.Code)
+	}
+	return err.Error()
 }

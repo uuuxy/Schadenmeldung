@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/mail"
 	"sort"
 	"strings"
 )
@@ -94,7 +95,7 @@ func (a *app) rolleSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	}
 	email := strings.ToLower(a.konf.vervollstaendige(ein.Email))
 	switch {
-	case !strings.Contains(email, "@") || len(email) > 200:
+	case !gueltigeAdresse(email):
 		fehler(w, http.StatusBadRequest, "Bitte eine E-Mail-Adresse der Schule eingeben.")
 		return
 	case !a.konf.domainErlaubt(email):
@@ -132,7 +133,20 @@ func (a *app) rolleLoeschen(w http.ResponseWriter, r *http.Request, b benutzer) 
 		nichtGefundenOderIntern(w, err)
 		return
 	}
+	// Mit der Rolle enden auch die Sitzungen: Bekäme die Person sie später wieder, hätte sonst auch ein
+	// gestohlenes Handy wieder alle Rechte.
+	if err := a.sp.loescheSitzungenVon(r.Context(), email); err != nil {
+		intern(w, err)
+		return
+	}
 	a.rollenListe(w, r, b)
+}
+
+// gueltigeAdresse lässt nur eine schlichte Adresse durch, ohne Namen, Leerzeichen oder Zeilenumbruch:
+// Sie landet später als Empfänger im Mailversand.
+func gueltigeAdresse(email string) bool {
+	a, err := mail.ParseAddress(email)
+	return err == nil && a.Address == email && len(email) <= 200
 }
 
 // ── Speicher ─────────────────────────────────────────────────────────────────
