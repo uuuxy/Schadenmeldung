@@ -64,6 +64,7 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
 | Offline | eigener Service Worker (`frontend/public/sw.js`), Ausgang in IndexedDB |
 | Anmeldung | IMAP gegen den Schul-Mailserver |
 | Betrieb | Docker Compose hinter Caddy |
+| Lizenz | [EUPL-1.2](LICENSE) |
 
 ## Ausprobieren auf dem eigenen Rechner
 
