@@ -37,14 +37,14 @@ func TestFremdeDomainKommtNichtHinein(t *testing.T) {
 func TestKurzdomainWirdUmgeschrieben(t *testing.T) {
 	k := konfiguration{Domains: []string{"schule.example"}, Aliase: []string{"kurz.example"}}
 	for ein, erwartet := range map[string]string{
-		"p.muster":                        "p.muster@schule.example",
-		" p.muster@kurz.example ":           "p.muster@schule.example",
-		"P.Muster@Kurz.Example":             "P.Muster@schule.example",
-		"p.muster@schule.example": "p.muster@schule.example",
-		"p.muster@gmail.com":              "p.muster@gmail.com",
-		"p.muster@neben.kurz.example":       "p.muster@neben.kurz.example",
-		"@kurz.example":                     "@kurz.example",
-		"":                                "",
+		"p.muster":                    "p.muster@schule.example",
+		" p.muster@kurz.example ":     "p.muster@schule.example",
+		"P.Muster@Kurz.Example":       "P.Muster@schule.example",
+		"p.muster@schule.example":     "p.muster@schule.example",
+		"p.muster@gmail.com":          "p.muster@gmail.com",
+		"p.muster@neben.kurz.example": "p.muster@neben.kurz.example",
+		"@kurz.example":               "@kurz.example",
+		"":                            "",
 	} {
 		if aus := k.vervollstaendige(ein); aus != erwartet {
 			t.Errorf("vervollstaendige(%q) = %q, erwartet %q", ein, aus, erwartet)
