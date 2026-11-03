@@ -1,6 +1,6 @@
 name: Prüfen und Docker-Image veröffentlichen (ghcr.io)
 
-# Bei jedem Push auf main: erst prüfen (gofmt, go vet, Go-Tests gegen PostgreSQL 18, Bau der
+# Bei jedem Push auf main: erst prüfen (gofmt, go vet, govulncheck, gosec, Go-Tests gegen PostgreSQL 18, Bau der
 # Oberfläche ohne Warnung), dann das Image bauen und als ghcr.io/uuuxy/schadenmeldung veröffentlichen. Auf
 # dem Server baut ./update.sh selbst; `docker compose pull && docker compose up -d` ginge auch.
 #
@@ -14,6 +14,12 @@ on:
   push:
     branches: [main]
     tags: ['v*.*.*']
+  # Vorschläge von Dependabot werden vor dem Übernehmen geprüft; veröffentlicht wird nur von main.
+  pull_request:
+    branches: [main]
+  # Montags auch ohne Änderung: Eine neue Lücke in Go oder einem Baustein meldet sich so von selbst.
+  schedule:
+    - cron: '0 5 * * 1'
   workflow_dispatch:
 
 # Läufe je Ref nacheinander statt abbrechen: Ein abgebrochener Lauf stünde als rotes Kreuz am
@@ -66,6 +72,14 @@ jobs:
           go vet ./...
           go test -count=1 ./...
 
+      - name: Sicherheit prüfen (govulncheck, gosec)
+        shell: bash
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.7.0
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.27.1
+          "$(go env GOPATH)/bin/govulncheck" ./...
+          "$(go env GOPATH)/bin/gosec" -quiet ./...
+
       - name: Node einrichten
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -83,6 +97,7 @@ jobs:
 
   veroeffentlichen:
     needs: pruefen
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-26.04
     permissions:
       contents: read
