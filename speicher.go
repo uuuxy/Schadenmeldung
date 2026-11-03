@@ -151,3 +151,16 @@ func nichtGefunden(err error) error {
 	}
 	return err
 }
+
+// alle fragt ab und sammelt die Zeilen; nie nil, damit die Oberfläche [] statt null bekommt.
+func alle[T any](ctx context.Context, db *pgxpool.Pool, lies pgx.RowToFunc[T], sql string, args ...any) ([]T, error) {
+	zeilen, err := db.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	liste, err := pgx.CollectRows(zeilen, lies)
+	if liste == nil {
+		liste = []T{}
+	}
+	return liste, err
+}

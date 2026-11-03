@@ -64,12 +64,8 @@ func (s *speicher) meldungenMitAusstehenderMail(ctx context.Context, seit time.T
 
 // ausstehendeEmpfaenger: an wen die Mail zu dieser Meldung noch hinaus muss.
 func (s *speicher) ausstehendeEmpfaenger(ctx context.Context, meldungID int64) ([]string, error) {
-	zeilen, err := s.db.Query(ctx, `SELECT empfaenger FROM mail_versand
+	return alle(ctx, s.db, pgx.RowTo[string], `SELECT empfaenger FROM mail_versand
 		WHERE meldung_id = $1 AND gesendet_am IS NULL ORDER BY empfaenger`, meldungID)
-	if err != nil {
-		return nil, err
-	}
-	return pgx.CollectRows(zeilen, pgx.RowTo[string])
 }
 
 func (s *speicher) anzahlOffen(ctx context.Context) (int, error) {

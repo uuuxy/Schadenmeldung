@@ -14,16 +14,8 @@ import (
 // raeume liefert die Bereiche in der Reihenfolge, in der die Verwaltung sie eingegeben hat (EG vor
 // 1. OG, nicht nach dem Alphabet), darin die Räume nach Namen.
 func (s *speicher) raeume(ctx context.Context) ([]raum, error) {
-	zeilen, err := s.db.Query(ctx, `SELECT r.id, r.name, r.bereich, r.code FROM raeume r
+	return alle(ctx, s.db, pgx.RowToStructByPos[raum], `SELECT r.id, r.name, r.bereich, r.code FROM raeume r
 		ORDER BY (SELECT min(x.id) FROM raeume x WHERE x.bereich = r.bereich), lower(r.name)`)
-	if err != nil {
-		return nil, err
-	}
-	liste, err := pgx.CollectRows(zeilen, pgx.RowToStructByPos[raum])
-	if liste == nil {
-		liste = []raum{}
-	}
-	return liste, err
 }
 
 func (s *speicher) raum(ctx context.Context, id int64) (raum, error) {

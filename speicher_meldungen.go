@@ -20,15 +20,8 @@ func scanneMeldung(z pgx.Row) (meldung, error) {
 }
 
 func (s *speicher) abfrage(ctx context.Context, rest string, args ...any) ([]meldung, error) {
-	zeilen, err := s.db.Query(ctx, "SELECT "+meldungSpalten+" "+rest, args...)
-	if err != nil {
-		return nil, err
-	}
-	liste, err := pgx.CollectRows(zeilen, func(z pgx.CollectableRow) (meldung, error) { return scanneMeldung(z) })
-	if liste == nil {
-		liste = []meldung{}
-	}
-	return liste, err
+	return alle(ctx, s.db, func(z pgx.CollectableRow) (meldung, error) { return scanneMeldung(z) },
+		"SELECT "+meldungSpalten+" "+rest, args...)
 }
 
 // offeneMeldungen zeigt Dringendes zuerst, sonst das Neueste oben.

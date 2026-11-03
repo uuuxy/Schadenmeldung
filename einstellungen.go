@@ -90,15 +90,7 @@ func (a *app) artSchalten(w http.ResponseWriter, r *http.Request, _ benutzer) {
 }
 
 func (s *speicher) artenAus(ctx context.Context) ([]string, error) {
-	zeilen, err := s.db.Query(ctx, "SELECT kategorie FROM arten_aus ORDER BY kategorie")
-	if err != nil {
-		return nil, err
-	}
-	aus, err := pgx.CollectRows(zeilen, pgx.RowTo[string])
-	if aus == nil {
-		aus = []string{}
-	}
-	return aus, err
+	return alle(ctx, s.db, pgx.RowTo[string], "SELECT kategorie FROM arten_aus ORDER BY kategorie")
 }
 
 func (s *speicher) schalteArt(ctx context.Context, kategorie string, sichtbar bool) error {
