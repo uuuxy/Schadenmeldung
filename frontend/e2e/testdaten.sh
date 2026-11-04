@@ -21,5 +21,5 @@ m lehrerin -F raumId=$(id 101) -F kategorie=heizung -F 'was=Zu kalt'
 st() { curl -s -b $SP/hm.txt -H "$H" -H "$J" -d "$2" $B/api/meldungen/$1/status | head -c 50; echo; }
 st 3 '{"status":"bestellt","antwort":"Neue Röhre ist bestellt, kommt Freitag."}'
 st 4 '{"status":"fachfirma"}'
-st 1 '{"status":"gesehen"}'
+st 1 '{"status":"in_arbeit"}'
 st 6 '{"status":"erledigt","antwort":"Ventil war zu – geht wieder."}'

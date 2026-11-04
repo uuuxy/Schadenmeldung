@@ -10,7 +10,7 @@ import (
 
 // Benachrichtigung: Jede neue Meldung geht sofort als eigene Mail an alle aus dem Backend, die Mail
 // eingeschaltet haben; der Hausmeister hat sie von sich aus an. Die Mail trägt drei Knöpfe –
-// „Gesehen“, „Fachfirma“ und „Erledigt“ –, die ohne Anmeldung wirken; mehr wären in einer Zeile zu
+// „In Arbeit“, „Fachfirma“ und „Erledigt“ –, die ohne Anmeldung wirken; mehr wären in einer Zeile zu
 // viel (M3), „Material bestellt“ steht auf der Seite dahinter. Wie sie hinausgeht: postausgang.go.
 
 const linkGueltigkeit = 14 * 24 * time.Hour
@@ -45,9 +45,9 @@ func (a *app) mailEmpfaenger(ctx context.Context) (map[string]empfaenger, error)
 }
 
 type mailMeldung struct {
-	Ort, Bereich, Was, Notiz, Wann, Von      string
-	Dringend, MitFoto                        bool
-	LinkGesehen, LinkFachfirma, LinkErledigt string
+	Ort, Bereich, Was, Notiz, Wann, Von       string
+	Dringend, MitFoto                         bool
+	LinkInArbeit, LinkFachfirma, LinkErledigt string
 }
 
 type mailDaten struct {
@@ -83,7 +83,7 @@ func (a *app) baueMail(ctx context.Context, e empfaenger, m meldung) (mailDaten,
 			return d, err
 		}
 		basis := a.konf.OeffentlicheAdresse + "/aktion/" + token + "?tun="
-		d.Meldung.LinkGesehen, d.Meldung.LinkFachfirma, d.Meldung.LinkErledigt = basis+"gesehen", basis+"fachfirma", basis+"erledigt"
+		d.Meldung.LinkInArbeit, d.Meldung.LinkFachfirma, d.Meldung.LinkErledigt = basis+"in_arbeit", basis+"fachfirma", basis+"erledigt"
 	}
 	offen, err := a.sp.anzahlOffen(ctx)
 	d.Offen = offen

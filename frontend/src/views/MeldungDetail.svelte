@@ -88,7 +88,7 @@
 			<section>
 				<h3 class="mb-3 text-title-small text-on-surface-variant">Stand</h3>
 				<Stand meldung={m} />
-				<p class="mt-2 text-body-small text-on-surface-variant">„Gesehen“ zeigt dem Kollegium, dass Bescheid gesagt ist – ohne Zusage, wann. Ein zweiter Tipp nimmt den Stand zurück.</p>
+				<p class="mt-2 text-body-small text-on-surface-variant">„In Arbeit“ zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage, wann. Ein zweiter Tipp nimmt den Stand zurück.</p>
 			</section>
 		{/if}
 

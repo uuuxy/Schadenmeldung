@@ -104,7 +104,7 @@
 					</Button>
 				{/each}
 			</div>
-			<p class="text-center text-body-small text-on-surface-variant">„Gesehen“ zeigt dem Kollegium, dass Bescheid gesagt ist – ohne Zusage, wann.</p>
+			<p class="text-center text-body-small text-on-surface-variant">„In Arbeit“ zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage, wann.</p>
 		{/if}
 		<Button variant="ghost" onclick={() => gehe('/', { ersetzen: true })}><Icon name="open_in_new" groesse={18} />In der App öffnen</Button>
 	{/if}

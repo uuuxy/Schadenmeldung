@@ -46,7 +46,7 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Verwaltung (Sekretariat) sieht und druckt QR-Aufkleber, ändert aber nichts (`rollen.go`,
   `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die Oberfläche.
 - Mails sollen den Hausmeister nicht hetzen: keine Erinnerungen, keine Eskalation, keine Zeitstempel
-  von „Gesehen“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
+  von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
 - Lokal landen Mails in Mailpit (`docker-compose.local.yml`, http://localhost:8025).
 
 ## Datenbank

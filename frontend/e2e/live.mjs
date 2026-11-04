@@ -46,15 +46,15 @@ pruefe(dauer < 2000, 'schneller als 2 Sekunden');
 pruefe(await hm.evaluate(() => window.__ohneNeuladen === true), '… ohne die Seite neu zu laden');
 pruefe(lehrerinStroeme.length === 0, 'Kollegium öffnet keinen Ereignisstrom');
 
-// Die Leitung sieht den neuen Stand, sobald der Hausmeister „Gesehen“ setzt.
+// Die Leitung sieht den neuen Stand, sobald der Hausmeister „In Arbeit“ setzt.
 const [, leitung] = await kontext('direktorin');
 await leitung.goto(B + '/');
 const karte = zeilen(leitung).filter({ hasText: was });
 await karte.waitFor();
 const start2 = Date.now();
-await hm.context().request.post(`${B}/api/meldungen/${neu.id}/status`, { headers: { 'X-Schaden': '1' }, data: { status: 'gesehen' } });
-await karte.getByText('Gesehen').first().waitFor({ timeout: 5000 });
-pruefe(true, `Leitung sieht „Gesehen“ nach ${Date.now() - start2} ms`);
+await hm.context().request.post(`${B}/api/meldungen/${neu.id}/status`, { headers: { 'X-Schaden': '1' }, data: { status: 'in_arbeit' } });
+await karte.getByText('In Arbeit').first().waitFor({ timeout: 5000 });
+pruefe(true, `Leitung sieht „In Arbeit“ nach ${Date.now() - start2} ms`);
 
 // Umschalter: von der Übersicht zur Meldeebene und zurück.
 await hm.getByRole('button', { name: 'Melden', exact: true }).click();

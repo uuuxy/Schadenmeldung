@@ -1,5 +1,7 @@
 import './app.css';
 import './lib/darstellung.svelte.js';
+// Früh laden: Chrome meldet gleich beim Start, dass es die App installieren kann.
+import './lib/installieren.svelte.js';
 import { mount } from 'svelte';
 import App from './App.svelte';
 

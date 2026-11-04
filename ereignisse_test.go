@@ -48,8 +48,8 @@ func TestEreignisstromMeldetJedeAenderung(t *testing.T) {
 	warteAuf("event: meldungen")
 
 	pfad := fmt.Sprintf("/api/meldungen/%v/status", m["id"])
-	if status, antwort := hm.json("POST", pfad, map[string]string{"status": "gesehen"}); status != http.StatusOK {
-		t.Fatalf("Gesehen: Status %d, %v", status, antwort)
+	if status, antwort := hm.json("POST", pfad, map[string]string{"status": "in_arbeit"}); status != http.StatusOK {
+		t.Fatalf("In Arbeit: Status %d, %v", status, antwort)
 	}
 	warteAuf("event: meldungen")
 

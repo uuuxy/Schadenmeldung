@@ -22,9 +22,8 @@ async function tippeNeben(s, ort, kante, abstand) {
 
 let [k, s] = await seite('s.schmidt');
 await s.goto(B + '/melden');
-let wo = await tippeNeben(s, s.getByRole('button', { name: 'Sport', exact: true }), 'unten', 6);
-pruefe(await s.getByRole('button', { name: 'Sport', exact: true }).getAttribute('aria-pressed') === 'true', `Bereichs-Chip „Sport“ (${wo})`);
-wo = await tippeNeben(s, s.getByRole('button', { name: 'Turnhalle' }), 'unten', 0.5);
+// Bis 15 Räume stehen alle gleich da (ohne Bereichs-Kachel), also gleich der Raum.
+let wo = await tippeNeben(s, s.getByRole('button', { name: 'Turnhalle' }), 'unten', 0.5);
 pruefe(await s.getByRole('button', { name: /Turnhalle.*Ändern/s }).isVisible(), `Raumknopf „Turnhalle“ (${wo})`);
 await s.getByRole('button', { name: 'Licht & Strom' }).click();
 await s.waitForTimeout(500);
@@ -52,10 +51,10 @@ await s.getByRole('button', { name: 'Rückgängig' }).click();
 await s.getByRole('button', { name: /^Bio 1/ }).click();
 // Erst nach dem Überblenden (View Transition, 0,3 s) nimmt die neue Seite Tipps an.
 await s.waitForTimeout(500);
-const gesehen = s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'Gesehen' });
-wo = await tippeNeben(s, gesehen, 'oben', 3);
+const inArbeit = s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'In Arbeit' });
+wo = await tippeNeben(s, inArbeit, 'oben', 3);
 await s.waitForTimeout(500);
-pruefe((await gesehen.getAttribute('aria-pressed')) === 'true', `Stand „Gesehen“ auf der Meldung (${wo})`);
+pruefe((await inArbeit.getAttribute('aria-pressed')) === 'true', `Stand „In Arbeit“ auf der Meldung (${wo})`);
 await s.getByRole('button', { name: 'Zurück' }).click();
 wo = await tippeNeben(s, s.getByRole('group', { name: 'Ansicht' }).getByRole('button', { name: 'Melden' }), 'unten', 3);
 await s.waitForTimeout(300);

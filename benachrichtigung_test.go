@@ -29,7 +29,7 @@ func TestJedeMeldungGehtSofortRaus(t *testing.T) {
 		if m.An != "hm@schule.de" || !strings.Contains(m.HTML, "https://schaden.schule.de/aktion/") {
 			t.Errorf("Mail an %q ohne Knöpfe", m.An)
 		}
-		for _, tun := range []string{"gesehen", "fachfirma", "erledigt"} {
+		for _, tun := range []string{"in_arbeit", "fachfirma", "erledigt"} {
 			if !strings.Contains(m.HTML, "?tun="+tun) || !strings.Contains(m.Text, "?tun="+tun) {
 				t.Errorf("Mail an %q ohne Knopf %q", m.An, tun)
 			}
@@ -60,12 +60,12 @@ func TestGescheiterteMailKommtNach(t *testing.T) {
 	lehrer.melde(map[string]string{"ort": "204", "kategorie": "fenster", "was": "Tür klemmt"}, nil)
 	_, fenster := lehrer.melde(map[string]string{"ort": "205", "kategorie": "fenster", "was": "Fenster offen"}, nil)
 	u.app.versendeAusstehende(ctx)
-	hm.json("POST", fmt.Sprintf("/api/meldungen/%v/status", fenster["id"]), map[string]string{"status": "gesehen"})
+	hm.json("POST", fmt.Sprintf("/api/meldungen/%v/status", fenster["id"]), map[string]string{"status": "in_arbeit"})
 	u.post.stoere(nil)
 	u.uhr = u.uhr.Add(time.Hour)
 	u.app.versendeAusstehende(ctx)
 	if b := betreffe(u.post.alle()); len(b) != 2 || !strings.Contains(b[1], "Tür klemmt") {
-		t.Fatalf("eine Stunde später: %v, erwartet nur „Tür klemmt“ dazu (das Fenster ist schon gesehen)", b)
+		t.Fatalf("eine Stunde später: %v, erwartet nur „Tür klemmt“ dazu (das Fenster ist schon in Arbeit)", b)
 	}
 
 	u.post.stoere(ausfall)

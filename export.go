@@ -11,7 +11,7 @@ import (
 
 // Export für alle mit Übersicht. Beide Dateien kommen ohne die Namen der Meldenden aus: Sie
 // verlassen die App, etwa zum Schulträger, und für Rückfragen steht der Name in der App. Auch der
-// Zeitpunkt von „Gesehen“ fehlt, wie in der Oberfläche.
+// Zeitpunkt von „In Arbeit“ fehlt, wie in der Oberfläche.
 
 // exportExcel: alle gespeicherten Meldungen, offene und erledigte, in der Reihenfolge ihres Eingangs.
 func (a *app) exportExcel(w http.ResponseWriter, r *http.Request, _ benutzer) {

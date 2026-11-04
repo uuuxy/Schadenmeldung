@@ -51,11 +51,11 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
   - `verwaltung` (Sekretariat): sieht die Übersicht, öffnet Meldungen, exportiert und druckt
     QR-Aufkleber, ändert nichts.
   - `ADMINS` (env) ist feste Verwaltung, damit sich niemand aussperrt. Der Nutzer rechnet mit bis zu 10 Personen im Backend.
-- **Stati:** `offen`, `gesehen`, `bestellt`, `fachfirma`, `erledigt` (CHECK in Migration 002).
-  „Gesehen“ ersetzt „In Arbeit“: Der Hausmeister zeigt damit, dass er Bescheid weiß, ohne eine Zusage, wann.
+- **Stati:** `offen`, `in_arbeit`, `bestellt`, `fachfirma`, `erledigt` (CHECK in Migration 007).
+  „In Arbeit“ (bis 4. November „In Arbeit“): Der Hausmeister zeigt damit, dass er sich kümmert, ohne Zusage, wann.
 - **Mail an den Hausmeister** (`benachrichtigung.go`):
   - Jede neue Meldung geht sofort als eigene Mail hinaus; eine Sammelmail gibt es nicht (Entscheidung des Nutzers, 3. November). `mail_versand` ist der Postausgang (`postausgang.go`): Was scheitert, schickt der Server einen Tag lang alle 5 Minuten nach, und nichts kommt doppelt.
-  - Die Knöpfe „Gesehen“, „Fachfirma“ und „Erledigt“ in der Mail öffnen `/aktion/<token>`. Das funktioniert ohne Anmeldung, 14 Tage lang, und erst ein Tipp auf der Seite löst etwas aus, damit Virenscanner beim Vorab-Öffnen nichts drücken.
+  - Die Knöpfe „In Arbeit“, „Fachfirma“ und „Erledigt“ in der Mail öffnen `/aktion/<token>`. Das funktioniert ohne Anmeldung, 14 Tage lang, und erst ein Tipp auf der Seite löst etwas aus, damit Virenscanner beim Vorab-Öffnen nichts drücken.
   - Ein- und ausschalten lässt sich das je Person im Kontomenü.
 - **Offline:** Service Worker (`frontend/public/sw.js`); der Ausgang in IndexedDB reicht Meldungen aus dem Funkloch nach.
 - **Fotos:** liegen als `bytea` in Postgres und werden verkleinert, die Metadaten fallen weg.
@@ -70,7 +70,7 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
   - Das Kollegium sieht nur das Formular, die Leitung nur lesend.
   - Ein Mail-Knopf erledigt die Meldung ohne Anmeldung.
   - Alle Tippflächen messen mindestens 48 px. Tipps 3–6 px neben die Ränder treffen trotzdem.
-  - Live: Eine neue Meldung erscheint beim Hausmeister nach rund 0,2–0,4 s, „Gesehen“ bei der
+  - Live: Eine neue Meldung erscheint beim Hausmeister nach rund 0,2–0,4 s, „In Arbeit“ bei der
     Leitung genauso, ohne Neuladen; das Kollegium öffnet keinen Strom.
 - Mailversand über Mailpit; Docker-Build und Compose-Probe.
 - Handy-Screenshots für den Nutzer: https://claude.ai/artifact/MmpdCqftLEHp4qr2hc7t75 (privat), vorher
@@ -103,7 +103,6 @@ nur in `SERVER.lokal.md`.
 
 ## Offene Entscheidungen des Nutzers (nicht vorwegnehmen)
 
-- „Gesehen“ statt „In Arbeit“ bestätigen.
 - Hat der Hausmeister ein Schulpostfach? Vorschlag: Funktionspostfach `hausmeister@…`.
 - Haben Schüler Postfächer unter derselben Domain? Dann könnten sie melden. Gewollt?
 - Offen im Internet mit Anmeldung (empfohlen, Vorgabe) oder nur im Schulnetz (Caddy `SCHULNETZ`)?

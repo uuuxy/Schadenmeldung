@@ -11,7 +11,7 @@
 	 * Eine Meldung als Eintrag einer M3-Liste (expressive, segmentiert): Ein Tipp öffnet die Meldung,
 	 * hinten liegt als einzige Zusatzaktion das Häkchen „Erledigt“ („multi-action list“). Alles
 	 * Weitere – Stand, Vermerk, Löschen – steht auf der Seite der Meldung, nicht an jeder Zeile.
-	 * Offen ist der Normalfall und trägt keinen Chip; einen Chip gibt es erst ab „Gesehen“. Der
+	 * Offen ist der Normalfall und trägt keinen Chip; einen Chip gibt es erst ab „In Arbeit“. Der
 	 * Bereich steht auf der Seite der Meldung und im Filter; hier bekommt der Ort die ganze Zeile.
 	 */
 	let { meldung: m } = $props();

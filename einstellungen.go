@@ -25,7 +25,7 @@ var arten = []struct{ schluessel, name string }{
 // migrations/002.
 var statusNamen = map[string]string{
 	"offen":     "Offen",
-	"gesehen":   "Gesehen",
+	"in_arbeit": "In Arbeit",
 	"bestellt":  "Material bestellt",
 	"fachfirma": "Fachfirma / Kreis informiert",
 	"erledigt":  "Erledigt",

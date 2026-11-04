@@ -50,7 +50,7 @@ func TestRechteJeRolle(t *testing.T) {
 		pruefe("PDF-Export", fall.sieht, status, http.StatusOK)
 		status, _ = n.json("POST", "/api/arten", map[string]any{"kategorie": "technik", "sichtbar": true})
 		pruefe("Arten schalten", fall.aendert, status, http.StatusOK)
-		status, _ = n.json("POST", "/api/meldungen/"+id+"/status", map[string]string{"status": "gesehen"})
+		status, _ = n.json("POST", "/api/meldungen/"+id+"/status", map[string]string{"status": "in_arbeit"})
 		pruefe("Stand setzen", fall.aendert, status, http.StatusOK)
 		status, _ = n.json("POST", "/api/raeume", map[string]string{"text": "Raum " + fall.name})
 		pruefe("Räume anlegen", fall.aendert, status, http.StatusOK)

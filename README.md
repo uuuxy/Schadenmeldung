@@ -21,7 +21,7 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   Adressen aus `ADMINS` sind immer Admin, damit sich niemand aussperren kann.
 - **Bearbeiten:** eine schlanke Liste der offenen Meldungen, Dringendes zuerst, Filter nach Bereich
   (ein Chip, die Bereiche im Blatt). Hinten an jeder Zeile das Häkchen „Erledigt“ mit Rückgängig.
-  Ein Tipp auf die Zeile öffnet die Meldung: Foto groß, Zwischenstand mit einem Tipp („Gesehen“,
+  Ein Tipp auf die Zeile öffnet die Meldung: Foto groß, Zwischenstand mit einem Tipp („In Arbeit“,
   „Bestellt“, „Fachfirma“), ein interner Vermerk (sehen alle mit Übersicht, nicht das Kollegium),
   Löschen mit Rückfrage. Ziehen zum Aktualisieren.
 - **Export:** „Exportieren“ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
@@ -36,11 +36,11 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   Übersicht.
 - **Mail an den Hausmeister:** Jede neue Meldung kommt sofort als eigene Mail, Dringendes mit
   „Dringend“ im Betreff, jede nur einmal. Antwortet der Mailserver nicht, schickt die App einen Tag
-  lang alle fünf Minuten nach. In der Mail stehen die Knöpfe „Gesehen“, „Fachfirma“ und „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
+  lang alle fünf Minuten nach. In der Mail stehen die Knöpfe „In Arbeit“, „Fachfirma“ und „Erledigt“; sie wirken ohne Anmeldung, 14 Tage lang, und erst beim Antippen auf der Seite dahinter
   (Virenscanner, die Links vorab öffnen, lösen nichts aus). Jeder schaltet seine Mails im Kontomenü
   selbst an oder ab; außer dem Hausmeister bekommt niemand ohne eigene Wahl welche.
-- **„Gesehen“ statt „In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass Bescheid gesagt ist – ohne
-  Zusage, wann. Angezeigt wird der Stand, nicht der Zeitpunkt.
+- **„In Arbeit“:** Ein Tipp zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage,
+  wann. Angezeigt wird der Stand, nicht der Zeitpunkt.
 - **Einstellungen** (Kontomenü): Räume per Liste einfügen (auch aus Excel oder CSV), umbenennen,
   ohne dass der QR-Aufkleber ungültig wird, QR-Aufkleber drucken (12 je A4-Blatt); Arten ein- und
   ausschalten (Medientechnik ist zu Beginn aus, weil die IT dafür ein eigenes Ticketsystem hat; die
@@ -158,7 +158,7 @@ Eingebaut:
 - Das Passwort geht nur an den Mailserver; in der Datenbank steht nur der Hash des Sitzungsschlüssels.
 - Fotos werden verkleinert und neu geschrieben, dabei fallen GPS-Ort und Gerätedaten weg.
 - Wer gemeldet hat, sehen nur Hausmeister, Leitung, Verwaltung und Admins (für Rückfragen); in den
-  Export (PDF, Excel) kommt der Name nicht, und auch nicht, wann „Gesehen“ gesetzt wurde.
+  Export (PDF, Excel) kommt der Name nicht, und auch nicht, wann „In Arbeit“ gesetzt wurde.
 - Fehlversuchsbremse bei der Anmeldung: 5 Fehlversuche je Konto bzw. 20 je Adresse in 15 Minuten.
   Ein Ausfall des Mailservers zählt nicht als Fehlversuch.
 - Löschfristen laufen stündlich von selbst. Die Datenschutzseite in der App nennt sie.

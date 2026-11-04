@@ -1,17 +1,17 @@
 // Die Stati einer Meldung mit Farbrolle. Die Schlüssel prüfen auch der Server (server.go, stati) und
 // die Datenbank (CHECK in migrations/002).
-// „Gesehen“ heißt: Der Hausmeister weiß Bescheid – ohne Zusage, wann. Das nimmt den Druck raus.
+// „In Arbeit“ heißt: Der Hausmeister kümmert sich – ohne Zusage, wann. Das nimmt den Druck raus.
 // `knapp` steht auf den Knöpfen des Hausmeisters, die in eine Handyzeile passen müssen.
 export const stati = {
 	offen: { name: 'Offen', knapp: 'Offen', icon: 'schedule', ton: 'neutral' },
-	gesehen: { name: 'Gesehen', knapp: 'Gesehen', icon: 'visibility', ton: 'primaer' },
+	in_arbeit: { name: 'In Arbeit', knapp: 'In Arbeit', icon: 'handyman', ton: 'primaer' },
 	bestellt: { name: 'Material bestellt', knapp: 'Bestellt', icon: 'local_shipping', ton: 'warten' },
 	fachfirma: { name: 'Fachfirma / Kreis informiert', knapp: 'Fachfirma', icon: 'engineering', ton: 'warten' },
 	erledigt: { name: 'Erledigt', knapp: 'Erledigt', icon: 'check_circle', ton: 'erfolg' }
 };
 
 // Was der Hausmeister zwischen „offen“ und „erledigt“ antippen kann.
-export const zwischenstati = ['gesehen', 'bestellt', 'fachfirma'];
+export const zwischenstati = ['in_arbeit', 'bestellt', 'fachfirma'];
 
 // Vermerke zum Antippen, damit niemand mit kalten Fingern im Flur tippen muss. Ohne Zeitzusage: Der
 // Hausmeister soll sich nicht festlegen müssen.
