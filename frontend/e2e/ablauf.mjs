@@ -86,15 +86,14 @@ await s.getByRole('button', { name: /Konto/ }).click();
 pruefe(await s.getByRole('button', { name: 'QR-Aufkleber drucken' }).isVisible() && !(await s.getByRole('button', { name: 'Einstellungen', exact: true }).isVisible()), 'Verwaltung: QR-Aufkleber im Kontomenü, keine Einstellungen');
 await k.close();
 
-// 4b. Hausmeister: Meldung öffnen, Stand setzen, in der Liste abhaken und rückgängig machen
+// 4b. Hausmeister: Meldung öffnen, Stand setzen (führt zurück zur Liste), in der Liste abhaken und rückgängig machen
 [k, s] = await kontext('hausmeister');
 await s.goto(B + '/');
 await s.getByRole('button', { name: /^Lehrerzimmer/ }).click();
-await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'In Arbeit' }).click();
-await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'In Arbeit', pressed: true }).waitFor({ timeout: 5000 });
-pruefe(true, 'Detailseite: „In Arbeit“ gesetzt');
 await bild(s, '09d-meldung-hausmeister');
-await s.getByRole('button', { name: 'Zurück' }).click();
+await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'In Arbeit' }).click();
+await s.getByText('In Arbeit: Lehrerzimmer').waitFor({ timeout: 5000 });
+pruefe(new URL(s.url()).pathname === '/' && (await s.getByRole('button', { name: /^Lehrerzimmer/ }).getByText('In Arbeit').isVisible()), '„In Arbeit“ führt zurück zur Liste, die Zeile zeigt den Stand');
 await s.getByRole('button', { name: 'Erledigt: Lehrerzimmer, Tisch wackelt' }).click();
 await s.getByText('Erledigt: Lehrerzimmer').waitFor();
 await s.getByRole('button', { name: /^Lehrerzimmer/ }).waitFor({ state: 'hidden' });

@@ -4,6 +4,8 @@
 		-webkit-text-size-adjust: 100%;
 		/* Das eigene Ziehen-zum-Aktualisieren ersetzt das des Browsers (sonst lädt Chrome die ganze Seite neu). */
 		overscroll-behavior-y: contain;
+		/* Wer per Tastatur weitergeht, landet nicht hinter der festen Leiste unten („Melden“, „Erledigt“). */
+		scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 	}
 	body {
 		@apply bg-surface font-sans text-on-surface antialiased;

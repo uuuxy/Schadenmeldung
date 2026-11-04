@@ -1,7 +1,7 @@
 <script>
 	import { slide } from 'svelte/transition';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
-	import { abhaken, loeschen, vermerkSpeichern, wiederOeffnen } from '../lib/meldung.js';
+	import { abhaken, loeschen, vermerkSpeichern, wiederOeffnen, zwischenstand } from '../lib/meldung.js';
 	import { kategorieNach } from '../lib/kategorien.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { zurueck } from '../lib/weg.svelte.js';
@@ -15,7 +15,9 @@
 	/**
 	 * Eine Meldung mit allem, was dazugehört: Foto in voller Breite, Stand, interner Vermerk. Die
 	 * Hauptaktion „Erledigt“ liegt unten in Daumenreichweite wie „Melden“ im Formular. Die Seite
-	 * liest die Meldung aus der Liste und bleibt damit live.
+	 * liest die Meldung aus der Liste und bleibt damit live. Ein Stand oder „Erledigt“ schließt die
+	 * Meldung ab und führt zurück zur Übersicht (wie Archivieren in Gmail); die Snackbar dort
+	 * bestätigt mit „Rückgängig“.
 	 */
 	let { id } = $props();
 	const m = $derived(zustand.offen.find((x) => x.id === id) ?? zustand.erledigt.find((x) => x.id === id));
@@ -32,10 +34,19 @@
 		return () => document.body.style.removeProperty('--snackbar-abstand');
 	});
 
-	async function fertig() {
-		const meldung = m;
+	// Ein getippter, noch nicht gespeicherter Vermerk reist mit, statt beim Zurückgehen zu verschwinden.
+	const mitVermerk = () => (vermerkGeaendert ? { antwort: vermerk.trim() } : {});
+
+	function fertig() {
+		const [meldung, zusatz] = [m, mitVermerk()];
 		zurueck('/');
-		await abhaken(meldung);
+		abhaken(meldung, zusatz);
+	}
+
+	function stand(s) {
+		const [meldung, zusatz] = [m, mitVermerk()];
+		zurueck('/');
+		zwischenstand(meldung, s, zusatz);
 	}
 
 	async function weg() {
@@ -87,7 +98,7 @@
 		{#if darfBearbeiten() && !erledigt}
 			<section>
 				<h3 class="mb-3 text-title-small text-on-surface-variant">Stand</h3>
-				<Stand meldung={m} />
+				<Stand meldung={m} onwahl={stand} />
 				<p class="mt-2 text-body-small text-on-surface-variant">„In Arbeit“ zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage, wann. Ein zweiter Tipp nimmt den Stand zurück.</p>
 			</section>
 		{/if}
