@@ -1,7 +1,7 @@
 <script>
 	import { slide } from 'svelte/transition';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
-	import { abhaken, loeschen, vermerkSpeichern, wiederOeffnen, weiterleiten, fotoAlsDatei } from '../lib/meldung.js';
+	import { abhaken, loeschen, vermerkSpeichern, wiederOeffnen } from '../lib/meldung.js';
 	import { kategorieNach } from '../lib/kategorien.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { zurueck } from '../lib/weg.svelte.js';
@@ -22,14 +22,6 @@
 	const art = $derived(m ? kategorieNach(m.kategorie) : null);
 	const erledigt = $derived(m?.status === 'erledigt');
 	let vermerk = $state(null);
-	// Fürs Weiterleiten liegt das Foto schon bereit: Das Teilen-Menü öffnet sich nur direkt nach dem
-	// Tippen, zum Nachladen bliebe keine Zeit.
-	const fotoAdresse = $derived(darfBearbeiten() ? m?.foto : null);
-	let fotoDatei = $state(null);
-	$effect(() => {
-		fotoDatei = null;
-		if (fotoAdresse) fotoAlsDatei(fotoAdresse).then((d) => (fotoDatei = d));
-	});
 	const vermerkGeaendert = $derived(m && vermerk !== null && vermerk.trim() !== m.antwort);
 
 	$effect(() => {
@@ -110,11 +102,7 @@
 					</div>
 				{/if}
 			</section>
-			<!-- Untereinander statt nebeneinander (M3: keine Knopfreihen); gap-2, damit sich die 48-px-Flächen nicht überlappen. -->
-			<div class="-ml-3 flex flex-col items-start gap-2">
-				<Button variant="ghost" onclick={() => weiterleiten(m, fotoDatei)}><Icon name="share" groesse={18} />Weiterleiten</Button>
-				<Button variant="warnend" onclick={weg}><Icon name="delete" groesse={18} />Meldung löschen</Button>
-			</div>
+			<Button variant="warnend" class="-ml-3 self-start" onclick={weg}><Icon name="delete" groesse={18} />Meldung löschen</Button>
 		{:else if m.antwort}
 			<section>
 				<h3 class="mb-2 text-title-small text-on-surface-variant">Vermerk</h3>

@@ -45,9 +45,8 @@
 			</p>
 		</section>
 		<section>
-			<h2 class="mb-2 text-title-medium">Export und Weiterleiten</h2>
+			<h2 class="mb-2 text-title-medium">Export</h2>
 			<p class="text-on-surface-variant">
-				Hausmeister und Leitung können eine einzelne Meldung über das Teilen-Menü ihres Geräts weiterleiten, etwa an den Schulträger: Ort, Schaden, Notiz und Foto, ohne den Namen der meldenden Person.
 				Hausmeister, Leitung und Verwaltung können die Meldungen als PDF oder Excel-Tabelle herunterladen, etwa für den Schulträger. Die Dateien enthalten keine Namen der Meldenden. Die Löschfristen gelten nur in der App: Wer eine Datei herunterlädt, löscht sie, sobald sie nicht mehr gebraucht wird.
 			</p>
 		</section>
