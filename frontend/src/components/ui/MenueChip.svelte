@@ -17,12 +17,13 @@
 	 *   kurz: Beschriftung auf dem Chip, wenn der volle Text zu lang ist; symbol und flaeche: Farbklassen.
 	 * @prop {string | null} wert - gebunden; null heißt alle.
 	 */
-	let { titel, alle, optionen, wert = $bindable(null) } = $props();
+	// alleIcon: das Symbol der Zeile „alle“, etwa für eine Sortierung statt eines Filters.
+	let { titel, alle, alleIcon = 'category', optionen, wert = $bindable(null) } = $props();
 	let offen = $state(false);
 
 	const gewaehlt = $derived(optionen.find((o) => o.wert === wert) ?? null);
 	const mitSymbol = $derived(optionen.some((o) => o.icon));
-	const zeilen = $derived([{ wert: null, text: alle, icon: 'category', flaeche: 'bg-surface-container-highest text-on-surface-variant' }, ...optionen]);
+	const zeilen = $derived([{ wert: null, text: alle, icon: alleIcon, flaeche: 'bg-surface-container-highest text-on-surface-variant' }, ...optionen]);
 
 	function waehle(w) {
 		wert = w;
