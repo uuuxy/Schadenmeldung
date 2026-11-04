@@ -1,7 +1,8 @@
 /**
  * Als App installieren. Chrome und Edge (Android, Windows) melden mit beforeinstallprompt, dass sie
  * es anbieten; das Ereignis kommt gleich beim Laden und wird hier aufgehoben, bis jemand tippt.
- * Safari auf dem iPhone kennt es nicht, dort geht es nur über „Teilen → Zum Home-Bildschirm“.
+ * Auf dem iPhone geht es in jedem Browser nur von Hand über „Teilen → Zum Home-Bildschirm“, denn Apple
+ * lässt keine Seite selbst installieren; Firefox auf Android bietet es nur in seinem Menü an.
  */
 export const installieren = $state({ angebot: null });
 
@@ -18,6 +19,9 @@ export const alsApp = () => matchMedia('(display-mode: standalone)').matches || 
 
 /** iPhone und iPad; neuere iPads geben sich als Mac aus, haben aber einen Touchscreen. */
 export const apfelGeraet = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+/** Firefox auf Android kann installieren, sagt es der Seite aber nicht (kein beforeinstallprompt). */
+export const firefoxAndroid = () => /Android/.test(navigator.userAgent) && /Firefox\//.test(navigator.userAgent);
 
 export function hinweisWeg() {
 	try {
