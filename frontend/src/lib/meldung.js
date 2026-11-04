@@ -3,17 +3,22 @@ import { zustand, setzeStatus, uebernimm } from './zustand.svelte.js';
 import { zeige } from './snackbar.svelte.js';
 import { frage } from './rueckfrage.svelte.js';
 import { rueckmeldung } from './haptik.js';
+import { stati } from './status.js';
 
 // Was man mit einer Meldung tun kann, an einer Stelle für Liste und Detailseite.
 
-/** Sofort abhaken, ohne auf den Server zu warten; schlägt es fehl, kommt die Meldung zurück. */
-export function abhaken(meldung) {
+/**
+ * Setzt den Stand sofort in der Liste, ohne auf den Server zu warten; schlägt es fehl, kommt der alte
+ * zurück. Die Snackbar bestätigt mit „Rückgängig“, denn wer hier tippt, ist schon wieder in der Liste.
+ * aenderung kann einen ungespeicherten Vermerk mitbringen ({ antwort }).
+ */
+function sofort(meldung, aenderung, text) {
 	const vorher = { ...meldung };
-	uebernimm({ ...vorher, status: 'erledigt', erledigtAm: new Date().toISOString() });
+	uebernimm({ ...vorher, ...aenderung, ...(aenderung.status === 'erledigt' && { erledigtAm: new Date().toISOString() }) });
 	rueckmeldung();
-	return setzeStatus(vorher.id, { status: 'erledigt' })
+	return setzeStatus(vorher.id, aenderung)
 		.then(() =>
-			zeige(`Erledigt: ${vorher.ort}`, {
+			zeige(`${text}: ${vorher.ort}`, {
 				name: 'Rückgängig',
 				tun: () => setzeStatus(vorher.id, { status: vorher.status }).catch((e) => zeige(e.message))
 			})
@@ -24,9 +29,14 @@ export function abhaken(meldung) {
 		});
 }
 
+export function abhaken(meldung, vermerk = {}) {
+	return sofort(meldung, { status: 'erledigt', ...vermerk }, 'Erledigt');
+}
+
 /** Ein zweiter Tipp auf den gewählten Zwischenstand nimmt ihn zurück. */
-export function zwischenstand(meldung, status) {
-	return setzeStatus(meldung.id, { status: meldung.status === status ? 'offen' : status }).catch((e) => zeige(e.message));
+export function zwischenstand(meldung, status, vermerk = {}) {
+	const neu = meldung.status === status ? 'offen' : status;
+	return sofort(meldung, { status: neu, ...vermerk }, neu === 'offen' ? 'Wieder offen' : stati[neu].name);
 }
 
 export function wiederOeffnen(meldung) {
