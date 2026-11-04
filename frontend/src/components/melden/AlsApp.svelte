@@ -1,4 +1,7 @@
 <script>
+	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { wenigBewegung } from '../../lib/weg.svelte.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
 	import { installieren, alsApp, apfelGeraet, hinweisWeg, hinweisAusblenden } from '../../lib/installieren.svelte.js';
@@ -11,6 +14,9 @@
 	 */
 	let { class: klasse = '' } = $props();
 	let weg = $state(alsApp() || hinweisWeg());
+	// Erst nach dem Aufbau einblenden: Beim ersten Zeichnen spielt Svelte keine Animation ab.
+	let bereit = $state(false);
+	onMount(() => (bereit = true));
 	const art = $derived(installieren.angebot ? 'knopf' : apfelGeraet() ? 'iphone' : null);
 
 	function ausblenden() {
@@ -26,11 +32,11 @@
 	}
 </script>
 
-{#if !weg && art}
-	<section class={['rounded-xl bg-surface-container-low p-4 text-left', klasse]}>
+{#if bereit && !weg && art}
+	<section transition:fly={{ y: -16, duration: wenigBewegung.matches ? 0 : 250 }} class={['rounded-xl bg-primary-container p-4 text-left text-on-primary-container', klasse]}>
 		<div class="flex items-start gap-3">
-			<Icon name={art === 'iphone' ? 'ios_share' : 'mobile_arrow_down'} class="shrink-0 text-primary" />
-			<p class="text-body-medium text-on-surface">
+			<Icon name={art === 'iphone' ? 'ios_share' : 'mobile_arrow_down'} class="shrink-0" />
+			<p class="text-body-medium">
 				{#if art === 'iphone'}
 					Als App auf den Home-Bildschirm: auf „Teilen“ tippen (das Symbol links), dann auf „Zum Home-Bildschirm“
 					und die Schadenmeldung über das neue Symbol öffnen.
