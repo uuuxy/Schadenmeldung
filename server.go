@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"io/fs"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -22,6 +24,12 @@ type app struct {
 	verteiler   *verteiler
 	// postWecker stößt den Postausgang an, sobald eine Meldung eingeht (Puffer 1, nichts geht verloren).
 	postWecker chan struct{}
+	// Mitteilungen aufs Handy (push.go): der Schlüssel des Servers, einmal geladen, und der Versand.
+	pushMu         sync.Mutex
+	pushSchluessel *ecdsa.PrivateKey
+	pushClient     *http.Client
+	pushPause      time.Duration
+	pushLaeuft     sync.WaitGroup
 }
 
 func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
@@ -36,6 +44,11 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		jetzt:       time.Now,
 		verteiler:   neuerVerteiler(),
 		postWecker:  make(chan struct{}, 1),
+		// Keine Weiterleitungen: Der Server spricht nur mit der geprüften Adresse des Push-Dienstes.
+		pushClient: &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		}},
+		pushPause: time.Second,
 	}
 	a.pruefeZugang = a.pruefeIMAP
 	if konf.mailAktiv() {
@@ -68,6 +81,9 @@ func (a *app) routen() http.Handler {
 	mux.HandleFunc("DELETE /api/rollen/{email}", a.mitBenutzer(a.nurBearbeiter(a.rolleLoeschen)))
 	mux.HandleFunc("GET /api/benachrichtigung", a.mitBenutzer(a.nurBackend(a.benachrichtigungLesen)))
 	mux.HandleFunc("POST /api/benachrichtigung", a.mitBenutzer(a.nurBackend(a.benachrichtigungSetzen)))
+	mux.HandleFunc("GET /api/push", a.mitBenutzer(a.nurBackend(a.pushLesen)))
+	mux.HandleFunc("POST /api/push", a.mitBenutzer(a.nurBackend(a.pushAnmelden)))
+	mux.HandleFunc("DELETE /api/push", a.mitBenutzer(a.nurBackend(a.pushAbmelden)))
 	// Die Knöpfe aus der Mail: ohne Anmeldung, der Link selbst berechtigt.
 	mux.HandleFunc("GET /api/aktion/{token}", a.aktionLesen)
 	mux.HandleFunc("POST /api/aktion/{token}", a.aktionAusfuehren)

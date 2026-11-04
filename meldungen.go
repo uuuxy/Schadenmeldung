@@ -106,8 +106,9 @@ func (a *app) meldungAnlegen(w http.ResponseWriter, r *http.Request, b benutzer)
 	}
 	slog.Info("Neue Meldung", "id", neu.ID, "kategorie", neu.Kategorie, "dringend", neu.Dringend)
 	a.verteiler.melde()
-	// Die Meldung steht; reißt die Verbindung jetzt ab (Funkloch), soll die Mail trotzdem hinaus.
+	// Die Meldung steht; reißt die Verbindung jetzt ab (Funkloch), sollen Mail und Mitteilung trotzdem hinaus.
 	a.mailVormerken(context.WithoutCancel(r.Context()), neu)
+	a.pushVerschicken(context.WithoutCancel(r.Context()), neu)
 	schreibeJSON(w, http.StatusCreated, fuerAnsicht(neu, b))
 }
 

@@ -23,7 +23,7 @@
 				<li>Ort, Art und Beschreibung des Schadens, auf Wunsch ein Foto</li>
 				<li>Zeitpunkt der Meldung und der Erledigung, der Stand und ein interner Vermerk, den das Kollegium nicht sieht</li>
 				<li>wer gemeldet hat – sichtbar nur für Hausmeister, Schulleitung, Sekretariat und Admins, für Rückfragen</li>
-				<li>wer welche Rolle hat (Hausmeister, Leitung, Verwaltung, Admin) und wer welche Mails bekommt</li>
+				<li>wer welche Rolle hat (Hausmeister, Leitung, Verwaltung, Admin) und wer welche Mails und Mitteilungen bekommt</li>
 			</ul>
 		</section>
 		<section>
@@ -36,6 +36,12 @@
 			<h2 class="mb-2 text-title-medium">Mail an den Hausmeister</h2>
 			<p class="text-on-surface-variant">
 				Der Hausmeister bekommt jede neue Meldung sofort per Mail; das lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie auf „In Arbeit“ gesetzt wurde.
+			</p>
+		</section>
+		<section>
+			<h2 class="mb-2 text-title-medium">Mitteilungen aufs Handy</h2>
+			<p class="text-on-surface-variant">
+				Hausmeister, Schulleitung, Sekretariat und Admins können sie je Gerät einschalten. Dann kommt zu jeder neuen Meldung eine Mitteilung mit Schaden und Ort, ohne Namen, und am App-Symbol steht die Zahl der neuen Meldungen. Dafür speichert die App je Gerät die Adresse, über die der Dienst des Browser-Herstellers (Google, Apple, Mozilla oder Microsoft) zustellt. Der Inhalt ist verschlüsselt; der Dienst sieht nur, dass eine Nachricht an das Gerät geht. Die Adresse wird gelöscht beim Ausschalten, beim Abmelden und wenn die App 180 Tage nicht geöffnet wurde.
 			</p>
 		</section>
 		<section>
@@ -53,7 +59,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Löschung</h2>
 			<p class="text-on-surface-variant">
-				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Jede Nacht und vor jedem Update sichert der Server die Datenbank; jede Sicherung wird nach 7 Tagen gelöscht. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe, keine fremden Dienste und kein Tracking.
+				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Jede Nacht und vor jedem Update sichert der Server die Datenbank; jede Sicherung wird nach 7 Tagen gelöscht. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe und kein Tracking. Einen fremden Dienst nutzen nur die Mitteilungen aufs Handy, verschlüsselt und nur für alle, die sie einschalten.
 			</p>
 		</section>
 		<section>

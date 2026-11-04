@@ -56,6 +56,48 @@ async function sonstiges(e) {
 	}
 }
 
+// Mitteilungen aufs Handy (push.go): Titel, Text, Weg zur Meldung und die Zahl der neuen Meldungen für
+// das App-Symbol. Ein Tipp öffnet die Meldung, in einem offenen Fenster der App oder in einem neuen.
+self.addEventListener('push', (e) => {
+	let n = {};
+	try {
+		n = e.data?.json() ?? {};
+	} catch {
+		/* unlesbar: dann eben eine schlichte Mitteilung */
+	}
+	const zahl = Number(n.zahl) || 0;
+	e.waitUntil(
+		Promise.all([
+			self.registration.showNotification(n.titel || 'Schadenmeldung', {
+				body: n.text || 'Eine neue Meldung ist da.',
+				tag: n.tag,
+				icon: '/icon-192.png',
+				badge: '/badge.png',
+				data: { weg: n.weg || '/' }
+			}),
+			zahl > 0 && self.navigator.setAppBadge ? self.navigator.setAppBadge(zahl).catch(() => {}) : null
+		])
+	);
+});
+
+self.addEventListener('notificationclick', (e) => {
+	e.notification.close();
+	const ziel = new URL(e.notification.data?.weg || '/', self.location.origin).href;
+	e.waitUntil(
+		(async () => {
+			for (const fenster of await self.clients.matchAll({ type: 'window', includeUncontrolled: true })) {
+				try {
+					await fenster.focus();
+					return await fenster.navigate(ziel);
+				} catch {
+					/* Dieses Fenster lässt sich nicht lenken: das nächste oder ein neues. */
+				}
+			}
+			return self.clients.openWindow(ziel);
+		})()
+	);
+});
+
 self.addEventListener('fetch', (e) => {
 	const url = new URL(e.request.url);
 	if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;

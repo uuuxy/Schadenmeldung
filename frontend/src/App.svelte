@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { zustand, starte, auffrischen, darfSehen, darfBearbeiten } from './lib/zustand.svelte.js';
 	import { weg } from './lib/weg.svelte.js';
+	import { gesehen } from './lib/mitteilungen.js';
 	import Anmelden from './views/Anmelden.svelte';
 	import Melden from './views/Melden.svelte';
 	import Uebersicht from './views/Uebersicht.svelte';
@@ -62,6 +63,16 @@
 			clearTimeout(warte);
 			document.removeEventListener('visibilitychange', sichtbarkeit);
 		};
+	});
+
+	// Wer die App öffnet, hat die neuen Meldungen gesehen: Zahl am App-Symbol und Mitteilungen
+	// verschwinden, und das Abo meldet sich beim Server (lib/mitteilungen.js).
+	$effect(() => {
+		if (!zustand.benutzer || !darfSehen()) return;
+		const sichtbar = () => document.visibilityState === 'visible' && gesehen().catch(() => {});
+		sichtbar();
+		document.addEventListener('visibilitychange', sichtbar);
+		return () => document.removeEventListener('visibilitychange', sichtbar);
 	});
 
 	// Ohne Strom (Kollegium, oder ein Proxy schluckt ihn) kommen neue Meldungen trotzdem: alle 30

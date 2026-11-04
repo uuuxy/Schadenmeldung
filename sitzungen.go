@@ -142,6 +142,10 @@ func (a *app) beendeSitzung(ctx context.Context, hash string, ueberall bool) err
 	if err != nil {
 		return err
 	}
+	// Wer überall abmeldet, etwa nach einem verlorenen Handy, bekommt auch keine Mitteilungen mehr.
+	if err := a.sp.loeschePushAbosVon(ctx, email); err != nil {
+		return err
+	}
 	return a.sp.loescheSitzungenVon(ctx, email)
 }
 
