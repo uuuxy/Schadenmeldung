@@ -13,8 +13,9 @@
 	const gemeldet = $derived(fertig.art === 'gemeldet');
 	const text = $derived.by(() => {
 		if (!gemeldet) return 'Gerade ist kein Netz. Die Meldung geht automatisch raus, sobald wieder Verbindung besteht.';
-		if (zustand.einstellungen.mailAktiv) return 'Sie ist beim Hausmeister angekommen, auch per Mail.';
-		return 'Sie ist beim Hausmeister angekommen.';
+		// Gleich dazu, wie der Bescheid kommt, wenn sie erledigt ist (rueckmeldung.go).
+		if (zustand.einstellungen.mailAktiv) return 'Sie ist beim Hausmeister angekommen. Ist sie erledigt, kommt Bescheid per Mail.';
+		return 'Sie ist beim Hausmeister angekommen. Ist sie erledigt, steht das beim nächsten Öffnen hier.';
 	});
 </script>
 

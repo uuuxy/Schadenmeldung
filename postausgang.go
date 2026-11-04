@@ -7,7 +7,8 @@ import (
 )
 
 // Postausgang: Eine neue Meldung merkt für jeden Empfänger eine Zeile in mail_versand vor, und ein
-// einziger Takt verschickt sie gleich darauf. Was scheitert, etwa weil der Mailserver nicht antwortet,
+// einziger Takt verschickt sie gleich darauf. Derselbe Takt schreibt den Meldenden, sobald ihre Meldung
+// erledigt ist (rueckmeldung.go). Was scheitert, etwa weil der Mailserver nicht antwortet,
 // versucht er alle fünf Minuten erneut, einen Tag lang. Weil nur dieser Takt verschickt, kommt keine
 // Mail doppelt.
 const (
@@ -58,6 +59,7 @@ func (a *app) versendeAusstehende(ctx context.Context) {
 	if !a.konf.mailAktiv() {
 		return
 	}
+	a.versendeRueckmeldungen(ctx)
 	meldungen, err := a.sp.meldungenMitAusstehenderMail(ctx, a.jetzt().Add(-nachholFrist))
 	if err != nil {
 		slog.Error("Mail: Postausgang nicht gelesen", "fehler", err)

@@ -136,7 +136,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 		}
 		ein.Antwort = &t
 	}
-	neu, err := a.sp.setzeStatus(r.Context(), id, ein.Status, ein.Antwort, a.jetzt())
+	neu, err := a.sp.setzeStatus(r.Context(), id, ein.Status, ein.Antwort, b.Email, a.jetzt())
 	if err != nil {
 		nichtGefundenOderIntern(w, err)
 		return

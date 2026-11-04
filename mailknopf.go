@@ -82,7 +82,7 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
 		return
 	}
-	neu, err := a.sp.setzeStatus(r.Context(), m.ID, &ein.Status, nil, a.jetzt())
+	neu, err := a.sp.setzeStatus(r.Context(), m.ID, &ein.Status, nil, b.Email, a.jetzt())
 	if err != nil {
 		nichtGefundenOderIntern(w, err)
 		return

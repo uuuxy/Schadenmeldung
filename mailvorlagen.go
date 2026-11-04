@@ -26,8 +26,8 @@ var mailHTML = htmlvorlage.Must(htmlvorlage.New("mail").Parse(`<!doctype html>
 <a href="{{.LinkErledigt}}" style="display:inline-block;margin:8px 0 0;padding:10px 16px;border-radius:999px;background:#0061a4;color:#ffffff;font-size:14px;line-height:20px;font-weight:500;text-decoration:none;">Erledigt</a>
 </p>{{end}}
 </div>
-{{end}}<p style="margin:20px 0 0;font-size:14px;line-height:20px;"><a href="{{.LinkApp}}" style="color:#0061a4;font-weight:500;text-decoration:none;">Alle Aufgaben in der App</a><span style="color:#42474e;"> · {{.Offen}} offen</span></p>
-<p style="margin:24px 0 0;font-size:12px;line-height:16px;color:#72777f;">{{if .MitKnoepfen}}„In Arbeit“ zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage, wann. {{end}}Diese Mail kommt, weil die Adresse in der Schadenmeldung eingetragen ist. Abbestellen: in der App im Kontomenü.</p>
+{{end}}<p style="margin:20px 0 0;font-size:14px;line-height:20px;"><a href="{{.LinkApp}}" style="color:#0061a4;font-weight:500;text-decoration:none;">{{if .Rueckmeldung}}Schadenmeldung öffnen</a>{{else}}Alle Aufgaben in der App</a><span style="color:#42474e;"> · {{.Offen}} offen</span>{{end}}</p>
+<p style="margin:24px 0 0;font-size:12px;line-height:16px;color:#72777f;">{{if .Rueckmeldung}}Diese Mail bekommt nur, wer den Schaden gemeldet hat, einmal je Meldung.{{else}}{{if .MitKnoepfen}}„In Arbeit“ zeigt dem Kollegium, dass sich jemand kümmert – ohne Zusage, wann. {{end}}Diese Mail kommt, weil die Adresse in der Schadenmeldung eingetragen ist. Abbestellen: in der App im Kontomenü.{{end}}</p>
 </div></body></html>`))
 
 var mailText = textvorlage.Must(textvorlage.New("mail").Parse(`{{.Ueberschrift}}
@@ -40,7 +40,10 @@ var mailText = textvorlage.Must(textvorlage.New("mail").Parse(`{{.Ueberschrift}}
 Fachfirma: {{.LinkFachfirma}}
 Erledigt:  {{.LinkErledigt}}
 {{end}}{{end}}
-Alle Aufgaben ({{.Offen}} offen): {{.LinkApp}}
+{{if .Rueckmeldung}}Schadenmeldung: {{.LinkApp}}
+
+Diese Mail bekommt nur, wer den Schaden gemeldet hat, einmal je Meldung.
+{{else}}Alle Aufgaben ({{.Offen}} offen): {{.LinkApp}}
 
 Abbestellen: in der App im Kontomenü.
-`))
+{{end}}`))

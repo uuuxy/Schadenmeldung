@@ -68,6 +68,19 @@ func (s *speicher) ausstehendeEmpfaenger(ctx context.Context, meldungID int64) (
 		WHERE meldung_id = $1 AND gesendet_am IS NULL ORDER BY empfaenger`, meldungID)
 }
 
+// faelligeRueckmeldungen: Meldungen, die zwischen ab und bis erledigt wurden und deren meldende Person
+// noch keinen Bescheid hat. Was vor ab erledigt wurde, holt niemand mehr nach.
+func (s *speicher) faelligeRueckmeldungen(ctx context.Context, ab, bis time.Time) ([]meldung, error) {
+	return s.abfrage(ctx, `WHERE m.status = 'erledigt' AND m.rueckmeldung_am IS NULL
+		AND m.erledigt_am >= $1 AND m.erledigt_am <= $2 AND m.gemeldet_von <> ''
+		ORDER BY m.erledigt_am, m.id`, ab, bis)
+}
+
+func (s *speicher) vermerkeRueckmeldung(ctx context.Context, meldungID int64, zeit time.Time) error {
+	_, err := s.db.Exec(ctx, "UPDATE meldungen SET rueckmeldung_am = $2 WHERE id = $1", meldungID, zeit)
+	return err
+}
+
 func (s *speicher) anzahlOffen(ctx context.Context) (int, error) {
 	var n int
 	err := s.db.QueryRow(ctx, "SELECT count(*) FROM meldungen WHERE status <> 'erledigt'").Scan(&n)

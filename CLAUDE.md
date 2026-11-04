@@ -47,6 +47,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die Oberfläche.
 - Mails und Mitteilungen aufs Handy sollen den Hausmeister nicht hetzen: eine je Meldung, keine
   Erinnerungen, keine Eskalation, keine Zeitstempel von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
+- Wer meldet, bekommt eine Mail, sobald die Meldung erledigt ist: eine je Meldung, erst nach zehn
+  Minuten (so lange greift „Rückgängig“), ohne den internen Vermerk; wer selbst erledigt, bekommt keine
+  (`rueckmeldung.go`). Die Karte „Erledigt“ im Formular gibt es nur, wenn der Server keine Mail schickt.
 - Lokal landen Mails in Mailpit (`docker-compose.local.yml`, http://localhost:8025).
 
 ## Datenbank

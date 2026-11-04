@@ -54,6 +54,7 @@ type mailDaten struct {
 	Betreff, Ueberschrift, Schule, LinkApp string
 	Offen                                  int
 	MitKnoepfen                            bool
+	Rueckmeldung                           bool // an die meldende Person: ohne Aufgabenzahl und Abbestellen
 	Meldung                                mailMeldung
 }
 
@@ -96,6 +97,15 @@ func (a *app) verschicke(ctx context.Context, e empfaenger, m meldung) error {
 	if err != nil {
 		return err
 	}
+	if err := a.sendeMail(ctx, e.Email, d); err != nil {
+		return err
+	}
+	return a.sp.vermerkeVersand(ctx, m.ID, e.Email, a.jetzt())
+}
+
+// sendeMail setzt die Mail aus beiden Vorlagen zusammen und verschickt sie; jeder Versuch zählt für
+// den Hinweis auf eine Mail-Störung.
+func (a *app) sendeMail(ctx context.Context, an string, d mailDaten) error {
 	var text, html bytes.Buffer
 	if err := mailText.Execute(&text, d); err != nil {
 		return err
@@ -103,10 +113,7 @@ func (a *app) verschicke(ctx context.Context, e empfaenger, m meldung) error {
 	if err := mailHTML.Execute(&html, d); err != nil {
 		return err
 	}
-	err = a.versender.sende(ctx, e.Email, d.Betreff, text.String(), html.String())
+	err := a.versender.sende(ctx, an, d.Betreff, text.String(), html.String())
 	a.mailVersuch(err)
-	if err != nil {
-		return err
-	}
-	return a.sp.vermerkeVersand(ctx, m.ID, e.Email, a.jetzt())
+	return err
 }
