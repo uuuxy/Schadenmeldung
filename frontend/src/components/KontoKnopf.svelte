@@ -7,14 +7,22 @@
 	import { gehe } from '../lib/weg.svelte.js';
 	import { darstellung } from '../lib/darstellung.svelte.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
+	import { mitteilungenStand, mitteilungenEin, mitteilungenAus } from '../lib/mitteilungen.js';
 
 	/**
 	 * Kontomenü (M3 Menu). „Dunkles Design“ steht als Schalter darin, wie bei Google (Gemini: „Dark
-	 * theme“ im Menü) und in der Bibliothek. Wer das Backend sieht, stellt hier auch seine Mails ein.
+	 * theme“ im Menü) und in der Bibliothek. Wer das Backend sieht, stellt hier auch Mails und
+	 * Mitteilungen ein; Mitteilungen gelten je Gerät, darum „Auf diesem Gerät“.
 	 */
 	const rollen = { ...rollenNamen, kollegium: 'Kollegium' };
 	let menue;
 	let mail = $state(null);
+	let mitteilung = $state('');
+	let schaltet = $state(false);
+	const mitteilungDetail = $derived(
+		{ gesperrt: 'in den Einstellungen des Geräts gesperrt', homescreen: 'erst die App auf den Home-Bildschirm legen' }[mitteilung] ??
+			'bei jeder neuen Meldung'
+	);
 	const initial = $derived((zustand.benutzer?.email ?? '?').charAt(0).toUpperCase());
 
 	async function geoeffnet(e) {
@@ -24,12 +32,31 @@
 		} catch {
 			mail = null;
 		}
+		mitteilung = await mitteilungenStand().catch(() => '');
+	}
+
+	// Beide Schalter zeigen die Wahl sofort; klappt es nicht, springen sie zurück. Ohne diesen Schritt
+	// bliebe der Schalter falsch stehen, denn er legt sich selbst um.
+	async function mitteilungSetzen(an) {
+		mitteilung = an ? 'an' : 'aus';
+		schaltet = true;
+		try {
+			if (!an) await mitteilungenAus();
+			else if (!(await mitteilungenEin())) zeige('Mitteilungen sind auf diesem Gerät gesperrt. Freigeben lässt sich das in den Einstellungen des Geräts.');
+		} catch (e) {
+			zeige(e.status !== undefined ? e.message : 'Mitteilungen ließen sich auf diesem Gerät nicht einschalten.');
+		}
+		mitteilung = await mitteilungenStand().catch(() => '');
+		schaltet = false;
 	}
 
 	async function mailSetzen(aenderung) {
+		const vorher = mail;
+		mail = { ...mail, ...aenderung };
 		try {
 			mail = await api('/api/benachrichtigung', { methode: 'POST', json: aenderung });
 		} catch (e) {
+			mail = vorher;
 			zeige(e.message);
 		}
 	}
@@ -42,6 +69,8 @@
 	/** Mit ueberall enden auch die Sitzungen auf anderen Geräten, etwa nach einem verlorenen Handy. */
 	async function abmelden(ueberall = false) {
 		menue.hidePopover();
+		// Ein abgemeldetes Gerät bekommt keine Mitteilungen mehr.
+		await mitteilungenAus().catch(() => {});
 		await api(ueberall ? '/api/abmelden?ueberall=1' : '/api/abmelden', { methode: 'POST' }).catch(() => {});
 		await vergissAlles();
 		zustand.benutzer = null;
@@ -56,13 +85,13 @@
 	</button>
 {/snippet}
 
-{#snippet zeile(id, text, detail, checked, onchange)}
+{#snippet zeile(id, text, detail, checked, onchange, gesperrt = false)}
 	<div class="flex items-center gap-4 px-4 py-2">
 		<label for={id} class="min-w-0 flex-1">
 			<span class="block text-body-large text-on-surface">{text}</span>
 			{#if detail}<span class="block text-body-small text-on-surface-variant">{detail}</span>{/if}
 		</label>
-		<Switch {id} {checked} {onchange} />
+		<Switch {id} {checked} {onchange} disabled={gesperrt} />
 	</div>
 {/snippet}
 
@@ -86,6 +115,14 @@
 		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mail an mich</p>
 		<div class="pb-1">
 			{@render zeile('mail-neu', 'Bei jeder neuen Meldung', 'sofort, eine Mail je Meldung', mail.mail, (an) => mailSetzen({ mail: an }))}
+		</div>
+	{/if}
+
+	{#if darfSehen() && mitteilung}
+		<hr class="border-outline-variant" />
+		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mitteilung aufs Handy</p>
+		<div class="pb-1">
+			{@render zeile('mitteilung-neu', 'Auf diesem Gerät', mitteilungDetail, mitteilung === 'an', mitteilungSetzen, schaltet || mitteilung === 'gesperrt' || mitteilung === 'homescreen')}
 		</div>
 	{/if}
 

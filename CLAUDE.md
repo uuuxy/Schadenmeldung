@@ -45,8 +45,8 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 - Kollegium sieht nur das Meldeformular; Hausmeister, Leitung und Admin dürfen alles, die
   Verwaltung (Sekretariat) sieht und druckt QR-Aufkleber, ändert aber nichts (`rollen.go`,
   `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die Oberfläche.
-- Mails sollen den Hausmeister nicht hetzen: keine Erinnerungen, keine Eskalation, keine Zeitstempel
-  von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
+- Mails und Mitteilungen aufs Handy sollen den Hausmeister nicht hetzen: eine je Meldung, keine
+  Erinnerungen, keine Eskalation, keine Zeitstempel von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
 - Lokal landen Mails in Mailpit (`docker-compose.local.yml`, http://localhost:8025).
 
 ## Datenbank
@@ -65,7 +65,9 @@ alle Stellen. Welche Arten das Formular zeigt, schaltet die App selbst (Tabelle 
 
 ## Datenschutz
 
-Keine fremden Dienste, CDNs oder Schriften von außen. Keine Namen oder Freitexte ins Log.
+Keine fremden Dienste, CDNs oder Schriften von außen. Einzige Ausnahme (Entscheidung vom 4. November
+2026): Mitteilungen aufs Handy laufen über den Push-Dienst des Browsers, nur an die Dienste in
+`pushDienste` (push.go) und Ende-zu-Ende verschlüsselt (webpush.go). Keine Namen oder Freitexte ins Log.
 Neue Felder mit Personenbezug brauchen eine Löschfrist (`aufraeumen.go`) und eine Zeile auf der
 Datenschutzseite.
 
