@@ -4,22 +4,23 @@
 	import { wenigBewegung } from '../../lib/weg.svelte.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
-	import { installieren, alsApp, apfelGeraet, firefoxAndroid, hinweisWeg, hinweisAusblenden } from '../../lib/installieren.svelte.js';
+	import { installieren, alsApp, anleitung, hinweisWeg, hinweisAusblenden } from '../../lib/installieren.svelte.js';
 
 	/**
 	 * Gleich beim ersten Öffnen das Angebot, die Schadenmeldung als App auf den Startbildschirm zu legen
 	 * (Anmeldung und Meldeseite): Auf dem iPhone ist der Anfang der beste Moment, wer zuerst installiert,
-	 * meldet sich gleich in der App an. Chrome bietet das selbst an (ein Knopf genügt); auf dem iPhone
-	 * geht es nur über „Teilen“, in Firefox auf Android über dessen Menü. Das Symbol der Karte zeigt,
-	 * wonach man suchen muss. Einmal weggetippt, kommt das Angebot auf dem Gerät nicht wieder.
+	 * meldet sich gleich in der App an. Bietet der Browser es selbst an (Chrome), genügt ein Knopf. Sonst
+	 * führen nummerierte Schritte durch sein Menü, damit es auch gelingt, wer so etwas nie gemacht hat:
+	 * ein Tipp je Schritt, die Knöpfe fett und so benannt, wie sie dort heißen, das gesuchte Symbol mitten
+	 * im Satz. Einmal weggetippt, kommt das Angebot auf dem Gerät nicht wieder.
 	 */
 	let { class: klasse = '' } = $props();
 	let weg = $state(alsApp() || hinweisWeg());
 	// Erst nach dem Aufbau einblenden: Beim ersten Zeichnen spielt Svelte keine Animation ab.
 	let bereit = $state(false);
 	onMount(() => (bereit = true));
-	const art = $derived(installieren.angebot ? 'knopf' : apfelGeraet() ? 'iphone' : firefoxAndroid() ? 'firefox' : null);
-	const symbol = { knopf: 'mobile_arrow_down', iphone: 'ios_share', firefox: 'more_vert' };
+	const vonHand = anleitung();
+	const karte = $derived(installieren.angebot ? { titel: 'Als App installieren', danach: 'Dann ist die Schadenmeldung mit einem Tipp da.' } : vonHand);
 
 	function ausblenden() {
 		hinweisAusblenden();
@@ -34,25 +35,29 @@
 	}
 </script>
 
-{#if bereit && !weg && art}
+<!-- Eine Zeile der Anleitung: {icon} wird zum Symbol, „Knopfnamen“ werden fett. -->
+{#snippet zeile(s)}
+	{#each s.text.split('{icon}') as teil, i}{#if i}<Icon name={s.icon} groesse={18} class="inline align-[-4px]" />{#if s.name}<span class="sr-only">{s.name}</span>{/if}{/if}{#each teil.split(/(„[^“]*“)/) as stueck, j}{#if j % 2}<strong class="font-medium">{stueck}</strong>{:else}{stueck}{/if}{/each}{/each}
+{/snippet}
+
+{#if bereit && !weg && karte}
 	<section transition:fly={{ y: -16, duration: wenigBewegung.matches ? 0 : 250 }} class={['rounded-xl bg-primary-container p-4 text-left text-on-primary-container', klasse]}>
 		<div class="flex items-start gap-3">
-			<Icon name={symbol[art]} class="shrink-0" />
-			<p class="text-body-medium">
-				{#if art === 'iphone'}
-					Als App auf den Home-Bildschirm: in der Leiste des Browsers auf das Teilen-Symbol tippen (oder zuerst auf
-					die drei Punkte), dann auf „Zum Home-Bildschirm“ und die Schadenmeldung über das neue Symbol öffnen.
-				{:else if art === 'firefox'}
-					Als App installieren: im Menü von Firefox (die drei Punkte) auf „Installieren“ oder „Zum Startbildschirm
-					hinzufügen“ tippen. Dann ist die Schadenmeldung mit einem Tipp vom Startbildschirm aus da.
-				{:else}
-					Als App installieren: Dann ist die Schadenmeldung mit einem Tipp vom Startbildschirm aus da.
+			<Icon name="mobile_arrow_down" class="shrink-0" />
+			<div class="min-w-0 flex-1">
+				<p class="text-title-small">{karte.titel}</p>
+				{#if karte.schritte}
+					<ol class="mt-2 flex list-decimal flex-col gap-1 pl-5 text-body-medium marker:font-medium">
+						{#each karte.schritte as s (s.text)}<li>{@render zeile(s)}</li>{/each}
+					</ol>
+					{#if karte.hinweis}<p class="mt-2 text-body-small">{@render zeile(karte.hinweis)}</p>{/if}
 				{/if}
-			</p>
+				<p class="mt-2 text-body-medium">{karte.danach}</p>
+			</div>
 		</div>
 		<div class="mt-3 flex justify-end gap-2">
-			<Button variant="ghost" onclick={ausblenden}>{art === 'knopf' ? 'Nicht jetzt' : 'Verstanden'}</Button>
-			{#if art === 'knopf'}<Button variant="tonal" onclick={installiere}>Installieren</Button>{/if}
+			<Button variant="ghost" onclick={ausblenden}>{installieren.angebot ? 'Nicht jetzt' : 'Verstanden'}</Button>
+			{#if installieren.angebot}<Button variant="tonal" onclick={installiere}>Installieren</Button>{/if}
 		</div>
 	</section>
 {/if}
