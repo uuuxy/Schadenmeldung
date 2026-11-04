@@ -22,7 +22,7 @@
 			<ul class="list-disc space-y-1 pl-5 text-on-surface-variant">
 				<li>Ort, Art und Beschreibung des Schadens, auf Wunsch ein Foto</li>
 				<li>Zeitpunkt der Meldung und der Erledigung, der Stand und ein interner Vermerk, den das Kollegium nicht sieht</li>
-				<li>wer gemeldet hat – sichtbar nur für Hausmeister, Schulleitung, Sekretariat und Admins, für Rückfragen</li>
+				<li>wer gemeldet hat – sichtbar nur für Hausmeister, Schulleitung, Sekretariat und Admins, für Rückfragen und für die Mail, sobald der Schaden erledigt ist</li>
 				<li>wer welche Rolle hat (Hausmeister, Leitung, Verwaltung, Admin) und wer welche Mails und Mitteilungen bekommt</li>
 			</ul>
 		</section>
@@ -36,6 +36,12 @@
 			<h2 class="mb-2 text-title-medium">Mail an den Hausmeister</h2>
 			<p class="text-on-surface-variant">
 				Der Hausmeister bekommt jede neue Meldung sofort per Mail; das lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie auf „In Arbeit“ gesetzt wurde.
+			</p>
+		</section>
+		<section>
+			<h2 class="mb-2 text-title-medium">Mail an die Meldenden</h2>
+			<p class="text-on-surface-variant">
+				Wer einen Schaden meldet, bekommt eine Mail, sobald er erledigt ist: einmal je Meldung, an die Adresse, mit der man sich angemeldet hat, mit Schaden und Ort, ohne den internen Vermerk. Wer die eigene Meldung selbst erledigt, bekommt keine.
 			</p>
 		</section>
 		<section>

@@ -5,9 +5,10 @@
 	import Button from '../ui/Button.svelte';
 
 	/**
-	 * Rückmeldung an die Meldenden (rueckmeldung.go): Was seit dem letzten Öffnen erledigt wurde, steht
-	 * einmal oben im Formular. Wer sieht, dass Melden etwas bewirkt, meldet wieder. Gemerkt wird nur auf
-	 * diesem Gerät, bis wann schon Bescheid gegeben wurde; beim ersten Mal zählen die letzten sieben Tage.
+	 * Rückmeldung an die Meldenden (rueckmeldung.go), wenn der Server keine Mail verschickt: Was seit dem
+	 * letzten Öffnen erledigt wurde, steht einmal oben im Formular. Mit Mail kommt der Bescheid per Mail,
+	 * und der Server liefert hier nichts. Gemerkt wird nur auf diesem Gerät, bis wann schon Bescheid
+	 * gegeben wurde; beim ersten Mal zählen die letzten sieben Tage.
 	 */
 	const SCHLUESSEL = 'schaden.erledigtGesehen';
 	let zeigen = $state([]);

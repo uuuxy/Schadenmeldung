@@ -83,13 +83,16 @@ func (s *speicher) legeMeldungAn(ctx context.Context, m meldung, foto []byte) (m
 
 // setzeStatus ändert Status und Antwort; nil lässt den bisherigen Wert stehen. Der Zeitpunkt der
 // Erledigung bleibt beim ersten Abhaken stehen und fällt weg, sobald die Meldung wieder offen ist.
-func (s *speicher) setzeStatus(ctx context.Context, id int64, status, antwort *string, jetzt time.Time) (meldung, error) {
+// Erledigt wer die eigene Meldung selbst, braucht es keine Rückmeldung per Mail.
+func (s *speicher) setzeStatus(ctx context.Context, id int64, status, antwort *string, wer string, jetzt time.Time) (meldung, error) {
 	tag, err := s.db.Exec(ctx, `UPDATE meldungen SET
 			status = coalesce($2, status),
 			antwort = coalesce($3, antwort),
 			erledigt_am = CASE WHEN coalesce($2, status) = 'erledigt' THEN coalesce(erledigt_am, $4) END,
+			rueckmeldung_am = CASE WHEN $2 = 'erledigt' AND gemeldet_von = $5
+				THEN coalesce(rueckmeldung_am, $4) ELSE rueckmeldung_am END,
 			geaendert_am = $4
-		WHERE id = $1`, id, status, antwort, jetzt)
+		WHERE id = $1`, id, status, antwort, jetzt, wer)
 	if err != nil {
 		return meldung{}, err
 	}
