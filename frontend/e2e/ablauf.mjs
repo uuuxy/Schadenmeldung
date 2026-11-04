@@ -76,7 +76,7 @@ pruefe((await s.getByRole('button', { name: haken }).count()) >= 6, 'Leitung: je
 await k.close();
 [k, s] = await kontext('sekretariat');
 await s.goto(B + '/'); await s.getByRole('button', { name: /WC verstopft/ }).waitFor(); await bild(s, '09b-verwaltung');
-pruefe((await s.getByRole('list', { name: 'Meldungen' }).getByRole('listitem').count()) >= 6 && (await s.getByRole('button', { name: haken }).count()) === 0, 'Verwaltung: alle Meldungen, ohne Häkchen');
+pruefe((await s.getByRole('region', { name: 'Meldungen' }).getByRole('listitem').count()) >= 6 && (await s.getByRole('button', { name: haken }).count()) === 0, 'Verwaltung: alle Meldungen, ohne Häkchen');
 await s.getByRole('button', { name: /^Bio 1/ }).click();
 await s.getByRole('heading', { name: 'Licht flackert' }).waitFor();
 pruefe(!(await s.getByRole('group', { name: 'Stand' }).isVisible()) && !(await s.getByLabel('Interner Vermerk').isVisible()) && !(await s.getByRole('button', { name: 'Erledigt' }).isVisible()), 'Verwaltung: Meldung nur lesend, ohne Stand, Vermerk-Feld und Erledigt');

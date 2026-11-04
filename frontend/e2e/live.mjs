@@ -25,7 +25,7 @@ await hm.goto(B + '/');
 await hm.getByRole('group', { name: 'Ansicht' }).waitFor();
 await hm.waitForTimeout(500);
 await hm.evaluate(() => (window.__ohneNeuladen = true));
-const zeilen = (s) => s.getByRole('list', { name: 'Meldungen' }).getByRole('listitem');
+const zeilen = (s) => s.getByRole('region', { name: 'Meldungen' }).getByRole('listitem');
 const vorher = await zeilen(hm).count();
 pruefe(hmStroeme.length === 1, 'Hausmeister öffnet einen Ereignisstrom');
 

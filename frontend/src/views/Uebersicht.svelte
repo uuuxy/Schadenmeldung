@@ -15,9 +15,10 @@
 
 	/**
 	 * Die Übersicht für Hausmeister, Leitung, Verwaltung und Admins: eine schlanke Liste, Dringendes
-	 * zuerst. Ein Tipp öffnet die Meldung mit allem Weiteren (M3 list-detail: am Handy immer nur eine
-	 * der beiden Ansichten). Filtern lässt sie sich nach Bereich und Art, je ein Chip mit Blatt statt
-	 * Reihen von Chips (M3). Reiter und Filter merkt sich die Sitzung, damit „Zurück“ dort landet.
+	 * unter eigener Überschrift oben, alles andere neueste zuerst. Ein Tipp öffnet die Meldung mit allem
+	 * Weiteren (M3 list-detail: am Handy immer nur eine der beiden Ansichten). Filtern lässt sie sich
+	 * nach Bereich und Art, je ein Chip mit Blatt statt Reihen von Chips (M3). Reiter und Filter merkt
+	 * sich die Sitzung, damit „Zurück“ dort landet.
 	 */
 	const merker = (() => {
 		try {
@@ -43,6 +44,36 @@
 			.map((k) => ({ wert: k.key, text: k.name, kurz: k.name.split(' & ')[0], icon: k.icon, symbol: k.farbe.symbol, flaeche: k.farbe.flaeche }))
 	);
 	const liste = $derived(quelle.filter((m) => (!bereich || m.bereich === bereich) && (!art || m.kategorie === art)));
+
+	// Sortierung: Dringendes steht unter eigener Überschrift oben, damit eine Gefahr nicht unter neueren
+	// Meldungen verschwindet, und die Überschrift erklärt, warum. Wer lieber nur nach Zeit sortiert,
+	// wählt das am Chip; jedes Gerät merkt sich seine Wahl.
+	let sortierung = $state(gemerkt('schaden.sortierung'));
+	const nachZeit = (a, b) => new Date(b.gemeldetAm) - new Date(a.gemeldetAm);
+	const mitDringend = $derived(reiter === 'offen' && quelle.some((m) => m.dringend));
+	const abschnitte = $derived.by(() => {
+		if (reiter !== 'offen') return [{ titel: '', meldungen: liste }];
+		const dringend = sortierung === 'zeit' ? [] : liste.filter((m) => m.dringend).sort(nachZeit);
+		const weitere = liste.filter((m) => sortierung === 'zeit' || !m.dringend).sort(nachZeit);
+		if (!dringend.length) return [{ titel: '', meldungen: weitere }];
+		return [{ titel: 'Dringend', meldungen: dringend }, ...(weitere.length ? [{ titel: 'Weitere, neueste zuerst', meldungen: weitere }] : [])];
+	});
+
+	function gemerkt(schluessel) {
+		try {
+			return localStorage.getItem(schluessel);
+		} catch {
+			return null;
+		}
+	}
+	$effect(() => {
+		try {
+			if (sortierung) localStorage.setItem('schaden.sortierung', sortierung);
+			else localStorage.removeItem('schaden.sortierung');
+		} catch {
+			/* Ohne Speicher gilt eben wieder „Dringende zuerst“. */
+		}
+	});
 
 	$effect(() => {
 		if (bereich && !bereiche.includes(bereich)) bereich = null;
@@ -78,9 +109,13 @@
 		<MailStoerung />
 
 		<!-- Ein Filter mit nur einer Möglichkeit fehlt (M3), außer er ist gerade gewählt. -->
-		<div class="flex min-h-14 items-center gap-2">
+		<!-- py-2: Die 48-px-Trefferflächen der Chips ragen 8 px über den Chip; so bleiben sie unter den Reitern. -->
+		<div class="flex min-h-14 flex-wrap content-center items-center gap-x-2 gap-y-4 py-2">
 			{#if bereiche.length > 1 || bereich}<MenueChip titel="Bereich" alle="Alle Bereiche" optionen={bereiche.map((b) => ({ wert: b, text: b }))} bind:wert={bereich} />{/if}
 			{#if arten.length > 1 || art}<MenueChip titel="Art" alle="Alle Arten" optionen={arten} bind:wert={art} />{/if}
+			{#if reiter === 'offen' && (mitDringend || sortierung)}
+				<MenueChip titel="Sortierung" alle="Dringende zuerst" alleIcon="warning" optionen={[{ wert: 'zeit', text: 'Neueste zuerst', icon: 'schedule' }]} bind:wert={sortierung} />
+			{/if}
 			<span class="flex-1"></span>
 			<Export liste={reiter} {bereich} {art} anzahl={liste.length} />
 		</div>
@@ -103,14 +138,19 @@
 			</div>
 		{:else}
 			<!-- Segmentierte Liste (M3 Expressive): gefüllte Einträge mit 2 px Abstand, außen 16 px rund,
-			     innen 4 px. -->
-			<ul class="flex flex-col gap-0.5" aria-label="Meldungen">
-				{#each liste as m (m.id)}
-					<li class="rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg" animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
-						<MeldungZeile meldung={m} />
-					</li>
+			     innen 4 px; je Abschnitt eine Liste unter ihrer Überschrift (M3 list subheader). -->
+			<section class="flex flex-col gap-2" aria-label="Meldungen">
+				{#each abschnitte as a (a.titel)}
+					{#if a.titel}<h2 class="px-1 pt-2 text-title-small text-on-surface-variant">{a.titel}</h2>{/if}
+					<ul class="flex flex-col gap-0.5">
+						{#each a.meldungen as m (m.id)}
+							<li class="rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg" animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
+								<MeldungZeile meldung={m} />
+							</li>
+						{/each}
+					</ul>
 				{/each}
-			</ul>
+			</section>
 		{/if}
 	</main>
 </Ziehen>
