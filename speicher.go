@@ -51,6 +51,8 @@ type meldung struct {
 	GemeldetAm  time.Time  `json:"gemeldetAm"`
 	GeaendertAm time.Time  `json:"geaendertAm"`
 	ErledigtAm  *time.Time `json:"erledigtAm"`
+	// Kennung vom Handy gegen doppelt geschickte Meldungen; geht nie hinaus.
+	Kennung string `json:"-"`
 }
 
 func oeffneSpeicher(ctx context.Context, url string) (*speicher, error) {

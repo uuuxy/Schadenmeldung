@@ -39,6 +39,7 @@ func (a *app) leseMeldung(r *http.Request, b benutzer) (meldung, error) {
 		Dringend:    r.FormValue("dringend") == "1",
 		GemeldetVon: b.Email,
 		GemeldetAm:  zeitpunktAusAusgang(r.FormValue("erstellt"), a.jetzt()),
+		Kennung:     gueltigeKennung(r.FormValue("kennung")),
 	}
 	if artName(m.Kategorie) == "" {
 		return m, eingabeFehler("Bitte eine Art des Schadens wählen.")
@@ -94,4 +95,28 @@ func leseFoto(r *http.Request, m *meldung) ([]byte, error) {
 	}
 	m.Foto = zufallsHex(16) + ".jpg"
 	return foto, nil
+}
+
+// gueltigeKennung nimmt die Kennung des Handys nur in der erwarteten Form (32 Hex-Zeichen); alles
+// andere zählt wie keine Kennung.
+func gueltigeKennung(s string) string {
+	if len(s) != 32 || strings.Trim(s, "0123456789abcdef") != "" {
+		return ""
+	}
+	return s
+}
+
+// schonDa antwortet mit der vorhandenen Meldung, wenn das Handy dieselbe noch einmal schickt (Antwort
+// im Funkloch verloren, zwei Tabs): kein zweiter Eintrag, keine zweite Mail. Das Handy streicht sie
+// dann aus seinem Ausgang.
+func (a *app) schonDa(w http.ResponseWriter, r *http.Request, b benutzer, kennung string) bool {
+	if kennung == "" {
+		return false
+	}
+	alt, err := a.sp.meldungMitKennung(r.Context(), b.Email, kennung)
+	if err != nil {
+		return false
+	}
+	schreibeJSON(w, http.StatusOK, fuerAnsicht(alt, b))
+	return true
 }

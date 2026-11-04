@@ -31,3 +31,6 @@ export const legeAb = (eintrag) => mitAblage('readwrite', (a) => a.add(eintrag))
 export const alleImAusgang = () => mitAblage('readonly', (a) => a.getAll());
 export const entferne = (id) => mitAblage('readwrite', (a) => a.delete(id));
 export const leereAusgang = () => mitAblage('readwrite', (a) => a.clear());
+
+/** Zufällige Kennung je Meldung: Kommt sie doppelt an (Antwort im Funkloch verloren), legt der Server sie nur einmal an. */
+export const neueKennung = () => [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');

@@ -86,6 +86,9 @@ func (a *app) meldungAnlegen(w http.ResponseWriter, r *http.Request, b benutzer)
 	defer func() { _ = r.MultipartForm.RemoveAll() }()
 
 	m, err := a.leseMeldung(r, b)
+	if err == nil && a.schonDa(w, r, b, m.Kennung) {
+		return
+	}
 	var foto []byte
 	if err == nil {
 		foto, err = leseFoto(r, &m)
@@ -94,6 +97,9 @@ func (a *app) meldungAnlegen(w http.ResponseWriter, r *http.Request, b benutzer)
 		return
 	}
 	neu, err := a.sp.legeMeldungAn(r.Context(), m, foto)
+	if errors.Is(err, errSchonDa) && a.schonDa(w, r, b, m.Kennung) {
+		return
+	}
 	if err != nil {
 		intern(w, err)
 		return

@@ -3,6 +3,7 @@
 	import { slide } from 'svelte/transition';
 	import { api } from '../lib/api.js';
 	import { zustand, uebernimm, legeInAusgang } from '../lib/zustand.svelte.js';
+	import { neueKennung } from '../lib/ausgang.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
 	import { rueckmeldung } from '../lib/haptik.js';
 	import { kategorieNach, sichtbareArten } from '../lib/kategorien.js';
@@ -90,7 +91,7 @@
 	async function melden() {
 		if (sendet) return;
 		sendet = true;
-		const felder = { kategorie, was };
+		const felder = { kategorie, was, kennung: neueKennung() };
 		if (raum?.id) felder.raumId = String(raum.id);
 		else felder.ort = ort;
 		if (!freiBeschreiben && notiz.trim()) felder.notiz = notiz.trim();

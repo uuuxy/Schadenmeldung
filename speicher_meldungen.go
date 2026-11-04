@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -38,6 +39,15 @@ func (s *speicher) meldung(ctx context.Context, id int64) (meldung, error) {
 	return m, nichtGefunden(err)
 }
 
+// errSchonDa: Dieselbe Kennung kam gleichzeitig zweimal (zwei Tabs); die andere Anfrage hat gespeichert.
+var errSchonDa = errors.New("meldung mit dieser Kennung gibt es schon")
+
+// meldungMitKennung findet eine Meldung, die das Handy dieser Person schon einmal geschickt hat.
+func (s *speicher) meldungMitKennung(ctx context.Context, email, kennung string) (meldung, error) {
+	m, err := scanneMeldung(s.db.QueryRow(ctx, "SELECT "+meldungSpalten+" WHERE m.gemeldet_von = $1 AND m.kennung = $2", email, kennung))
+	return m, nichtGefunden(err)
+}
+
 // legeMeldungAn speichert Meldung und Foto in einer Transaktion: Es gibt kein Foto ohne Meldung.
 func (s *speicher) legeMeldungAn(ctx context.Context, m meldung, foto []byte) (meldung, error) {
 	tx, err := s.db.Begin(ctx)
@@ -53,10 +63,15 @@ func (s *speicher) legeMeldungAn(ctx context.Context, m meldung, foto []byte) (m
 		fotoName = &m.Foto
 	}
 	var id int64
+	// Dieselbe Kennung gleichzeitig zweimal: nichts anlegen, auch das Foto nicht (Rollback).
 	err = tx.QueryRow(ctx, `INSERT INTO meldungen
-		(raum_id, ort, kategorie, was, notiz, foto, dringend, gemeldet_von, gemeldet_am, geaendert_am)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9) RETURNING id`,
-		m.RaumID, m.Ort, m.Kategorie, m.Was, m.Notiz, fotoName, m.Dringend, m.GemeldetVon, m.GemeldetAm).Scan(&id)
+		(raum_id, ort, kategorie, was, notiz, foto, dringend, gemeldet_von, gemeldet_am, geaendert_am, kennung)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9, NULLIF($10, ''))
+		ON CONFLICT (gemeldet_von, kennung) DO NOTHING RETURNING id`,
+		m.RaumID, m.Ort, m.Kategorie, m.Was, m.Notiz, fotoName, m.Dringend, m.GemeldetVon, m.GemeldetAm, m.Kennung).Scan(&id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return meldung{}, errSchonDa
+	}
 	if err != nil {
 		return meldung{}, err
 	}
