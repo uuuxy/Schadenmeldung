@@ -2,6 +2,7 @@
 	import { api } from '../../lib/api.js';
 	import { zustand } from '../../lib/zustand.svelte.js';
 	import { zeige } from '../../lib/snackbar.svelte.js';
+	import { haltFest } from '../../lib/fassung.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
 	import Feld from '../ui/Feld.svelte';
@@ -15,6 +16,8 @@
 	let text = $state('');
 	let laeuft = $state(false);
 	let dateiWahl = $state();
+	// Eingelesene Räume stehen im Feld, ohne dass jemand getippt hat: Eine neue Fassung wartet darauf.
+	$effect(() => haltFest(() => laeuft || text.trim() !== ''));
 
 	async function hinzufuegen() {
 		if (!text.trim() || laeuft) return;

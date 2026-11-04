@@ -12,7 +12,8 @@
 		"pruefen:tippflaechen": "node e2e/tippflaechen.mjs",
 		"pruefen:tippen": "node e2e/tippen.mjs",
 		"pruefen:ablauf": "node e2e/ablauf.mjs",
-		"pruefen:live": "node e2e/live.mjs"
+		"pruefen:live": "node e2e/live.mjs",
+		"pruefen:fassung": "node e2e/fassung.mjs"
 	},
 	"devDependencies": {
 		"@fontsource/roboto": "5.3.0",

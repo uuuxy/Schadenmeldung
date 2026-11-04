@@ -60,6 +60,9 @@ self.addEventListener('fetch', (e) => {
 	const url = new URL(e.request.url);
 	if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
 	if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/fotos/') || url.pathname === '/healthz') return;
+	// Die Frage nach einer neuen Fassung (lib/fassung.js) geht am Speicher vorbei: Sonst läge dort eine
+	// index.html, deren Dateien noch fehlen, und die App startete im Funkloch nicht.
+	if (e.request.cache === 'no-store') return;
 	if (e.request.mode === 'navigate') e.respondWith(seite(e));
 	else if (url.pathname.startsWith('/assets/')) e.respondWith(datei(e));
 	else e.respondWith(sonstiges(e));

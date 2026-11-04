@@ -4,6 +4,7 @@
 	import { api } from '../lib/api.js';
 	import { zustand, uebernimm, legeInAusgang } from '../lib/zustand.svelte.js';
 	import { neueKennung } from '../lib/ausgang.js';
+	import { haltFest } from '../lib/fassung.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
 	import { rueckmeldung } from '../lib/haptik.js';
 	import { kategorieNach, sichtbareArten } from '../lib/kategorien.js';
@@ -55,6 +56,12 @@
 		was: 'Bitte eine Kachel antippen.',
 		genau: freiBeschreiben ? 'Bitte kurz beschreiben, was kaputt ist.' : 'Bitte antippen, was genau kaputt ist.'
 	});
+
+	// Eine neue Fassung (lib/fassung.js) wartet, solange eine Kachel angetippt ist (bis zum Abschicken)
+	// oder ein selbst gewählter Raum dasteht. Den Raum aus dem QR-Code bringt der Weg zurück, der Raum
+	// der letzten Meldung bleibt nur zur Bequemlichkeit stehen.
+	let raumDerLetzten = null;
+	$effect(() => haltFest(() => kategorie !== '' || (!!raum && raum.id !== codeRaum?.id && raum.id !== raumDerLetzten)));
 
 	// Ein Hinweis gilt nur, bis die Frage beantwortet ist.
 	$effect(() => {
@@ -119,6 +126,7 @@
 
 	function abschliessen(artDerMeldung) {
 		fertig = { art: artDerMeldung, was, ort, dringend };
+		raumDerLetzten = raum?.id ?? null;
 		kategorie = '';
 		fall = '';
 		notiz = '';
