@@ -9,7 +9,7 @@ const namen = [
 	// Bedienung
 	'meeting_room', 'location_on', 'search', 'photo_camera', 'close', 'check', 'check_circle', 'send', 'warning',
 	'error', 'edit_note', 'edit', 'schedule', 'local_shipping', 'engineering', 'undo', 'delete', 'print', 'qr_code_2',
-	'upload_file', 'download', 'picture_as_pdf', 'table_view', 'logout', 'devices', 'handyman', 'ios_share', 'mobile_arrow_down', 'more_vert', 'privacy_tip', 'arrow_back', 'task_alt',
+	'upload_file', 'download', 'picture_as_pdf', 'table_view', 'logout', 'devices', 'handyman', 'ios_share', 'share', 'mobile_arrow_down', 'more_vert', 'privacy_tip', 'arrow_back', 'task_alt',
 	'visibility', 'visibility_off', 'build', 'add_comment', 'history', 'cloud_off', 'schedule_send', 'arrow_downward',
 	'arrow_drop_down', 'chevron_right', 'add', 'settings', 'category', 'admin_panel_settings', 'open_in_new'
 ];

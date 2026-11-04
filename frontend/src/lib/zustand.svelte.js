@@ -10,6 +10,8 @@ export const zustand = $state({
 	einstellungen: { schulname: '', domain: '', fotoTage: 30, aufbewahrungTage: 365, mailAktiv: false, artenAus: [] },
 	offen: [],
 	erledigt: [],
+	meineErledigt: [],
+	mailStoerungSeit: null,
 	raeume: [],
 	// Funkloch: Die App zeigt den letzten Stand (standVon) und sammelt Meldungen im Ausgang.
 	offline: false,
@@ -95,8 +97,8 @@ export async function ladeAlles() {
 
 export async function ladeMeldungen() {
 	const daten = await api('/api/meldungen');
-	zustand.offen = daten.offen;
-	zustand.erledigt = daten.erledigt;
+	const { offen, erledigt, meineErledigt = [], mailStoerungSeit = null } = daten;
+	Object.assign(zustand, { offen, erledigt, meineErledigt, mailStoerungSeit });
 	zustand.offline = false;
 	zustand.standVon = null;
 	merkeStand();

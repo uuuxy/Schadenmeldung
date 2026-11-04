@@ -103,7 +103,9 @@ func (a *app) verschicke(ctx context.Context, e empfaenger, m meldung) error {
 	if err := mailHTML.Execute(&html, d); err != nil {
 		return err
 	}
-	if err := a.versender.sende(ctx, e.Email, d.Betreff, text.String(), html.String()); err != nil {
+	err = a.versender.sende(ctx, e.Email, d.Betreff, text.String(), html.String())
+	a.mailVersuch(err)
+	if err != nil {
 		return err
 	}
 	return a.sp.vermerkeVersand(ctx, m.ID, e.Email, a.jetzt())

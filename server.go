@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -30,6 +31,8 @@ type app struct {
 	pushClient     *http.Client
 	pushPause      time.Duration
 	pushLaeuft     sync.WaitGroup
+	// mailStoerung: seit wann Mails scheitern, in Unix-Sekunden; 0, solange alles läuft (mailstoerung.go).
+	mailStoerung atomic.Int64
 }
 
 func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {

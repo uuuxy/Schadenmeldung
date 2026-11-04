@@ -10,6 +10,7 @@
 	import MenueChip from '../components/ui/MenueChip.svelte';
 	import MeldungZeile from '../components/uebersicht/MeldungZeile.svelte';
 	import Export from '../components/uebersicht/Export.svelte';
+	import MailStoerung from '../components/uebersicht/MailStoerung.svelte';
 	import { kategorien } from '../lib/kategorien.js';
 
 	/**
@@ -74,6 +75,7 @@
 				onwahl={(w) => (reiter = w)}
 			/>
 		</div>
+		<MailStoerung />
 
 		<!-- Ein Filter mit nur einer Möglichkeit fehlt (M3), außer er ist gerade gewählt. -->
 		<div class="flex min-h-14 items-center gap-2">

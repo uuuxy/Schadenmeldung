@@ -18,6 +18,7 @@
 	import FallWahl from '../components/melden/FallWahl.svelte';
 	import Gemeldet from '../components/melden/Gemeldet.svelte';
 	import AlsApp from '../components/melden/AlsApp.svelte';
+	import Erledigt from '../components/melden/Erledigt.svelte';
 
 	/**
 	 * Melden: das Einzige, was das Kollegium sieht. Drei Fragen untereinander – Wo? Was ist kaputt?
@@ -143,6 +144,7 @@
 	<Gemeldet {fertig} onweiter={() => (fertig = null)} />
 {:else}
 	<main class="mx-auto flex max-w-3xl flex-col gap-8 px-4 pt-2 pb-36">
+		<Erledigt />
 		<AlsApp />
 		<Frage titel="Wo?" erledigt={ort !== ''} hinweis={fehlt === 'wo' ? hinweise.wo : ''} bind:element={abschnitt.wo}>
 			<WoWahl bind:raum bind:ortFrei bind:freierOrt codeUnbekannt={!!raumCode && !codeRaum && zustand.raeume.length > 0} ongewaehlt={() => weiterNach('wo')} />
