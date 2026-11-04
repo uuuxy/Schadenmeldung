@@ -4,10 +4,12 @@
 	import { installieren, alsApp, apfelGeraet, hinweisWeg, hinweisAusblenden } from '../../lib/installieren.svelte.js';
 
 	/**
-	 * Nach dem Melden der Tipp, die Schadenmeldung als App auf den Startbildschirm zu legen: Dann ist
-	 * sie beim nächsten Schaden mit einem Tipp da. Chrome bietet das selbst an (ein Knopf genügt), auf
-	 * dem iPhone geht es nur über „Teilen“. Einmal weggetippt, kommt der Tipp auf dem Gerät nicht wieder.
+	 * Gleich beim ersten Öffnen das Angebot, die Schadenmeldung als App auf den Startbildschirm zu legen
+	 * (Anmeldung und Meldeseite): Auf dem iPhone ist der Anfang der beste Moment, wer zuerst installiert,
+	 * meldet sich gleich in der App an. Chrome bietet das selbst an (ein Knopf genügt), auf dem iPhone
+	 * geht es nur über „Teilen“. Einmal weggetippt, kommt das Angebot auf dem Gerät nicht wieder.
 	 */
+	let { class: klasse = '' } = $props();
 	let weg = $state(alsApp() || hinweisWeg());
 	const art = $derived(installieren.angebot ? 'knopf' : apfelGeraet() ? 'iphone' : null);
 
@@ -25,15 +27,15 @@
 </script>
 
 {#if !weg && art}
-	<section class="rounded-xl bg-surface-container-low p-4 text-left">
+	<section class={['rounded-xl bg-surface-container-low p-4 text-left', klasse]}>
 		<div class="flex items-start gap-3">
 			<Icon name={art === 'iphone' ? 'ios_share' : 'mobile_arrow_down'} class="shrink-0 text-primary" />
 			<p class="text-body-medium text-on-surface">
 				{#if art === 'iphone'}
-					Als App auf den Home-Bildschirm: auf „Teilen“ tippen (das Symbol links), dann auf „Zum Home-Bildschirm“.
-					Beim nächsten Schaden genügt ein Tipp.
+					Als App auf den Home-Bildschirm: auf „Teilen“ tippen (das Symbol links), dann auf „Zum Home-Bildschirm“
+					und die Schadenmeldung über das neue Symbol öffnen.
 				{:else}
-					Als App installieren: Beim nächsten Schaden ist die Schadenmeldung mit einem Tipp da.
+					Als App installieren: Dann ist die Schadenmeldung mit einem Tipp vom Startbildschirm aus da.
 				{/if}
 			</p>
 		</div>

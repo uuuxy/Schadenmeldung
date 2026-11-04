@@ -6,6 +6,7 @@
 	import Ladekreis from '../components/Ladekreis.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import Feld from '../components/ui/Feld.svelte';
+	import AlsApp from '../components/melden/AlsApp.svelte';
 
 	/**
 	 * Anmeldung mit dem Schul-Postfach, nur einmal je Gerät: Danach bleibt das Handy angemeldet, und
@@ -45,6 +46,7 @@
 		<h1 class="text-headline-medium text-on-surface">Schadenmeldung</h1>
 		{#if zustand.einstellungen.schulname}<p class="mt-1 text-body-large text-on-surface-variant">{zustand.einstellungen.schulname}</p>{/if}
 	</div>
+	<AlsApp class="mb-6" />
 
 	<form class="flex flex-col gap-5" onsubmit={absenden}>
 		<Feld

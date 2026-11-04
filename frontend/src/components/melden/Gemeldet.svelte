@@ -4,7 +4,6 @@
 	import { gehe } from '../../lib/weg.svelte.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
-	import AlsApp from './AlsApp.svelte';
 
 	/**
 	 * Bestätigung statt Formular: Die Meldung ist sicher angekommen oder sicher im Ausgang. Der Text
@@ -32,5 +31,4 @@
 			<Button variant="ghost" onclick={() => gehe('/')}>Zur Übersicht</Button>
 		{/if}
 	</div>
-	<div class="mt-8 self-stretch"><AlsApp /></div>
 </main>
