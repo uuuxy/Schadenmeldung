@@ -44,12 +44,12 @@ func (a *app) meldungen(w http.ResponseWriter, r *http.Request, b benutzer) {
 		return
 	}
 	if !b.darfSehen() {
-		kurz := make([]meldungKurz, len(offen))
-		for i, m := range offen {
-			kurz[i] = meldungKurz{ID: m.ID, RaumID: m.RaumID, Kategorie: m.Kategorie, Was: m.Was,
-				Status: m.Status, GemeldetAm: m.GemeldetAm}
+		sicht, err := a.sichtFuerKollegium(r.Context(), b, offen)
+		if err != nil {
+			intern(w, err)
+			return
 		}
-		schreibeJSON(w, http.StatusOK, map[string]any{"offen": kurz, "erledigt": []meldungKurz{}})
+		schreibeJSON(w, http.StatusOK, sicht)
 		return
 	}
 	erledigt, err := a.sp.erledigteMeldungen(r.Context(), a.jetzt().AddDate(0, 0, -30))
@@ -63,7 +63,7 @@ func (a *app) meldungen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	for i := range erledigt {
 		erledigt[i] = fuerAnsicht(erledigt[i], b)
 	}
-	schreibeJSON(w, http.StatusOK, map[string]any{"offen": offen, "erledigt": erledigt})
+	schreibeJSON(w, http.StatusOK, map[string]any{"offen": offen, "erledigt": erledigt, "mailStoerungSeit": a.mailStoerungSeit()})
 }
 
 // meldungAnlegen nimmt ein Formular, weil ein Foto dabei sein kann. Datum und meldende Person
