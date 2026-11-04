@@ -45,34 +45,16 @@
 	);
 	const liste = $derived(quelle.filter((m) => (!bereich || m.bereich === bereich) && (!art || m.kategorie === art)));
 
-	// Sortierung: Dringendes steht unter eigener Überschrift oben, damit eine Gefahr nicht unter neueren
-	// Meldungen verschwindet, und die Überschrift erklärt, warum. Wer lieber nur nach Zeit sortiert,
-	// wählt das am Chip; jedes Gerät merkt sich seine Wahl.
-	let sortierung = $state(gemerkt('schaden.sortierung'));
+	// Dringendes steht unter eigener Überschrift oben, damit eine Gefahr nicht unter neueren Meldungen
+	// verschwindet, und die Überschrift erklärt, warum. Eine Wahl der Sortierung gibt es bewusst nicht:
+	// eine gute Reihenfolge statt einer Einstellung, wie bei Gmail.
 	const nachZeit = (a, b) => new Date(b.gemeldetAm) - new Date(a.gemeldetAm);
-	const mitDringend = $derived(reiter === 'offen' && quelle.some((m) => m.dringend));
 	const abschnitte = $derived.by(() => {
 		if (reiter !== 'offen') return [{ titel: '', meldungen: liste }];
-		const dringend = sortierung === 'zeit' ? [] : liste.filter((m) => m.dringend).sort(nachZeit);
-		const weitere = liste.filter((m) => sortierung === 'zeit' || !m.dringend).sort(nachZeit);
+		const dringend = liste.filter((m) => m.dringend).sort(nachZeit);
+		const weitere = liste.filter((m) => !m.dringend).sort(nachZeit);
 		if (!dringend.length) return [{ titel: '', meldungen: weitere }];
 		return [{ titel: 'Dringend', meldungen: dringend }, ...(weitere.length ? [{ titel: 'Weitere, neueste zuerst', meldungen: weitere }] : [])];
-	});
-
-	function gemerkt(schluessel) {
-		try {
-			return localStorage.getItem(schluessel);
-		} catch {
-			return null;
-		}
-	}
-	$effect(() => {
-		try {
-			if (sortierung) localStorage.setItem('schaden.sortierung', sortierung);
-			else localStorage.removeItem('schaden.sortierung');
-		} catch {
-			/* Ohne Speicher gilt eben wieder „Dringende zuerst“. */
-		}
 	});
 
 	$effect(() => {
@@ -113,9 +95,6 @@
 		<div class="flex min-h-14 flex-wrap content-center items-center gap-x-2 gap-y-4 py-2">
 			{#if bereiche.length > 1 || bereich}<MenueChip titel="Bereich" alle="Alle Bereiche" optionen={bereiche.map((b) => ({ wert: b, text: b }))} bind:wert={bereich} />{/if}
 			{#if arten.length > 1 || art}<MenueChip titel="Art" alle="Alle Arten" optionen={arten} bind:wert={art} />{/if}
-			{#if reiter === 'offen' && (mitDringend || sortierung)}
-				<MenueChip titel="Sortierung" alle="Dringende zuerst" alleIcon="warning" optionen={[{ wert: 'zeit', text: 'Neueste zuerst', icon: 'schedule' }]} bind:wert={sortierung} />
-			{/if}
 			<span class="flex-1"></span>
 			<Export liste={reiter} {bereich} {art} anzahl={liste.length} />
 		</div>
