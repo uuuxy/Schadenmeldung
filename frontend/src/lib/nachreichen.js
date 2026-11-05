@@ -22,10 +22,12 @@ export async function auffrischen() {
 	}
 }
 
-/** Legt eine Meldung im Ausgang ab, wenn sie gerade nicht rausgeht. Ihr Zeitpunkt reist mit. */
+/** Legt eine Meldung im Ausgang ab, wenn sie gerade nicht rausgeht; zurück kommt ihre Nummer dort. */
 export async function legeInAusgang(felder, foto, anzeige) {
-	await legeAb({ von: zustand.benutzer?.email, felder, foto, anzeige, erstellt: new Date().toISOString() });
+	// Ihr Zeitpunkt reist mit.
+	const id = await legeAb({ von: zustand.benutzer?.email, felder, foto, anzeige, erstellt: new Date().toISOString() });
 	await ladeAusgang();
+	return id;
 }
 
 /** Legt eine Änderung am Stand in den Ausgang, wenn sie gerade nicht rausgeht; zurück kommt ihre Nummer dort. */
@@ -68,6 +70,7 @@ async function sendeDerReiheNach() {
 					formular.set('erstellt', eintrag.erstellt);
 					if (eintrag.foto) formular.set('foto', eintrag.foto, 'foto.jpg');
 					uebernimm(await api('/api/meldungen', { methode: 'POST', formular }));
+					zustand.nachgereicht.push(eintrag.id);
 					zeige(`Nachgereicht: ${eintrag.anzeige.was} (${eintrag.anzeige.ort})`);
 				}
 				await entferne(eintrag.id);

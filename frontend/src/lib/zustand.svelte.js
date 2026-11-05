@@ -17,7 +17,10 @@ export const zustand = $state({
 	offline: false,
 	standVon: null,
 	ausgang: [],
-	wartend: []
+	wartend: [],
+	// Nummern der Meldungen aus dem Ausgang, die seit dem Laden beim Server ankamen: Die Bestätigung im
+	// Formular springt dann von „Gespeichert“ auf „Gemeldet“.
+	nachgereicht: []
 });
 
 // Kollegium meldet nur. Hausmeister, Leitung und Admin dürfen alles, auch Räume und Rollen; die

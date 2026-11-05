@@ -10,7 +10,9 @@
 	 * verspricht nur, was stimmt: eine Mail nur, wenn der Server Mails verschickt.
 	 */
 	let { fertig, onweiter } = $props();
-	const gemeldet = $derived(fertig.art === 'gemeldet');
+	// Kommt die Meldung aus dem Ausgang beim Server an, springt die Bestätigung um: „Gerade ist kein Netz“
+	// stimmte dann nicht mehr. Eine abgelehnte zählt nicht, das sagt die Snackbar.
+	const gemeldet = $derived(fertig.art === 'gemeldet' || zustand.nachgereicht.includes(fertig.ausgangId));
 	const text = $derived.by(() => {
 		if (!gemeldet) return 'Gerade ist kein Netz. Die Meldung geht automatisch raus, sobald wieder Verbindung besteht.';
 		// Gleich dazu, wie der Bescheid kommt, wenn sie erledigt ist (rueckmeldung.go).
