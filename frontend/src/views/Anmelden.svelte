@@ -1,6 +1,6 @@
 <script>
 	import { api } from '../lib/api.js';
-	import { zustand, ladeAlles } from '../lib/zustand.svelte.js';
+	import { zustand, ladeAlles, ladeAusgang } from '../lib/zustand.svelte.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
 	import Ladekreis from '../components/Ladekreis.svelte';
@@ -28,6 +28,8 @@
 		try {
 			const benutzer = await api('/api/anmelden', { methode: 'POST', json: { email, passwort } });
 			passwort = '';
+			// Der Ausgang dieser Person, nicht der einer Person, die vorher hier angemeldet war.
+			await ladeAusgang(benutzer.email);
 			await ladeAlles().catch(() => {});
 			zustand.benutzer = benutzer;
 		} catch (err) {

@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { alleImAusgang, leereAusgang } from './ausgang.js';
+import { alleImAusgang, entferne } from './ausgang.js';
 
 /** Der gemeinsame Zustand der App: wer angemeldet ist, die Meldungen, die Räume und das Netz. */
 export const zustand = $state({
@@ -46,14 +46,15 @@ function gemerkterStand() {
 	}
 }
 
-/** Beim Abmelden: nichts von dieser Person bleibt auf dem Gerät. */
-export async function vergissAlles() {
+/** Beim Abmelden: nichts von dieser Person bleibt auf dem Gerät. Was eine andere Person hier gespeichert
+ * hat, wartet weiter auf deren Anmeldung. */
+export async function vergissAlles(email) {
 	try {
 		localStorage.removeItem(STAND);
 	} catch {
 		/* nichts zu tun */
 	}
-	await leereAusgang().catch(() => {});
+	for (const e of await ausgangVon(email).catch(() => [])) await entferne(e.id).catch(() => {});
 	zustand.ausgang = [];
 	zustand.wartend = [];
 	zustand.offen = [];
@@ -66,10 +67,10 @@ export async function starte() {
 	await ladeEinstellungen().catch(() => {
 		/* Ohne Einstellungen geht es mit den Vorgaben weiter. */
 	});
-	// Zuerst der Ausgang: Wartende Änderungen gelten schon, wenn die Meldungen kommen (ladeMeldungen).
-	await ladeAusgang();
 	try {
 		zustand.benutzer = await api('/api/ich');
+		// Zuerst der Ausgang dieser Person: Wartende Änderungen gelten schon, wenn die Meldungen kommen.
+		await ladeAusgang();
 		await ladeAlles();
 	} catch (e) {
 		const stand = e.status === 0 ? gemerkterStand() : null;
@@ -83,6 +84,7 @@ export async function starte() {
 				standVon: stand.zeit,
 				offline: true
 			});
+			await ladeAusgang();
 		} else {
 			zustand.benutzer = null;
 		}
@@ -151,10 +153,15 @@ export async function setzeStatus(id, aenderung) {
 
 // ── Ausgang ──────────────────────────────────────────────────────────────────
 
-/** Liest den Ausgang in den Zustand; was hinein- und hinausgeht, regelt nachreichen.js. */
-export async function ladeAusgang() {
+/** Was im Ausgang dieser Person gehört; Einträge ohne von stammen von vor dieser Unterscheidung. */
+export async function ausgangVon(email) {
+	return (await alleImAusgang()).filter((e) => !e.von || e.von === email);
+}
+
+/** Liest den Ausgang einer Person in den Zustand; was hinein- und hinausgeht, regelt nachreichen.js. */
+export async function ladeAusgang(email = zustand.benutzer?.email) {
 	try {
-		const alle = await alleImAusgang();
+		const alle = await ausgangVon(email);
 		zustand.ausgang = alle.filter((e) => e.art !== 'stand').map(({ id, anzeige, erstellt }) => ({ id, ...anzeige, erstellt }));
 		zustand.wartend = alle.filter((e) => e.art === 'stand');
 	} catch {

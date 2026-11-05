@@ -1,6 +1,6 @@
 // Der Ausgang: Meldungen (samt Foto) und Änderungen am Stand (art: 'stand'), die im Funkloch
 // abgeschickt wurden. Sie liegen im Browser (IndexedDB) und gehen der Reihe nach raus, sobald wieder
-// Verbindung besteht (nachreichen.js).
+// Verbindung besteht (nachreichen.js), und zwar nur unter der Person, die sie gespeichert hat (von).
 const DATENBANK = 'schadenmeldung';
 const ABLAGE = 'ausgang';
 
@@ -31,7 +31,6 @@ async function mitAblage(modus, arbeit) {
 export const legeAb = (eintrag) => mitAblage('readwrite', (a) => a.add(eintrag));
 export const alleImAusgang = () => mitAblage('readonly', (a) => a.getAll());
 export const entferne = (id) => mitAblage('readwrite', (a) => a.delete(id));
-export const leereAusgang = () => mitAblage('readwrite', (a) => a.clear());
 
 /** Nimmt einen Eintrag heraus, solange er noch wartet; undefined, wenn er schon hinaus ist. */
 export const nimmHeraus = (id) =>

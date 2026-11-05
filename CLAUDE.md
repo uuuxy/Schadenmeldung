@@ -40,8 +40,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 - **Funkloch:** Schreibende Wege dürfen im Funkloch nichts verlieren: Meldungen und Stand-Änderungen
   warten im Ausgang (`lib/ausgang.js`, `lib/nachreichen.js`), bis wieder Netz da ist, und
   `ladeMeldungen` legt wartende Änderungen über den Stand vom Server. Abmelden schickt zuerst los
-  und fragt nach, statt Wartendes still zu löschen. Der Service Worker cacht nie
-  `/api/` oder `/fotos/`.
+  und fragt nach, statt Wartendes still zu löschen. Was wartet, geht nur unter der Person raus, die
+  es gespeichert hat (`von`), auch wenn sich danach jemand anderes am Gerät anmeldet. Der Service
+  Worker cacht nie `/api/` oder `/fotos/`.
 
 ## Rollen und Mail
 
