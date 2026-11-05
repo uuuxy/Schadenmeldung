@@ -13,6 +13,7 @@
 	import Datenschutz from './views/Datenschutz.svelte';
 	import Snackbar from './components/Snackbar.svelte';
 	import Rueckfrage from './components/Rueckfrage.svelte';
+	import ZurueckWischen from './components/ZurueckWischen.svelte';
 	import Ladekreis from './components/Ladekreis.svelte';
 
 	// Nach dem Start gleich nachreichen, was im Funkloch liegen geblieben ist.
@@ -119,3 +120,5 @@
 {/if}
 <Snackbar />
 <Rueckfrage />
+<!-- navigator.standalone gibt es nur am iPhone und iPad, in der App vom Home-Bildschirm. -->
+{#if navigator.standalone}<ZurueckWischen />{/if}

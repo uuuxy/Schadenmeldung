@@ -31,7 +31,11 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Abstand `gap-3`. Passt ein Name nicht, bekommt die Kachel ein Symbol statt einer größeren Fläche.
   Pillenform nur für einzeilige Knöpfe, Suche und Segmente (M3 „round“), Chips `rounded-sm`.
 - **Zurück:** Jede Unteransicht (ein Bereich, „Weitere Räume“, „Anderer Ort“) hat oben den Pfeil mit
-  ihrem Namen (`ZurueckZeile`), nie einen Textlink darunter (M3: der Zurück-Pfeil steht vorn).
+  ihrem Namen (`ZurueckZeile`), nie einen Textlink darunter (M3: der Zurück-Pfeil steht vorn). Die Zeile
+  gibt ihr einen Eintrag im Verlauf (`unteransicht`, weg.svelte.js), so führen Pfeil, Zurück-Geste von
+  Android und Wischen in Safari gleich weit; in der App vom Home-Bildschirm am iPhone wischt
+  `ZurueckWischen` (tippt den innersten Pfeil mit `data-zurueck` an). Neue Unteransichten nehmen deshalb
+  immer `ZurueckZeile`, neue Pfeile tragen `data-zurueck`.
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
   Wert im hellen und im dunklen Schema. Einzige Ausnahme: die Papier-Rollen (`papier`, `auf-papier`,

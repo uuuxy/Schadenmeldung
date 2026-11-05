@@ -43,7 +43,7 @@
 <header class={['sticky top-0 z-20 pt-[env(safe-area-inset-top)] transition-colors duration-300', gescrollt ? 'bg-surface-container' : 'bg-surface']}>
 	<div class="mx-auto flex h-16 max-w-3xl items-center gap-1 px-1">
 		{#if zurueck}
-			<button class="icon-btn text-on-surface" aria-label="Zurück" onclick={zurueck}><Icon name="arrow_back" /></button>
+			<button class="icon-btn text-on-surface" aria-label="Zurück" data-zurueck onclick={zurueck}><Icon name="arrow_back" /></button>
 		{:else}
 			<span class="w-3"></span>
 		{/if}

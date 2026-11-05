@@ -130,6 +130,9 @@ APP_ENV=local IMAP_HOST=mock DATABASE_URL='postgres://schaden:schaden@localhost:
   SMTP_HOST=localhost SMTP_PORT=1025 MAIL_ABSENDER=schaden@schule.de OEFFENTLICHE_ADRESSE=http://127.0.0.1:8090 go run .
 ```
 
+Der Server bettet `frontend/dist` beim Start ein: Nach `npm run build` neu starten, sonst prüft man den
+alten Stand der Oberfläche.
+
 Browserprüfungen (Chromium von Playwright ist auf dem Mac installiert):
 - `frontend/e2e/testdaten.sh` füllt eine **frische** Datenbank. Davor die DB leeren:
   `docker exec schaden-db-local psql -U schaden -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'`,
@@ -139,6 +142,8 @@ Browserprüfungen (Chromium von Playwright ist auf dem Mac installiert):
 - `npm run pruefen:tippflaechen` misst alle Tippflächen; `npm run pruefen:tippen` tippt neben die Ränder.
 - `npm run pruefen:live` misst, wie schnell die Übersicht eine neue Meldung zeigt (Testdaten nötig).
 - `npm run pruefen:funkloch` setzt ohne Netz einen Stand und prüft, dass er nachgereicht wird (Testdaten nötig).
+- `npm run pruefen:zurueck` prüft „Zurück“ über Pfeil, Geste und Wischen (App vom Home-Bildschirm am
+  iPhone nachgestellt); bringt eigene Räume mit und schickt nichts ab, braucht also keine frischen Testdaten.
 - Betrieb: `waechter.sh`, `sicherung.sh` und `sicherung-pruefen.sh` lassen sich lokal mit
   `COMPOSE_FILE=…/docker-compose.local.yml` in einem Probeordner mit eigener `.env` ausprobieren
   (`APP_ENV=local`, `SMTP_HOST=localhost`, `SMTP_PORT=1025`); die Mails landen in Mailpit.
