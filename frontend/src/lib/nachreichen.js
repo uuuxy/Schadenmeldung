@@ -40,11 +40,17 @@ export async function nimmAusAusgang(id) {
 	return Boolean(eintrag);
 }
 
-let sendetGerade = false;
+// Läuft schon ein Senden, wartet ein weiterer Aufruf darauf, statt gleich zurückzukehren. Sonst sähe
+// „Abmelden“ als wartend, was gerade unterwegs ist, und fragte grundlos nach.
+let laufend = null;
 
-async function sendeAusgang() {
-	if (sendetGerade || !zustand.benutzer) return;
-	sendetGerade = true;
+function sendeAusgang() {
+	if (!zustand.benutzer) return;
+	laufend ??= sendeDerReiheNach().finally(() => (laufend = null));
+	return laufend;
+}
+
+async function sendeDerReiheNach() {
 	let staende = 0;
 	try {
 		// Der Reihe nach, wie getippt: Zwei Änderungen an derselben Meldung kommen so in ihrer Folge an.
@@ -73,7 +79,6 @@ async function sendeAusgang() {
 			}
 		}
 	} finally {
-		sendetGerade = false;
 		await ladeAusgang();
 		if (staende) zeige(staende === 1 ? 'Änderung nachgereicht' : `${staende} Änderungen nachgereicht`);
 	}
