@@ -9,3 +9,4 @@ frontend/dist/*
 *.lokal.*
 # Sicherungen von update.sh auf dem Server
 backups/
+.waechter

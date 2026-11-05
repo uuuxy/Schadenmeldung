@@ -36,9 +36,10 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   dann `npm run symbole`.
 - **Wenig tippen:** Neue Eingaben zuerst als Kacheln oder Chips denken, Freitext nur als Ausweg.
   Alles muss auch ohne QR-Code in wenigen Tipps gehen.
-- **Funkloch:** Schreibende Wege der Kollegien-Seite dürfen im Funkloch nichts verlieren
-  (Ausgang in `lib/ausgang.js`, `zustand.sendeAusgang`). Der Service Worker cacht nie `/api/` oder
-  `/fotos/`.
+- **Funkloch:** Schreibende Wege dürfen im Funkloch nichts verlieren: Meldungen und Stand-Änderungen
+  warten im Ausgang (`lib/ausgang.js`, `lib/nachreichen.js`), bis wieder Netz da ist, und
+  `ladeMeldungen` legt wartende Änderungen über den Stand vom Server. Der Service Worker cacht nie
+  `/api/` oder `/fotos/`.
 
 ## Rollen und Mail
 
@@ -84,7 +85,7 @@ Werkzeug-Hinweis, wie in der Bibliothek.
 
 - `docker compose -f docker-compose.local.yml up -d`, dann
   `TEST_DATABASE_URL='postgres://schaden:schaden@localhost:5435/schaden?sslmode=disable' go test ./...`
-- `go vet ./...` und `cd frontend && npm run build` (0 Warnungen)
+- `go vet ./...` und `cd frontend && npm run build` (0 Warnungen); Skripte mit `shellcheck *.sh`
 - Die schnellen Prüfungen laufen vor jedem Commit von selbst, wenn der Hook eingeschaltet ist:
   einmal je Klon `chmod +x .githooks/pre-commit && git config core.hooksPath .githooks`.
 - Code auf Deutsch benennen wie in der Bibliothek; Kommentare erklären in ein, zwei Sätzen das Warum.

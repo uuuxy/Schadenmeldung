@@ -105,6 +105,17 @@ Datenbank hängt nur am internen Netz des Stacks.
 4. Als Admin anmelden, unter „Einstellungen“ Räume einfügen und den Hausmeister eintragen,
    dann die QR-Aufkleber drucken. Dafür die Seite über die echte Adresse öffnen, denn die Codes
    führen auf die Adresse, unter der sie erzeugt werden.
+5. Wächter und nächtliche Sicherung einrichten (`crontab -e` als root, Pfad anpassen):
+
+   ```
+   */5 * * * * /pfad/zur/schadenmeldung/waechter.sh 2>&1 | logger -t schadenmeldung
+   30 2 * * * /pfad/zur/schadenmeldung/sicherung.sh 2>&1 | logger -t schadenmeldung
+   ```
+
+   Der Wächter startet App oder Datenbank neu, wenn sie hängen, und mailt an `WAECHTER_AN` (sonst
+   an den ersten aus `ADMINS`), wenn das nicht hilft, die Platte fast voll ist oder die Sicherung
+   ausbleibt. `./waechter.sh --probe` schickt eine Probemail. Vor dem Start an der Schule:
+   [GENERALPROBE.md](GENERALPROBE.md).
 
 **Erreichbarkeit:** Ohne weitere Einstellung ist die App überall erreichbar, geschützt durch die
 Anmeldung, also auch über mobile Daten im Keller oder von zu Hause. Soll sie nur im Schulnetz
@@ -141,8 +152,13 @@ löscht Sicherungen nach sieben Tagen. Einmal auf dem Server einrichten (`cronta
 30 2 * * * /pfad/zur/schadenmeldung/sicherung.sh 2>&1 | logger -t schadenmeldung
 ```
 
-Ob es geklappt hat, zeigt `journalctl -t schadenmeldung`. Die Sicherungen liegen auf demselben Server; eine Kopie
-woanders schützt auch vor dessen Ausfall. Von Hand ist eine Sicherung ein einziger Befehl:
+Ob es geklappt hat, zeigt `journalctl -t schadenmeldung`. Eine Sicherung auf demselben Server hilft nicht, wenn
+dessen Platte ausfällt: Mit `SICHERUNG_KOPIE` in `.env` (ein eingehängtes NAS oder `benutzer@nas:/pfad` mit
+SSH-Schlüssel) spiegelt `sicherung.sh` den Ordner jede Nacht auf ein zweites Gerät, samt Löschen nach sieben
+Tagen. Ob sich eine Sicherung zurückspielen lässt, zeigt `./sicherung-pruefen.sh`: Es spielt die neueste
+probeweise in eine eigene Datenbank ein und zählt Meldungen und Räume, ohne die echte anzufassen.
+
+Von Hand ist eine Sicherung ein einziger Befehl:
 
 ```bash
 docker compose exec -T db pg_dump -U schaden -Fc schaden > sicherung-$(date +%F).dump

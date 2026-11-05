@@ -65,7 +65,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Löschung</h2>
 			<p class="text-on-surface-variant">
-				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Jede Nacht und vor jedem Update sichert der Server die Datenbank; jede Sicherung wird nach 7 Tagen gelöscht. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe und kein Tracking. Einen fremden Dienst nutzen nur die Mitteilungen aufs Handy, verschlüsselt und nur für alle, die sie einschalten.
+				Fotos werden {e.fotoTage} Tage nach der Erledigung gelöscht, die Meldung selbst nach {e.aufbewahrungTage} Tagen. Jede Nacht und vor jedem Update sichert der Server die Datenbank; jede Sicherung wird nach 7 Tagen gelöscht, auch eine Kopie auf einem zweiten Gerät der Schule. Alles bleibt auf dem Server der Schule; es gibt keine Weitergabe und kein Tracking. Einen fremden Dienst nutzen nur die Mitteilungen aufs Handy, verschlüsselt und nur für alle, die sie einschalten.
 			</p>
 		</section>
 		<section>
