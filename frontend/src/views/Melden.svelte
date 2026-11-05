@@ -115,9 +115,9 @@
 			if (e.status !== 0) return zeige(e.message);
 			// Funkloch: nicht verwerfen, sondern im Ausgang ablegen und später selbst nachreichen.
 			try {
-				await legeInAusgang(felder, foto, { ort, raumId: raum?.id ?? null, kategorie, was });
+				const nummer = await legeInAusgang(felder, foto, { ort, raumId: raum?.id ?? null, kategorie, was });
 				zustand.offline = true;
-				abschliessen('ausgang');
+				abschliessen('ausgang', nummer);
 			} catch {
 				zeige(e.message);
 			}
@@ -126,8 +126,8 @@
 		}
 	}
 
-	function abschliessen(artDerMeldung) {
-		fertig = { art: artDerMeldung, was, ort, dringend };
+	function abschliessen(artDerMeldung, ausgangId = null) {
+		fertig = { art: artDerMeldung, was, ort, dringend, ausgangId };
 		raumDerLetzten = raum?.id ?? null;
 		kategorie = '';
 		fall = '';

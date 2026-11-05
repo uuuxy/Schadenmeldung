@@ -2,7 +2,8 @@ import { chromium } from 'playwright-core';
 // Funkloch beim Hausmeister im Handyformat: Ein Stand, der ohne Netz gesetzt wird, bleibt stehen, auch
 // nach dem Neuladen, steht als „wartet auf Netz“ in der Liste und geht raus, sobald wieder Netz da ist.
 // „Rückgängig“ nimmt eine wartende Änderung zurück, ohne dass etwas beim Server ankommt; Abmelden fragt
-// nach, solange etwas wartet. Was wartet, geht nur unter der Person raus, die es gespeichert hat.
+// nach, solange etwas wartet. Was wartet, geht nur unter der Person raus, die es gespeichert hat. Eine
+// Meldung ohne Netz zeigt „Gespeichert“ und nach dem Nachreichen „Gemeldet – danke!“.
 // Braucht den lokalen Server mit Testdaten aus e2e/testdaten.sh.
 const B = process.env.ADRESSE ?? 'http://127.0.0.1:8090';
 const H = { 'X-Schaden': '1' };
@@ -105,7 +106,24 @@ await netzZurueck();
 await s.getByText('Änderung nachgereicht').waitFor({ timeout: 10000 });
 pruefe((await standAmServer(flur.id)) === 'erledigt', 'Der Hausmeister wieder angemeldet: Jetzt geht seine Änderung raus');
 
-for (const m of [keller, flur]) await pruefer.request.delete(`${B}/api/meldungen/${m.id}`, { headers: H });
+// 7. Eine Meldung ohne Netz: Die Bestätigung sagt „Gespeichert“ und springt auf „Gemeldet – danke!“,
+// sobald die Meldung nachgereicht ist.
+const qr = (await (await pruefer.request.get(`${B}/api/raeume`)).json()).find((r) => r.id === raum.id).code;
+await s.goto(`${B}/r/${qr}`);
+await s.getByRole('heading', { name: 'Schaden melden' }).waitFor();
+await s.getByRole('button', { name: 'Wasser & WC' }).click();
+await s.getByRole('button', { name: 'Wasserhahn tropft' }).click();
+await k.setOffline(true);
+await s.getByRole('button', { name: /^Melden · / }).click();
+await s.getByRole('heading', { name: 'Gespeichert' }).waitFor({ timeout: 5000 });
+await k.setOffline(false);
+const umgesprungen = await s.getByRole('heading', { name: 'Gemeldet – danke!' }).waitFor({ timeout: 10000 }).then(() => true, () => false);
+pruefe(umgesprungen, 'Meldung ohne Netz: Nach dem Nachreichen springt „Gespeichert“ auf „Gemeldet – danke!“');
+const nachgereicht = (await (await pruefer.request.get(`${B}/api/meldungen`)).json()).offen
+	.filter((m) => m.raumId === raum.id && m.was === 'Wasserhahn tropft')
+	.sort((x, y) => y.id - x.id)[0];
+
+for (const m of [keller, flur, nachgereicht].filter(Boolean)) await pruefer.request.delete(`${B}/api/meldungen/${m.id}`, { headers: H });
 await browser.close();
 if (fehler.length) {
 	console.log(fehler.join('\n'));
