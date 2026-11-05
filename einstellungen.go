@@ -15,7 +15,7 @@ var arten = []struct{ schluessel, name string }{
 	{"heizung", "Heizung & Lüftung"},
 	{"wasser", "Wasser & WC"},
 	{"fenster", "Fenster & Türen"},
-	{"moebel", "Möbel & Tafel"},
+	{"moebel", "Möbel"},
 	{"technik", "Medientechnik"},
 	{"reinigung", "Reinigung"},
 	{"sonstiges", "Sonstiges"},
