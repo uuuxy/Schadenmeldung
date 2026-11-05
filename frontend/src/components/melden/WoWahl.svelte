@@ -4,6 +4,7 @@
 	import { zuletztGewaehlt, merkeRaum } from '../../lib/zuletzt.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
+	import ZurueckZeile from '../ZurueckZeile.svelte';
 	import Feld from '../ui/Feld.svelte';
 	import FilterChips from '../ui/FilterChips.svelte';
 	import RaumWahl from '../RaumWahl.svelte';
@@ -54,10 +55,12 @@
 	</button>
 	<HierGemeldet raumId={raum.id} />
 {:else if nurFreitext}
-	<Feld etikett="Wo ist der Schaden?" placeholder="z. B. Schulhof, Treppenhaus Nord" bind:wert={ortFrei} autocomplete="off" enterkeyhint="next" maxlength="80" />
-	{#if zustand.raeume.length}
-		<Button variant="ghost" class="mt-2 -ml-4" onclick={() => (freierOrt = false)}><Icon name="meeting_room" groesse={18} />Doch einen Raum wählen</Button>
-	{:else if darfBearbeiten()}
+	<!-- Wie in einem Bereich: oben der Pfeil zurück zu den Räumen, kein Link unter dem Feld. -->
+	{#if zustand.raeume.length}<ZurueckZeile titel="Anderer Ort" etikett="Zurück zu den Räumen" onzurueck={() => (freierOrt = false)} />{/if}
+	<div class={zustand.raeume.length && 'mt-1'}>
+		<Feld etikett="Wo ist der Schaden?" placeholder="z. B. Schulhof, Treppenhaus Nord" bind:wert={ortFrei} autocomplete="off" enterkeyhint="next" maxlength="80" />
+	</div>
+	{#if !zustand.raeume.length && darfBearbeiten()}
 		<p class="mt-2 text-body-small text-on-surface-variant">Tipp: Unter Einstellungen (Kontomenü) die Raumliste anlegen – dann genügt hier ein Tipp.</p>
 	{/if}
 {:else}
