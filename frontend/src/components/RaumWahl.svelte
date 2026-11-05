@@ -1,6 +1,7 @@
 <script>
 	import { raumGruppen } from '../lib/raumgruppen.js';
 	import Icon from './Icon.svelte';
+	import Button from './ui/Button.svelte';
 	import Suchpille from './ui/Suchpille.svelte';
 	import BereichKacheln from './melden/BereichKacheln.svelte';
 	import RaumRaster from './melden/RaumRaster.svelte';
@@ -10,9 +11,11 @@
 	 * Kacheln und nach einem Tipp nur deren Räume, nach Stockwerken. Wenige Räume stehen gleich da.
 	 * Melden und Raumverwaltung teilen sich diesen Weg, damit Räume überall gleich aussehen.
 	 * vorschlaege steht unter der Suche, solange nichts eingegeben ist (beim Melden „Zuletzt“);
-	 * ohneTreffer unter den Treffern, wenn kein Raum genau so heißt.
+	 * ohneTreffer unter den Treffern, wenn kein Raum genau so heißt. anderOrt (nur beim Melden) führt zur
+	 * freien Ortsangabe: als Kachel bei den Bereichen, bei wenigen Räumen als Link darunter; bei Suche
+	 * und in einem Bereich nicht, dort gibt es „… als Ort nehmen“ und den Pfeil zurück.
 	 */
-	let { raeume, onwahl, suche = $bindable(''), vorschlaege, ohneTreffer } = $props();
+	let { raeume, onwahl, suche = $bindable(''), vorschlaege, ohneTreffer, anderOrt = null } = $props();
 
 	// Bis zu so vielen Räumen genügt ein Blick; darüber erst der Bereich, dann der Raum.
 	const AUF_EINEN_BLICK = 15;
@@ -52,11 +55,12 @@
 	{@render vorschlaege?.()}
 	{#if stufenweise}
 		<h3 class="mt-5 mb-2 text-label-large text-on-surface-variant">Bereich</h3>
-		<BereichKacheln {gruppen} onwahl={(g) => (gruppenTitel = g.titel)} />
+		<BereichKacheln {gruppen} {anderOrt} onwahl={(g) => (gruppenTitel = g.titel)} />
 	{:else}
 		{#each gruppen as g (g.titel)}
 			{#if gruppen.length > 1}<h3 class="mt-5 mb-2 text-title-small text-primary">{g.titel}</h3>{/if}
 			<div class={gruppen.length > 1 ? '' : 'mt-4'}><RaumRaster raeume={g.raeume} stockwerke={g.stockwerke} onwahl={waehle} /></div>
 		{/each}
+		{#if anderOrt}<Button variant="ghost" class="mt-3 -ml-4" onclick={anderOrt}><Icon name="edit_note" groesse={18} />Anderer Ort (Schulhof, Flur …)</Button>{/if}
 	{/if}
 {/if}

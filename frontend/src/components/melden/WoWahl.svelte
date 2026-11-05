@@ -61,7 +61,7 @@
 		<p class="mt-2 text-body-small text-on-surface-variant">Tipp: Unter Einstellungen (Kontomenü) die Raumliste anlegen – dann genügt hier ein Tipp.</p>
 	{/if}
 {:else}
-	<RaumWahl raeume={zustand.raeume} bind:suche onwahl={waehleRaum}>
+	<RaumWahl raeume={zustand.raeume} bind:suche onwahl={waehleRaum} anderOrt={() => (freierOrt = true)}>
 		{#snippet vorschlaege()}
 			{#if zuletztRaeume.length}
 				<h3 class="mt-5 mb-2 text-label-large text-on-surface-variant">Zuletzt</h3>
@@ -72,5 +72,4 @@
 			<Button variant="ghost" class="mt-2 -ml-4" onclick={() => ortAusSuche(text)}><Icon name="location_on" groesse={18} />„{text}“ als Ort nehmen</Button>
 		{/snippet}
 	</RaumWahl>
-	<Button variant="ghost" class="mt-3 -ml-4" onclick={() => (freierOrt = true)}><Icon name="edit_note" groesse={18} />Anderer Ort (Schulhof, Flur …)</Button>
 {/if}
