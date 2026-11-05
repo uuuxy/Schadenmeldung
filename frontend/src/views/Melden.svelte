@@ -2,7 +2,8 @@
 	import { tick } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { api } from '../lib/api.js';
-	import { zustand, uebernimm, legeInAusgang } from '../lib/zustand.svelte.js';
+	import { zustand, uebernimm } from '../lib/zustand.svelte.js';
+	import { legeInAusgang } from '../lib/nachreichen.js';
 	import { neueKennung } from '../lib/ausgang.js';
 	import { haltFest } from '../lib/fassung.js';
 	import { zeige } from '../lib/snackbar.svelte.js';

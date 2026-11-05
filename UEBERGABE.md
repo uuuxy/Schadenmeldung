@@ -72,6 +72,8 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
   - Alle Tippflächen messen mindestens 48 px. Tipps 3–6 px neben die Ränder treffen trotzdem.
   - Live: Eine neue Meldung erscheint beim Hausmeister nach rund 0,2–0,4 s, „In Arbeit“ bei der
     Leitung genauso, ohne Neuladen; das Kollegium öffnet keinen Strom.
+  - Funkloch: Ein Stand ohne Netz bleibt stehen, auch nach dem Neuladen, und geht raus, sobald wieder
+    Netz da ist; „Rückgängig“ nimmt eine wartende Änderung zurück.
 - Mailversand über Mailpit; Docker-Build und Compose-Probe.
 - Handy-Screenshots für den Nutzer: https://claude.ai/artifact/MmpdCqftLEHp4qr2hc7t75 (privat), vorher
   und nachher der M3-Durchsicht: https://claude.ai/artifact/UMRmh6j4WRnX1F9QyNm73R (privat).
@@ -134,6 +136,10 @@ Browserprüfungen (Chromium von Playwright ist auf dem Mac installiert):
   frischen Testdaten, sonst schlagen die Mail-Prüfungen fehl.
 - `npm run pruefen:tippflaechen` misst alle Tippflächen; `npm run pruefen:tippen` tippt neben die Ränder.
 - `npm run pruefen:live` misst, wie schnell die Übersicht eine neue Meldung zeigt (Testdaten nötig).
+- `npm run pruefen:funkloch` setzt ohne Netz einen Stand und prüft, dass er nachgereicht wird (Testdaten nötig).
+- Betrieb: `waechter.sh`, `sicherung.sh` und `sicherung-pruefen.sh` lassen sich lokal mit
+  `COMPOSE_FILE=…/docker-compose.local.yml` in einem Probeordner mit eigener `.env` ausprobieren
+  (`APP_ENV=local`, `SMTP_HOST=localhost`, `SMTP_PORT=1025`); die Mails landen in Mailpit.
 
 ## Fallstricke
 

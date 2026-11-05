@@ -1,7 +1,8 @@
 <script>
 	import { flip } from 'svelte/animate';
 	import { fade, slide } from 'svelte/transition';
-	import { zustand, darfBearbeiten, auffrischen } from '../lib/zustand.svelte.js';
+	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
+	import { auffrischen } from '../lib/nachreichen.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
 	import Ziehen from '../components/Ziehen.svelte';

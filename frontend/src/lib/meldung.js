@@ -1,5 +1,6 @@
 import { api } from './api.js';
-import { zustand, setzeStatus, uebernimm } from './zustand.svelte.js';
+import { zustand, setzeStatus, uebernimm, mitAenderung } from './zustand.svelte.js';
+import { legeStandInAusgang, nimmAusAusgang } from './nachreichen.js';
 import { zeige } from './snackbar.svelte.js';
 import { frage } from './rueckfrage.svelte.js';
 import { rueckmeldung } from './haptik.js';
@@ -7,26 +8,50 @@ import { stati } from './status.js';
 
 // Was man mit einer Meldung tun kann, an einer Stelle für Liste und Detailseite.
 
+// Kein Netz, abgemeldet, gebremst oder Server gestört: Dann wartet die Änderung im Ausgang wie eine
+// Meldung und geht raus, sobald es wieder geht (nachreichen.js). Sonst hat der Server abgelehnt.
+const wartet = (e) => e.status === 0 || e.status === 401 || e.status === 429 || e.status >= 500;
+
+/** Speichert eine Änderung am Stand; geht das gerade nicht, kommt sie in den Ausgang, und zurück kommt ihre Nummer dort. */
+async function speichere(id, aenderung) {
+	try {
+		await setzeStatus(id, aenderung);
+		return null;
+	} catch (e) {
+		if (!wartet(e)) throw e;
+		if (e.status === 0) zustand.offline = true;
+		return legeStandInAusgang(id, aenderung);
+	}
+}
+
 /**
- * Setzt den Stand sofort in der Liste, ohne auf den Server zu warten; schlägt es fehl, kommt der alte
- * zurück. Die Snackbar bestätigt mit „Rückgängig“, denn wer hier tippt, ist schon wieder in der Liste.
- * aenderung kann einen ungespeicherten Vermerk mitbringen ({ antwort }).
+ * Setzt den Stand sofort in der Liste, ohne auf den Server zu warten. Im Funkloch bleibt er stehen und
+ * geht raus, sobald wieder Netz da ist, denn der Hausmeister steht oft im Keller; lehnt der Server ab,
+ * kommt der alte zurück. Die Snackbar bestätigt mit „Rückgängig“, denn wer hier tippt, ist schon
+ * wieder in der Liste. aenderung kann einen ungespeicherten Vermerk mitbringen ({ antwort }).
  */
 function sofort(meldung, aenderung, text) {
 	const vorher = { ...meldung };
-	uebernimm({ ...vorher, ...aenderung, ...(aenderung.status === 'erledigt' && { erledigtAm: new Date().toISOString() }) });
+	uebernimm(mitAenderung(vorher, aenderung));
 	rueckmeldung();
-	return setzeStatus(vorher.id, aenderung)
-		.then(() =>
-			zeige(`${text}: ${vorher.ort}`, {
+	return speichere(vorher.id, aenderung)
+		.then((wartend) =>
+			zeige(`${text}: ${vorher.ort}${wartend ? ' · wird nachgereicht' : ''}`, {
 				name: 'Rückgängig',
-				tun: () => setzeStatus(vorher.id, { status: vorher.status }).catch((e) => zeige(e.message))
+				tun: () => zuruecknehmen(vorher, wartend)
 			})
 		)
 		.catch((e) => {
 			uebernimm(vorher);
 			zeige(e.message);
 		});
+}
+
+/** „Rückgängig“: Wartet die Änderung noch im Ausgang, fällt sie dort einfach weg; sonst geht der alte Stand hinterher. */
+async function zuruecknehmen(vorher, wartend) {
+	uebernimm(vorher);
+	if (wartend && (await nimmAusAusgang(wartend))) return;
+	await speichere(vorher.id, { status: vorher.status }).catch((e) => zeige(e.message));
 }
 
 export function abhaken(meldung, vermerk = {}) {
@@ -40,15 +65,15 @@ export function zwischenstand(meldung, status, vermerk = {}) {
 }
 
 export function wiederOeffnen(meldung) {
-	return setzeStatus(meldung.id, { status: 'offen' })
-		.then(() => zeige('Wieder offen'))
-		.catch((e) => zeige(e.message));
+	return sofort(meldung, { status: 'offen' }, 'Wieder offen');
 }
 
 export async function vermerkSpeichern(meldung, text) {
+	const antwort = text.trim();
 	try {
-		await setzeStatus(meldung.id, { antwort: text });
-		zeige(text.trim() ? 'Vermerk gespeichert' : 'Vermerk entfernt');
+		const wartend = await speichere(meldung.id, { antwort });
+		if (wartend) uebernimm({ ...meldung, antwort });
+		zeige(`${antwort ? 'Vermerk gespeichert' : 'Vermerk entfernt'}${wartend ? ' · wird nachgereicht' : ''}`);
 		return true;
 	} catch (e) {
 		zeige(e.message);
