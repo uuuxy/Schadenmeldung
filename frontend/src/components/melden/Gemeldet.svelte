@@ -1,6 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { hereinfedern, eindrehen } from '../../lib/bewegung.js';
+	import { eindrehen, aufspringen } from '../../lib/bewegung.js';
 	import { zustand, darfSehen } from '../../lib/zustand.svelte.js';
 	import { gehe } from '../../lib/weg.svelte.js';
 	import Icon from '../Icon.svelte';
@@ -32,9 +32,9 @@
 <main class="mx-auto flex max-w-xl flex-col items-center px-6 pt-16 pb-12 text-center" in:fade={{ duration: 200 }}>
 	{#if gemeldet}
 		<!-- global: Das läuft auch, wenn die Bestätigung gerade erst erscheint. -->
-		<span class="relative mb-6 grid size-24 place-items-center text-on-success-container" in:hereinfedern|global>
+		<span class="relative mb-6 grid size-24 place-items-center text-on-success-container">
 			<svg class="absolute inset-0 size-full fill-success-container" viewBox="-1.07 -1.07 2.14 2.14" aria-hidden="true" in:eindrehen|global><polygon points={keks} /></svg>
-			<Icon name="check" groesse={48} class="relative" />
+			<span class="relative" in:aufspringen|global><Icon name="check" groesse={48} /></span>
 		</span>
 	{:else}
 		<span class="mb-6 grid size-24 place-items-center rounded-2xl bg-surface-container-highest text-on-surface-variant">

@@ -6,7 +6,8 @@
 	 * entweder einen Rahmen oder eine Erhebung, nie beides. Rückmeldung beim Zeigen und Drücken
 	 * gibt der State-Layer aus styles/komponenten.css. Gedrückt wird die Pille eckiger und federt
 	 * zurück (M3 Expressive, Buttons: Shape morph, gedrückt 8 dp, ab 56 px Höhe 12 dp); damit sich die
-	 * Ecke stufenlos ändert, ist die Rundung die halbe Höhe statt „voll“.
+	 * Ecke stufenlos ändert, ist die Rundung die halbe Höhe statt „voll“. Nach dem Loslassen bleibt sie
+	 * 150 ms eckig, sonst läge der Formwechsel nur unter dem Finger.
 	 *
 	 * Varianten nach M3, Buttons: `primary` gefüllt, `tonal` in secondary-container, `secondary`
 	 * umrandet (outline-variant, on-surface-variant), `ghost` der Textknopf in primary, `warnend` der
@@ -40,7 +41,7 @@
 	bind:this={element}
 	class={[
 		// Die Ecke federt (fast spatial), Farben gehen ohne Überschwingen über (M3: effects).
-		'inline-flex shrink-0 items-center justify-center border [transition:border-radius_350ms_var(--ease-spring),color_200ms_var(--ease-standard),background-color_200ms_var(--ease-standard),border-color_200ms_var(--ease-standard)]',
+		'inline-flex shrink-0 items-center justify-center border enabled:active:delay-0 [transition:border-radius_350ms_var(--ease-spring)_150ms,color_200ms_var(--ease-standard),background-color_200ms_var(--ease-standard),border-color_200ms_var(--ease-standard)]',
 		'disabled:cursor-not-allowed disabled:border-transparent! disabled:bg-on-surface/12! disabled:text-on-surface/38!',
 		'aria-disabled:border-transparent! aria-disabled:bg-on-surface/12! aria-disabled:text-on-surface/38!',
 		variant !== 'symbol' && groessen[size],
