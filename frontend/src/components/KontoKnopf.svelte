@@ -7,6 +7,8 @@
 	import { gehe } from '../lib/weg.svelte.js';
 	import { darstellung } from '../lib/darstellung.svelte.js';
 	import { zeige } from '../lib/snackbar.svelte.js';
+	import { frage } from '../lib/rueckfrage.svelte.js';
+	import { auffrischen } from '../lib/nachreichen.js';
 	import { mitteilungenStand, mitteilungenEin, mitteilungenAus } from '../lib/mitteilungen.js';
 
 	/**
@@ -69,6 +71,22 @@
 	/** Mit ueberall enden auch die Sitzungen auf anderen Geräten, etwa nach einem verlorenen Handy. */
 	async function abmelden(ueberall = false) {
 		menue.hidePopover();
+		// Beim Abmelden bleibt nichts von dieser Person auf dem Gerät, auch nicht der Ausgang. Darum erst
+		// losschicken, was wartet; bleibt etwas liegen (kein Netz), fragt die App, statt still zu löschen.
+		if (zustand.ausgang.length || zustand.wartend.length) await auffrischen();
+		const [m, a] = [zustand.ausgang.length, zustand.wartend.length];
+		if (m + a) {
+			const was = [m && `${m} ${m === 1 ? 'Meldung' : 'Meldungen'}`, a && `${a} ${a === 1 ? 'Änderung' : 'Änderungen'}`].filter(Boolean).join(' und ');
+			const eins = m + a === 1;
+			// Erst das Menü fertig ausblenden lassen (200 ms), sonst liegt es noch über dem Dialog.
+			await Promise.all(menue.getAnimations().map((x) => x.finished.catch(() => {})));
+			const ja = await frage({
+				titel: 'Trotzdem abmelden?',
+				text: `${was} ${eins ? 'ist' : 'sind'} noch nicht beim Server angekommen. Abmelden löscht sie von diesem Gerät; bleibst du angemeldet, ${eins ? 'geht' : 'gehen'} sie von selbst raus, sobald wieder Netz da ist.`,
+				ja: 'Abmelden'
+			});
+			if (!ja) return;
+		}
 		// Ein abgemeldetes Gerät bekommt keine Mitteilungen mehr.
 		await mitteilungenAus().catch(() => {});
 		await api(ueberall ? '/api/abmelden?ueberall=1' : '/api/abmelden', { methode: 'POST' }).catch(() => {});

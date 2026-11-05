@@ -39,7 +39,8 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Alles muss auch ohne QR-Code in wenigen Tipps gehen.
 - **Funkloch:** Schreibende Wege dürfen im Funkloch nichts verlieren: Meldungen und Stand-Änderungen
   warten im Ausgang (`lib/ausgang.js`, `lib/nachreichen.js`), bis wieder Netz da ist, und
-  `ladeMeldungen` legt wartende Änderungen über den Stand vom Server. Der Service Worker cacht nie
+  `ladeMeldungen` legt wartende Änderungen über den Stand vom Server. Abmelden schickt zuerst los
+  und fragt nach, statt Wartendes still zu löschen. Der Service Worker cacht nie
   `/api/` oder `/fotos/`.
 
 ## Rollen und Mail
