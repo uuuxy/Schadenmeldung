@@ -1,7 +1,8 @@
 import { chromium } from 'playwright-core';
 // Funkloch beim Hausmeister im Handyformat: Ein Stand, der ohne Netz gesetzt wird, bleibt stehen, auch
 // nach dem Neuladen, steht als „wartet auf Netz“ in der Liste und geht raus, sobald wieder Netz da ist.
-// „Rückgängig“ nimmt eine wartende Änderung zurück, ohne dass etwas beim Server ankommt.
+// „Rückgängig“ nimmt eine wartende Änderung zurück, ohne dass etwas beim Server ankommt; Abmelden fragt
+// nach, solange etwas wartet.
 // Braucht den lokalen Server mit Testdaten aus e2e/testdaten.sh.
 const B = process.env.ADRESSE ?? 'http://127.0.0.1:8090';
 const H = { 'X-Schaden': '1' };
@@ -63,7 +64,17 @@ await s.getByRole('button', { name: 'Rückgängig' }).click();
 await s.waitForTimeout(300);
 pruefe((await zeile('Funkloch Flur').getByText(/wartet auf Netz|In Arbeit/).count()) === 0, '„Rückgängig“ ohne Netz nimmt die wartende Änderung zurück');
 
-// 4. Wieder Netz: Was wartet, geht von selbst raus.
+// 4. Abmelden ohne Netz, solange „Erledigt“ wartet: Die App fragt nach, statt still zu löschen.
+await s.getByRole('button', { name: 'Konto und Einstellungen' }).click();
+await s.getByRole('button', { name: 'Abmelden', exact: true }).click();
+const dialog = s.getByRole('dialog');
+const gefragt = await dialog.getByText('1 Änderung ist noch nicht beim Server angekommen', { exact: false }).waitFor({ timeout: 5000 }).then(() => true, () => false);
+pruefe(gefragt, 'Abmelden ohne Netz fragt nach, solange eine Änderung wartet');
+if (process.argv[2]) await s.screenshot({ path: `${process.argv[2]}/funkloch-abmelden.png` });
+await dialog.getByRole('button', { name: 'Abbrechen' }).click();
+pruefe(await s.getByRole('button', { name: 'Konto und Einstellungen' }).isVisible(), '„Abbrechen“: weiter angemeldet, die Änderung wartet weiter');
+
+// 5. Wieder Netz: Was wartet, geht von selbst raus.
 await k.setOffline(false);
 await s.getByText('Änderung nachgereicht').waitFor({ timeout: 10000 });
 pruefe((await standAmServer(keller.id)) === 'erledigt', 'Wieder Netz: „Erledigt“ ist beim Server angekommen');
