@@ -26,13 +26,19 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   (`/meldung/<id>`). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
   nebeneinander sind aber zu viel. Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`),
   nie über `confirm()`.
+- **Kacheln:** In einem Raster sind alle Kacheln gleich groß (M3: das Standard-Raster zeigt Karten
+  gleich groß), die letzte Reihe darf kürzer sein; Form `rounded-xl`, Fläche `bg-surface-container-low`,
+  Abstand `gap-3`. Passt ein Name nicht, bekommt die Kachel ein Symbol statt einer größeren Fläche.
+  Pillenform nur für einzeilige Knöpfe, Suche und Segmente (M3 „round“), Chips `rounded-sm`.
+- **Zurück:** Jede Unteransicht (ein Bereich, „Weitere Räume“, „Anderer Ort“) hat oben den Pfeil mit
+  ihrem Namen (`ZurueckZeile`), nie einen Textlink darunter (M3: der Zurück-Pfeil steht vorn).
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
   Wert im hellen und im dunklen Schema. Einzige Ausnahme: die Papier-Rollen (`papier`, `auf-papier`,
   `papier-akzent` …) für den QR-Bogen bleiben fest, denn Papier ist weiß.
 - **Schrift über die M3-Stufen** aus `mass.css` (`text-title-medium`, `text-body-large`,
-  `text-label-large` …), Formen über die M3-Radien (`rounded-sm` = Chip, `rounded-xl` = Karte,
-  `rounded-2xl` = Kachel/Blatt).
+  `text-label-large` …), Formen über die M3-Radien (`rounded-sm` = Chip, `rounded-xl` = Karte
+  und Kachel, `rounded-2xl` = großes Symbolfeld/Blatt).
 - **Symbole:** Material Symbols Rounded. Neues Symbol in `frontend/scripts/symbole.mjs` eintragen,
   dann `npm run symbole`.
 - **Wenig tippen:** Neue Eingaben zuerst als Kacheln oder Chips denken, Freitext nur als Ausweg.

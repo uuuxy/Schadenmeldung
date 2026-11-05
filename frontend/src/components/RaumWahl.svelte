@@ -1,9 +1,9 @@
 <script>
 	import { raumGruppen } from '../lib/raumgruppen.js';
-	import Icon from './Icon.svelte';
-	import Button from './ui/Button.svelte';
 	import Suchpille from './ui/Suchpille.svelte';
 	import BereichKacheln from './melden/BereichKacheln.svelte';
+	import ZurueckZeile from './ZurueckZeile.svelte';
+	import Kachel from './melden/Kachel.svelte';
 	import RaumRaster from './melden/RaumRaster.svelte';
 
 	/**
@@ -12,8 +12,8 @@
 	 * Melden und Raumverwaltung teilen sich diesen Weg, damit Räume überall gleich aussehen.
 	 * vorschlaege steht unter der Suche, solange nichts eingegeben ist (beim Melden „Zuletzt“);
 	 * ohneTreffer unter den Treffern, wenn kein Raum genau so heißt. anderOrt (nur beim Melden) führt zur
-	 * freien Ortsangabe: als Kachel bei den Bereichen, bei wenigen Räumen als Link darunter; bei Suche
-	 * und in einem Bereich nicht, dort gibt es „… als Ort nehmen“ und den Pfeil zurück.
+	 * freien Ortsangabe: als letzte Kachel bei den Bereichen, bei wenigen Räumen als Kachel unter ihnen;
+	 * bei Suche und in einem Bereich nicht, dort gibt es „… als Ort nehmen“ und den Pfeil zurück.
 	 */
 	let { raeume, onwahl, suche = $bindable(''), vorschlaege, ohneTreffer, anderOrt = null } = $props();
 
@@ -21,6 +21,8 @@
 	const AUF_EINEN_BLICK = 15;
 	let gruppenTitel = $state(null);
 	const gruppen = $derived(raumGruppen(raeume));
+	// Wenige Räume stehen gruppenweise untereinander; alle teilen eine Kachelbreite.
+	const alleKurz = $derived(raeume.every((r) => r.name.length <= 5));
 	const stufenweise = $derived(raeume.length > AUF_EINEN_BLICK && gruppen.length > 1);
 	const gruppe = $derived(stufenweise ? (gruppen.find((g) => g.titel === gruppenTitel) ?? null) : null);
 	const begriff = $derived(suche.trim().toLowerCase());
@@ -45,11 +47,7 @@
 	<div class="mt-4"><RaumRaster raeume={treffer} mitBereich onwahl={waehle} /></div>
 	{#if !treffer.some((r) => r.name.toLowerCase() === begriff)}{@render ohneTreffer?.(suche.trim())}{/if}
 {:else if gruppe}
-	<!-- Zurück zu allen Bereichen wie aus einem Untermenü: der Pfeil vorn, daneben, wo man gerade ist. -->
-	<button class="mt-3 -ml-2 flex min-h-12 items-center gap-1 rounded-full pr-4 text-on-surface" aria-label="Zurück zu allen Bereichen" onclick={() => (gruppenTitel = null)}>
-		<span class="grid size-10 place-items-center"><Icon name="arrow_back" /></span>
-		<span class="text-title-medium">{gruppe.titel}</span>
-	</button>
+	<ZurueckZeile titel={gruppe.titel} etikett="Zurück zu allen Bereichen" onzurueck={() => (gruppenTitel = null)} />
 	<div class="mt-1"><RaumRaster raeume={gruppe.raeume} stockwerke={gruppe.stockwerke} onwahl={waehle} /></div>
 {:else}
 	{@render vorschlaege?.()}
@@ -59,8 +57,12 @@
 	{:else}
 		{#each gruppen as g (g.titel)}
 			{#if gruppen.length > 1}<h3 class="mt-5 mb-2 text-title-small text-primary">{g.titel}</h3>{/if}
-			<div class={gruppen.length > 1 ? '' : 'mt-4'}><RaumRaster raeume={g.raeume} stockwerke={g.stockwerke} onwahl={waehle} /></div>
+			<div class={gruppen.length > 1 ? '' : 'mt-4'}><RaumRaster raeume={g.raeume} stockwerke={g.stockwerke} kurz={alleKurz} onwahl={waehle} /></div>
 		{/each}
-		{#if anderOrt}<Button variant="ghost" class="mt-3 -ml-4" onclick={anderOrt}><Icon name="edit_note" groesse={18} />Anderer Ort (Schulhof, Flur …)</Button>{/if}
+		{#if anderOrt}
+			<div class={['mt-4 grid gap-3', alleKurz ? 'grid-cols-3 sm:grid-cols-4' : 'grid-cols-2']}>
+				<Kachel kurz={alleKurz} oben="Anderer Ort" unten="Schulhof, Flur …" symbol="edit_location_alt" etikett="Anderer Ort: Schulhof, Flur …" onclick={anderOrt} />
+			</div>
+		{/if}
 	{/if}
 {/if}

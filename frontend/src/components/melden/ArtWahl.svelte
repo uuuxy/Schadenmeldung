@@ -1,17 +1,17 @@
 <script>
 	import { slide } from 'svelte/transition';
-	import { kategorieNach, letzteKachel } from '../../lib/kategorien.js';
+	import { kategorieNach } from '../../lib/kategorien.js';
 	import Icon from '../Icon.svelte';
 
 	/**
 	 * Was ist kaputt? Große Kacheln, jede leuchtet beim Antippen in ihrer eigenen Farbe (kat-* in
 	 * rollen.css), wie Geräte-Kacheln in Google Home. Gewählt schrumpft das Raster auf eine Zeile in
 	 * dieser Farbe, wie „Wo?“ auf den Raum: Darunter steht sofort die nächste Frage, ohne Wischen.
-	 * Abgeschaltete Arten fehlen; die letzte Kachel füllt die Reihe, damit das Raster immer aufgeht.
+	 * Abgeschaltete Arten fehlen. Alle Kacheln sind gleich groß, auch „Sonstiges“ (M3: das Standard-Raster
+	 * zeigt Karten gleich groß); die letzte Reihe darf kürzer sein.
 	 */
 	let { arten, kategorie, onwahl } = $props();
 	const art = $derived(kategorie ? kategorieNach(kategorie) : null);
-	const letzte = $derived(letzteKachel(arten.length));
 </script>
 
 {#if art}
@@ -24,12 +24,10 @@
 	</div>
 {:else}
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="group" aria-label="Art des Schadens" transition:slide={{ duration: 250 }}>
-		{#each arten as k, i (k.key)}
-			{@const istLetzte = i === arten.length - 1}
+		{#each arten as k (k.key)}
 			<button
 				class={[
-					'relative flex rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-colors duration-200 active:scale-[0.98]',
-					istLetzte ? letzte.klassen : 'min-h-28 flex-col justify-between gap-3'
+					'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-colors duration-200 active:scale-[0.98]'
 				]}
 				onclick={() => onwahl(k.key)}
 			>
