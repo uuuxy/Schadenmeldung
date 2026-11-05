@@ -21,10 +21,11 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Kopfleiste per Segmented Button zwischen „Übersicht“ und „Melden“ (`KopfLeiste ebene=…`), nicht
   per Switch: M3 nimmt Switches nur für Ein/Aus. Die Übersicht aktualisiert sich live über
   `/api/ereignisse`; jeder neue Schreibweg für Meldungen ruft `a.verteiler.melde()`.
-- **Liste und Detail (M3 list-detail):** Eine Zeile der Übersicht trägt nur eine Zusatzaktion (das
-  Häkchen „Erledigt“); alles Weitere steht auf der Seite der Meldung (`/meldung/<id>`). M3: Auf eine
-  antippbare Fläche gehört keine weitere Aktion, mehr als drei Knöpfe nebeneinander sind zu viel.
-  Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`), nie über `confirm()`.
+- **Liste und Detail (M3 list-detail):** Eine Zeile der Übersicht trägt bewusst nur eine Zusatzaktion
+  (das Häkchen „Erledigt“), damit die Liste ruhig bleibt; alles Weitere steht auf der Seite der Meldung
+  (`/meldung/<id>`). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
+  nebeneinander sind aber zu viel. Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`),
+  nie über `confirm()`.
 - **Farben nur über Rollen** aus `frontend/src/styles/rollen.css` (`bg-surface`,
   `text-on-surface-variant`, `bg-primary-container` …), nie Palettenfarben. Jede Rolle hat einen
   Wert im hellen und im dunklen Schema. Einzige Ausnahme: die Papier-Rollen (`papier`, `auf-papier`,

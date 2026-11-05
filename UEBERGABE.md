@@ -64,7 +64,7 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
 
 ### Geprüft
 
-- 21 Go-Tests gegen Postgres, jeder Test mit eigenem Schema.
+- Go-Tests gegen Postgres (`go test ./...`), jeder Test mit eigenem Schema.
 - Browserprüfungen im Handyformat (`frontend/e2e/`):
   - Der Ablauf QR → Anmeldung → Raum erkannt.
   - Das Kollegium sieht nur das Formular, die Leitung nur lesend.
