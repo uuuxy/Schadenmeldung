@@ -32,17 +32,17 @@ export const kategorien = [
 	},
 	{
 		key: 'moebel',
-		name: 'Möbel & Tafel',
+		name: 'Möbel',
 		icon: 'chair',
 		farbe: { symbol: 'text-kat-moebel', flaeche: 'bg-kat-moebel-container text-on-kat-moebel-container' },
-		faelle: ['Stuhl kaputt', 'Tisch wackelt', 'Tafel / Whiteboard', 'Schrank / Regal']
+		faelle: ['Stuhl kaputt', 'Tisch wackelt', 'Schrank / Regal']
 	},
 	{
 		key: 'technik',
 		name: 'Medientechnik',
 		icon: 'tv',
 		farbe: { symbol: 'text-kat-technik', flaeche: 'bg-kat-technik-container text-on-kat-technik-container' },
-		faelle: ['Beamer / Display aus', 'Kein Ton', 'Kabel / Adapter fehlt', 'Dokumentenkamera']
+		faelle: ['Beamer / Display aus', 'Tafel / Whiteboard', 'Kein Ton', 'Kabel / Adapter fehlt', 'Dokumentenkamera']
 	},
 	{
 		key: 'reinigung',
