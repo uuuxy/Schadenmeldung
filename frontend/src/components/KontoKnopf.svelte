@@ -78,8 +78,9 @@
 		if (m + a) {
 			const was = [m && `${m} ${m === 1 ? 'Meldung' : 'Meldungen'}`, a && `${a} ${a === 1 ? 'Änderung' : 'Änderungen'}`].filter(Boolean).join(' und ');
 			const eins = m + a === 1;
-			// Erst das Menü fertig ausblenden lassen (200 ms), sonst liegt es noch über dem Dialog.
-			await Promise.all(menue.getAnimations().map((x) => x.finished.catch(() => {})));
+			// Erst das Menü fertig ausblenden lassen (200 ms), sonst liegt es noch über dem Dialog. War die
+			// Sitzung am Server schon beendet, ist das Menü beim Senden samt Kopfleiste verschwunden.
+			await Promise.all((menue?.getAnimations() ?? []).map((x) => x.finished.catch(() => {})));
 			const ja = await frage({
 				titel: 'Trotzdem abmelden?',
 				text: `${was} ${eins ? 'ist' : 'sind'} noch nicht beim Server angekommen. Abmelden löscht sie von diesem Gerät; bleibst du angemeldet, ${eins ? 'geht' : 'gehen'} sie von selbst raus, sobald wieder Netz da ist.`,
