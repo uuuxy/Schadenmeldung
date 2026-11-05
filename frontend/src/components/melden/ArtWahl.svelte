@@ -1,5 +1,5 @@
 <script>
-	import { slide } from 'svelte/transition';
+	import { aufklappen, zuklappen } from '../../lib/bewegung.js';
 	import { kategorieNach } from '../../lib/kategorien.js';
 	import Icon from '../Icon.svelte';
 
@@ -15,7 +15,7 @@
 </script>
 
 {#if art}
-	<div transition:slide={{ duration: 250 }}>
+	<div in:aufklappen={{ schnell: true }} out:zuklappen>
 		<button class={['flex w-full items-center gap-4 rounded-xl p-4 text-left', art.farbe.flaeche]} onclick={() => onwahl('')}>
 			<Icon name={art.icon} gefuellt groesse={24} class={art.farbe.symbol} />
 			<span class="min-w-0 flex-1 truncate text-title-medium">{art.name}</span>
@@ -23,11 +23,11 @@
 		</button>
 	</div>
 {:else}
-	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="group" aria-label="Art des Schadens" transition:slide={{ duration: 250 }}>
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="group" aria-label="Art des Schadens" in:aufklappen out:zuklappen>
 		{#each arten as k (k.key)}
 			<button
 				class={[
-					'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-colors duration-200 active:scale-[0.98]'
+					'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-[scale,border-radius] duration-350 ease-spring active:scale-[0.98] active:rounded-md'
 				]}
 				onclick={() => onwahl(k.key)}
 			>

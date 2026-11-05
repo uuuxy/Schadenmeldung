@@ -1,6 +1,5 @@
 <script>
 	import { tick } from 'svelte';
-	import { slide } from 'svelte/transition';
 	import { api } from '../lib/api.js';
 	import { zustand, uebernimm } from '../lib/zustand.svelte.js';
 	import { legeInAusgang } from '../lib/nachreichen.js';
@@ -9,6 +8,7 @@
 	import { zeige } from '../lib/snackbar.svelte.js';
 	import { rueckmeldung } from '../lib/haptik.js';
 	import { kategorieNach, sichtbareArten } from '../lib/kategorien.js';
+	import { aufklappen, zuklappen } from '../lib/bewegung.js';
 	import Icon from '../components/Icon.svelte';
 	import Ladekreis from '../components/Ladekreis.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
@@ -156,7 +156,7 @@
 		</Frage>
 
 		{#if art}
-			<div transition:slide={{ duration: 250 }}>
+			<div in:aufklappen out:zuklappen>
 				<Frage titel={art.faelle.length ? 'Was genau?' : 'Kurz beschreiben'} erledigt={was !== ''} hinweis={fehlt === 'genau' ? hinweise.genau : ''} bind:element={abschnitt.genau}>
 					<FallWahl {art} {freiBeschreiben} bind:fall bind:notiz bind:dringend bind:foto />
 				</Frage>

@@ -62,8 +62,9 @@
 	--shadow-2: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
 	--shadow-3: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
 
-	/* M3-Bewegung: „standard" für Zustandswechsel, „emphasized" für Ein- und Ausblenden, dazu eine
-	   Federkurve im Stil von M3 Expressive für Rückmeldung beim Antippen. */
+	/* M3-Bewegung: „standard" für Zustandswechsel, „emphasized" für Ein- und Ausblenden, dazu die
+	   Feder von M3 Expressive für Rückmeldung beim Antippen: „fast spatial", wie Google sie fürs Web
+	   umrechnet (m3.material.io, Motion specs), mit 350 ms. Weitere Federn stehen in lib/bewegung.js. */
 	--ease-standard: cubic-bezier(0.2, 0, 0, 1);
 	--ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
 	--ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
