@@ -74,7 +74,7 @@ Adressen, Zugänge oder Pfade des Servers stehen. Fehlt die Datei, den Nutzer fr
     Leitung genauso, ohne Neuladen; das Kollegium öffnet keinen Strom.
   - Funkloch: Ein Stand ohne Netz bleibt stehen, auch nach dem Neuladen, und geht raus, sobald wieder
     Netz da ist; „Rückgängig“ nimmt eine wartende Änderung zurück, Abmelden fragt nach, solange
-    etwas wartet.
+    etwas wartet, und nach einer beendeten Sitzung geht nichts unter fremdem Namen raus.
 - Mailversand über Mailpit; Docker-Build und Compose-Probe.
 - Handy-Screenshots für den Nutzer: https://claude.ai/artifact/MmpdCqftLEHp4qr2hc7t75 (privat), vorher
   und nachher der M3-Durchsicht: https://claude.ai/artifact/UMRmh6j4WRnX1F9QyNm73R (privat).

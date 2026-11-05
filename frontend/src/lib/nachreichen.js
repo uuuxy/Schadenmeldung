@@ -1,11 +1,13 @@
 import { api } from './api.js';
-import { legeAb, alleImAusgang, entferne, nimmHeraus } from './ausgang.js';
-import { zustand, uebernimm, ladeAusgang, ladeMeldungen, ladeEinstellungen, merkeStand } from './zustand.svelte.js';
+import { legeAb, entferne, nimmHeraus } from './ausgang.js';
+import { zustand, uebernimm, ausgangVon, ladeAusgang, ladeMeldungen, ladeEinstellungen, merkeStand } from './zustand.svelte.js';
 import { zeige } from './snackbar.svelte.js';
 
 // Nachreichen: Was im Funkloch nicht rausging, Meldungen und Änderungen am Stand, wartet im Ausgang
 // (ausgang.js) und geht der Reihe nach raus, sobald wieder Netz da ist. App.svelte frischt dafür beim
-// Start, alle 30 Sekunden, beim Sichtbarwerden und bei zurückkehrendem Netz auf.
+// Start, alle 30 Sekunden, beim Sichtbarwerden und bei zurückkehrendem Netz auf. Jeder Eintrag merkt sich,
+// wer ihn gespeichert hat (von): Endet die Sitzung und meldet sich danach eine andere Person am Gerät
+// an, geht er nicht unter deren Namen raus, sondern wartet auf seine Person.
 
 /** Schickt Wartendes los und holt den neuesten Stand; im Funkloch bleibt der letzte Stand stehen. */
 export async function auffrischen() {
@@ -22,13 +24,13 @@ export async function auffrischen() {
 
 /** Legt eine Meldung im Ausgang ab, wenn sie gerade nicht rausgeht. Ihr Zeitpunkt reist mit. */
 export async function legeInAusgang(felder, foto, anzeige) {
-	await legeAb({ felder, foto, anzeige, erstellt: new Date().toISOString() });
+	await legeAb({ von: zustand.benutzer?.email, felder, foto, anzeige, erstellt: new Date().toISOString() });
 	await ladeAusgang();
 }
 
 /** Legt eine Änderung am Stand in den Ausgang, wenn sie gerade nicht rausgeht; zurück kommt ihre Nummer dort. */
 export async function legeStandInAusgang(meldungId, aenderung) {
-	const id = await legeAb({ art: 'stand', meldungId, aenderung, erstellt: new Date().toISOString() });
+	const id = await legeAb({ von: zustand.benutzer?.email, art: 'stand', meldungId, aenderung, erstellt: new Date().toISOString() });
 	await ladeAusgang();
 	return id;
 }
@@ -54,7 +56,7 @@ async function sendeDerReiheNach() {
 	let staende = 0;
 	try {
 		// Der Reihe nach, wie getippt: Zwei Änderungen an derselben Meldung kommen so in ihrer Folge an.
-		for (const eintrag of await alleImAusgang()) {
+		for (const eintrag of await ausgangVon(zustand.benutzer?.email)) {
 			const stand = eintrag.art === 'stand';
 			try {
 				if (stand) {

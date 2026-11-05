@@ -2,7 +2,7 @@
 	import Icon from './Icon.svelte';
 	import Switch from './ui/Switch.svelte';
 	import { api } from '../lib/api.js';
-	import { zustand, vergissAlles, darfSehen, darfBearbeiten } from '../lib/zustand.svelte.js';
+	import { zustand, vergissAlles, ausgangVon, darfSehen, darfBearbeiten } from '../lib/zustand.svelte.js';
 	import { rollenNamen } from '../lib/rollen.js';
 	import { gehe } from '../lib/weg.svelte.js';
 	import { darstellung } from '../lib/darstellung.svelte.js';
@@ -71,10 +71,14 @@
 	/** Mit ueberall enden auch die Sitzungen auf anderen Geräten, etwa nach einem verlorenen Handy. */
 	async function abmelden(ueberall = false) {
 		menue.hidePopover();
-		// Beim Abmelden bleibt nichts von dieser Person auf dem Gerät, auch nicht der Ausgang. Darum erst
+		// Vorher gemerkt: War die Sitzung am Server schon beendet, ist nach dem Senden niemand mehr angemeldet.
+		const ich = zustand.benutzer?.email;
+		// Beim Abmelden bleibt nichts von dieser Person auf dem Gerät, auch nicht ihr Ausgang. Darum erst
 		// losschicken, was wartet; bleibt etwas liegen (kein Netz), fragt die App, statt still zu löschen.
 		if (zustand.ausgang.length || zustand.wartend.length) await auffrischen();
-		const [m, a] = [zustand.ausgang.length, zustand.wartend.length];
+		const wartet = await ausgangVon(ich).catch(() => []);
+		const a = wartet.filter((e) => e.art === 'stand').length;
+		const m = wartet.length - a;
 		if (m + a) {
 			const was = [m && `${m} ${m === 1 ? 'Meldung' : 'Meldungen'}`, a && `${a} ${a === 1 ? 'Änderung' : 'Änderungen'}`].filter(Boolean).join(' und ');
 			const eins = m + a === 1;
@@ -91,7 +95,7 @@
 		// Ein abgemeldetes Gerät bekommt keine Mitteilungen mehr.
 		await mitteilungenAus().catch(() => {});
 		await api(ueberall ? '/api/abmelden?ueberall=1' : '/api/abmelden', { methode: 'POST' }).catch(() => {});
-		await vergissAlles();
+		await vergissAlles(ich);
 		zustand.benutzer = null;
 		gehe('/', { ersetzen: true });
 	}
