@@ -1,7 +1,7 @@
 <script>
 	import Icon from '../Icon.svelte';
 	import StatusChip from '../ui/StatusChip.svelte';
-	import { darfBearbeiten } from '../../lib/zustand.svelte.js';
+	import { zustand, darfBearbeiten } from '../../lib/zustand.svelte.js';
 	import { abhaken } from '../../lib/meldung.js';
 	import { kategorieNach } from '../../lib/kategorien.js';
 	import { wann } from '../../lib/zeit.js';
@@ -18,6 +18,8 @@
 	const art = $derived(kategorieNach(m.kategorie));
 	const erledigt = $derived(m.status === 'erledigt');
 	const zeit = $derived(erledigt && m.erledigtAm ? `erledigt ${wann(m.erledigtAm)}` : wann(m.gemeldetAm));
+	// Im Funkloch geänderter Stand, der noch im Ausgang liegt: sichtbar, damit niemand nachtippt.
+	const wartet = $derived(zustand.wartend.some((w) => w.meldungId === m.id));
 </script>
 
 <div class="flex items-center gap-1">
@@ -35,6 +37,7 @@
 				{#if !erledigt && m.status !== 'offen'}<StatusChip status={m.status} knapp />{/if}
 				<span class="truncate">{zeit}</span>
 				{#if m.foto}<Icon name="photo_camera" groesse={16} class="shrink-0" />{/if}
+				{#if wartet}<span class="inline-flex shrink-0 items-center gap-1"><Icon name="schedule_send" groesse={16} />wartet auf Netz</span>{/if}
 			</span>
 			{#if m.antwort}<span class="mt-1 block truncate text-body-small text-on-surface-variant">Vermerk: {m.antwort}</span>{/if}
 		</span>

@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { zustand, starte, auffrischen, darfSehen, darfBearbeiten } from './lib/zustand.svelte.js';
+	import { zustand, starte, darfSehen, darfBearbeiten } from './lib/zustand.svelte.js';
+	import { auffrischen } from './lib/nachreichen.js';
 	import { weg } from './lib/weg.svelte.js';
 	import { gesehen } from './lib/mitteilungen.js';
 	import Anmelden from './views/Anmelden.svelte';

@@ -1,6 +1,5 @@
 import { api } from './api.js';
-import { legeAb, alleImAusgang, entferne, leereAusgang } from './ausgang.js';
-import { zeige } from './snackbar.svelte.js';
+import { alleImAusgang, leereAusgang } from './ausgang.js';
 
 /** Der gemeinsame Zustand der App: wer angemeldet ist, die Meldungen, die Räume und das Netz. */
 export const zustand = $state({
@@ -13,10 +12,12 @@ export const zustand = $state({
 	meineErledigt: [],
 	mailStoerungSeit: null,
 	raeume: [],
-	// Funkloch: Die App zeigt den letzten Stand (standVon) und sammelt Meldungen im Ausgang.
+	// Funkloch: Die App zeigt den letzten Stand (standVon) und sammelt im Ausgang Meldungen (ausgang)
+	// und Änderungen am Stand (wartend), bis wieder Netz da ist.
 	offline: false,
 	standVon: null,
-	ausgang: []
+	ausgang: [],
+	wartend: []
 });
 
 // Kollegium meldet nur. Hausmeister, Leitung und Admin dürfen alles, auch Räume und Rollen; die
@@ -28,7 +29,7 @@ export const darfSehen = () => ['hausmeister', 'leitung', 'verwaltung', 'admin']
 // Damit die App im Funkloch nicht leer oder mit der Anmeldung startet. Beim Abmelden gelöscht.
 const STAND = 'schaden.stand';
 
-function merkeStand() {
+export function merkeStand() {
 	try {
 		const { benutzer, einstellungen, raeume, offen, erledigt } = $state.snapshot(zustand);
 		localStorage.setItem(STAND, JSON.stringify({ zeit: new Date().toISOString(), benutzer, einstellungen, raeume, offen, erledigt }));
@@ -54,6 +55,7 @@ export async function vergissAlles() {
 	}
 	await leereAusgang().catch(() => {});
 	zustand.ausgang = [];
+	zustand.wartend = [];
 	zustand.offen = [];
 	zustand.erledigt = [];
 }
@@ -64,6 +66,8 @@ export async function starte() {
 	await ladeEinstellungen().catch(() => {
 		/* Ohne Einstellungen geht es mit den Vorgaben weiter. */
 	});
+	// Zuerst der Ausgang: Wartende Änderungen gelten schon, wenn die Meldungen kommen (ladeMeldungen).
+	await ladeAusgang();
 	try {
 		zustand.benutzer = await api('/api/ich');
 		await ladeAlles();
@@ -83,7 +87,6 @@ export async function starte() {
 			zustand.benutzer = null;
 		}
 	}
-	await ladeAusgang();
 	zustand.bereit = true;
 }
 
@@ -99,6 +102,11 @@ export async function ladeMeldungen() {
 	const daten = await api('/api/meldungen');
 	const { offen, erledigt, meineErledigt = [], mailStoerungSeit = null } = daten;
 	Object.assign(zustand, { offen, erledigt, meineErledigt, mailStoerungSeit });
+	// Was noch im Ausgang wartet, gilt schon: Sonst spränge der Stand bis zum Nachreichen zurück.
+	for (const w of zustand.wartend) {
+		const m = zustand.offen.find((x) => x.id === w.meldungId) ?? zustand.erledigt.find((x) => x.id === w.meldungId);
+		if (m) uebernimm(mitAenderung(m, w.aenderung, w.erstellt));
+	}
 	zustand.offline = false;
 	zustand.standVon = null;
 	merkeStand();
@@ -107,19 +115,6 @@ export async function ladeMeldungen() {
 export async function ladeRaeume() {
 	zustand.raeume = await api('/api/raeume');
 	merkeStand();
-}
-
-/** Schickt Wartendes los und holt den neuesten Stand; im Funkloch bleibt der letzte Stand stehen. */
-export async function auffrischen() {
-	if (!zustand.benutzer) return;
-	try {
-		await sendeAusgang();
-		// Die Einstellungen kommen mit: Schaltet jemand eine Art ab, verschwindet ihre Kachel bald überall.
-		await Promise.all([ladeMeldungen(), ladeEinstellungen()]);
-		merkeStand();
-	} catch (e) {
-		if (e.status === 0) zustand.offline = true;
-	}
 }
 
 // ── Meldungen ändern ─────────────────────────────────────────────────────────
@@ -143,6 +138,11 @@ export function uebernimm(meldung) {
 	merkeStand();
 }
 
+/** Die Meldung, wie sie nach der Änderung aussieht; erledigt bleibt beim ersten Abhaken stehen wie im Server. */
+export function mitAenderung(meldung, aenderung, zeit = new Date().toISOString()) {
+	return { ...meldung, ...aenderung, ...(aenderung.status === 'erledigt' && meldung.status !== 'erledigt' && { erledigtAm: zeit }) };
+}
+
 export async function setzeStatus(id, aenderung) {
 	const neu = await api(`/api/meldungen/${id}/status`, { methode: 'POST', json: aenderung });
 	uebernimm(neu);
@@ -151,47 +151,15 @@ export async function setzeStatus(id, aenderung) {
 
 // ── Ausgang ──────────────────────────────────────────────────────────────────
 
-async function ladeAusgang() {
+/** Liest den Ausgang in den Zustand; was hinein- und hinausgeht, regelt nachreichen.js. */
+export async function ladeAusgang() {
 	try {
-		zustand.ausgang = (await alleImAusgang()).map(({ id, anzeige, erstellt }) => ({ id, ...anzeige, erstellt }));
+		const alle = await alleImAusgang();
+		zustand.ausgang = alle.filter((e) => e.art !== 'stand').map(({ id, anzeige, erstellt }) => ({ id, ...anzeige, erstellt }));
+		zustand.wartend = alle.filter((e) => e.art === 'stand');
 	} catch {
 		zustand.ausgang = [];
-	}
-}
-
-/** Legt eine Meldung im Ausgang ab, wenn sie gerade nicht rausgeht. Ihr Zeitpunkt reist mit. */
-export async function legeInAusgang(felder, foto, anzeige) {
-	await legeAb({ felder, foto, anzeige, erstellt: new Date().toISOString() });
-	await ladeAusgang();
-}
-
-let sendetGerade = false;
-
-export async function sendeAusgang() {
-	if (sendetGerade || !zustand.benutzer) return;
-	sendetGerade = true;
-	try {
-		for (const eintrag of await alleImAusgang()) {
-			const formular = new FormData();
-			for (const [schluessel, wert] of Object.entries(eintrag.felder)) formular.set(schluessel, wert);
-			formular.set('erstellt', eintrag.erstellt);
-			if (eintrag.foto) formular.set('foto', eintrag.foto, 'foto.jpg');
-			try {
-				uebernimm(await api('/api/meldungen', { methode: 'POST', formular }));
-				await entferne(eintrag.id);
-				zustand.offline = false;
-				zeige(`Nachgereicht: ${eintrag.anzeige.was} (${eintrag.anzeige.ort})`);
-			} catch (e) {
-				// Kein Netz, abgemeldet, gebremst oder Server gestört: liegen lassen und später erneut versuchen.
-				if (e.status === 0 || e.status === 401 || e.status === 429 || e.status >= 500) throw e;
-				// Abgelehnt (etwa weil der Raum inzwischen gelöscht ist): nicht endlos wiederholen.
-				await entferne(eintrag.id);
-				zeige(`Eine gespeicherte Meldung wurde abgelehnt: ${e.message}`);
-			}
-		}
-	} finally {
-		sendetGerade = false;
-		await ladeAusgang();
+		zustand.wartend = [];
 	}
 }
 

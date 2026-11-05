@@ -1,5 +1,6 @@
-// Der Ausgang: Meldungen, die im Funkloch abgeschickt wurden. Sie liegen samt Foto im Browser
-// (IndexedDB) und gehen raus, sobald wieder Verbindung besteht (zustand.svelte.js, sendeAusgang).
+// Der Ausgang: Meldungen (samt Foto) und Änderungen am Stand (art: 'stand'), die im Funkloch
+// abgeschickt wurden. Sie liegen im Browser (IndexedDB) und gehen der Reihe nach raus, sobald wieder
+// Verbindung besteht (nachreichen.js).
 const DATENBANK = 'schadenmeldung';
 const ABLAGE = 'ausgang';
 
@@ -31,6 +32,14 @@ export const legeAb = (eintrag) => mitAblage('readwrite', (a) => a.add(eintrag))
 export const alleImAusgang = () => mitAblage('readonly', (a) => a.getAll());
 export const entferne = (id) => mitAblage('readwrite', (a) => a.delete(id));
 export const leereAusgang = () => mitAblage('readwrite', (a) => a.clear());
+
+/** Nimmt einen Eintrag heraus, solange er noch wartet; undefined, wenn er schon hinaus ist. */
+export const nimmHeraus = (id) =>
+	mitAblage('readwrite', (a) => {
+		const anfrage = a.get(id);
+		anfrage.onsuccess = () => anfrage.result && a.delete(id);
+		return anfrage;
+	});
 
 /** Zufällige Kennung je Meldung: Kommt sie doppelt an (Antwort im Funkloch verloren), legt der Server sie nur einmal an. */
 export const neueKennung = () => [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
