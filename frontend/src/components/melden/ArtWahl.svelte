@@ -27,7 +27,7 @@
 		{#each arten as k (k.key)}
 			<button
 				class={[
-					'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-[scale,border-radius] duration-350 ease-spring active:scale-[0.98] active:rounded-md'
+					'relative flex min-h-28 flex-col justify-between gap-3 rounded-xl bg-surface-container-low p-4 text-left text-on-surface transition-[scale,border-radius] delay-150 duration-350 ease-spring active:scale-[0.98] active:rounded-sm active:delay-0'
 				]}
 				onclick={() => onwahl(k.key)}
 			>

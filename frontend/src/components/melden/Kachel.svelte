@@ -12,7 +12,7 @@
 
 <button
 	class={[
-		'flex min-h-16 min-w-0 flex-col justify-center rounded-xl bg-surface-container-low py-2 text-on-surface transition-[scale,border-radius] duration-350 ease-spring active:scale-[0.97] active:rounded-md',
+		'flex min-h-16 min-w-0 flex-col justify-center rounded-xl bg-surface-container-low py-2 text-on-surface transition-[scale,border-radius] delay-150 duration-350 ease-spring active:scale-[0.97] active:rounded-sm active:delay-0',
 		kurz ? 'items-center px-2 text-center' : 'items-start px-3 text-left'
 	]}
 	aria-label={etikett}

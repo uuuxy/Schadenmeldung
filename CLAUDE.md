@@ -18,8 +18,8 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Buntheit 24, damit es ruhig bleibt). Knöpfe tragen keinen Schatten, Chips brechen um statt
   seitlich zu scrollen.
 - **M3 Expressive gezielt** (Entscheidung vom 5. November 2026): Knöpfe und Kacheln werden beim Drücken
-  eckiger (Shape morph), Fragen klappen federnd auf (`lib/bewegung.js`, mit Googles Kurven fürs Web aus den
-  Motion specs), das Häkchen bei „Gemeldet“ steht in einer Expressive-Form. Nur Räumliches federt, Farbe,
+  eckiger und bleiben es kurz (Shape morph), Fragen steigen beim Aufklappen federnd an ihren Platz
+  (`lib/bewegung.js`, mit Googles Kurven fürs Web aus den Motion specs), das Häkchen bei „Gemeldet“ steht in einer Expressive-Form. Nur Räumliches federt, Farbe,
   Deckkraft und Zuklappen nicht; „Bewegung reduzieren“ schaltet alles ab. Nicht übernehmen: schwebende
   Werkzeugleisten, Knopfgruppen, wellige Fortschrittsbalken, verspielte Formen in der Übersicht.
 - **Zwei Ebenen:** Wer die Übersicht sieht (Hausmeister, Leitung, Verwaltung), wechselt in der
