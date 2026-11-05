@@ -4,7 +4,9 @@
 	 *
 	 * Eine Pille (M3, Shape: Buttons voll rund), ohne Schatten: In den M3-Token trägt ein Bauteil
 	 * entweder einen Rahmen oder eine Erhebung, nie beides. Rückmeldung beim Zeigen und Drücken
-	 * gibt der State-Layer aus styles/komponenten.css.
+	 * gibt der State-Layer aus styles/komponenten.css. Gedrückt wird die Pille eckiger und federt
+	 * zurück (M3 Expressive, Buttons: Shape morph, gedrückt 8 dp, ab 56 px Höhe 12 dp); damit sich die
+	 * Ecke stufenlos ändert, ist die Rundung die halbe Höhe statt „voll“.
 	 *
 	 * Varianten nach M3, Buttons: `primary` gefüllt, `tonal` in secondary-container, `secondary`
 	 * umrandet (outline-variant, on-surface-variant), `ghost` der Textknopf in primary, `warnend` der
@@ -25,9 +27,9 @@
 		symbol: 'icon-btn bg-transparent border-transparent text-on-surface-variant'
 	};
 	const groessen = {
-		sm: 'h-8 px-3 gap-1.5 text-label-large',
-		md: 'h-10 px-4 gap-2 text-label-large',
-		lg: 'h-14 px-6 gap-2 text-title-medium'
+		sm: 'h-8 px-3 gap-1.5 text-label-large rounded-lg enabled:active:rounded-sm',
+		md: 'h-10 px-4 gap-2 text-label-large rounded-xl enabled:active:rounded-sm',
+		lg: 'h-14 px-6 gap-2 text-title-medium rounded-2xl enabled:active:rounded-md'
 	};
 </script>
 
@@ -37,7 +39,8 @@
 <button
 	bind:this={element}
 	class={[
-		'inline-flex shrink-0 items-center justify-center rounded-full border transition-colors duration-200',
+		// Die Ecke federt (fast spatial), Farben gehen ohne Überschwingen über (M3: effects).
+		'inline-flex shrink-0 items-center justify-center border [transition:border-radius_350ms_var(--ease-spring),color_200ms_var(--ease-standard),background-color_200ms_var(--ease-standard),border-color_200ms_var(--ease-standard)]',
 		'disabled:cursor-not-allowed disabled:border-transparent! disabled:bg-on-surface/12! disabled:text-on-surface/38!',
 		'aria-disabled:border-transparent! aria-disabled:bg-on-surface/12! aria-disabled:text-on-surface/38!',
 		variant !== 'symbol' && groessen[size],

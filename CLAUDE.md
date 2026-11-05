@@ -17,6 +17,11 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   Kacheln der Arten leuchten in ihrer eigenen Farbe (`kat-*`, M3 „custom colors“, Fläche in
   Buntheit 24, damit es ruhig bleibt). Knöpfe tragen keinen Schatten, Chips brechen um statt
   seitlich zu scrollen.
+- **M3 Expressive gezielt** (Entscheidung vom 5. November 2026): Knöpfe und Kacheln werden beim Drücken
+  eckiger (Shape morph), Fragen klappen federnd auf (`lib/bewegung.js`, mit Googles Kurven fürs Web aus den
+  Motion specs), das Häkchen bei „Gemeldet“ steht in einer Expressive-Form. Nur Räumliches federt, Farbe,
+  Deckkraft und Zuklappen nicht; „Bewegung reduzieren“ schaltet alles ab. Nicht übernehmen: schwebende
+  Werkzeugleisten, Knopfgruppen, wellige Fortschrittsbalken, verspielte Formen in der Übersicht.
 - **Zwei Ebenen:** Wer die Übersicht sieht (Hausmeister, Leitung, Verwaltung), wechselt in der
   Kopfleiste per Segmented Button zwischen „Übersicht“ und „Melden“ (`KopfLeiste ebene=…`), nicht
   per Switch: M3 nimmt Switches nur für Ein/Aus. Die Übersicht aktualisiert sich live über
