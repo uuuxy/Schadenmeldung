@@ -1,6 +1,8 @@
 // Die Arten von Schäden mit typischen Fällen zum Antippen. Die Schlüssel prüft auch der Server
 // (server.go, kategorien); eine neue Art braucht beide Stellen und ihre Farbrollen kat-<key> in
 // styles/rollen.css. Die Klassen stehen ausgeschrieben, sonst findet Tailwind sie nicht.
+// Ein Fall muss allein verständlich sein, denn so steht er ohne die Art im Betreff der Mail, in der
+// Mitteilung aufs Handy und unter „Schon gemeldet“: „Fenster klemmt“, nicht „Klemmt“.
 export const kategorien = [
 	{
 		key: 'licht',
@@ -28,7 +30,7 @@ export const kategorien = [
 		name: 'Fenster & Türen',
 		icon: 'door_front',
 		farbe: { symbol: 'text-kat-fenster', flaeche: 'bg-kat-fenster-container text-on-kat-fenster-container' },
-		faelle: ['Schließt nicht', 'Klemmt', 'Schloss defekt', 'Scheibe kaputt', 'Rollo defekt']
+		faelle: ['Fenster schließt nicht', 'Fenster klemmt', 'Scheibe kaputt', 'Rollo defekt', 'Tür schließt nicht', 'Tür klemmt', 'Schloss defekt']
 	},
 	{
 		key: 'moebel',
