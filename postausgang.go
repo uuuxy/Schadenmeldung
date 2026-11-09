@@ -18,7 +18,7 @@ const (
 
 // mailVormerken läuft nach dem Speichern einer Meldung. Wer selbst meldet, bekommt dazu keine Mail.
 func (a *app) mailVormerken(ctx context.Context, m meldung) {
-	if !a.konf.mailAktiv() {
+	if !a.mailAktiv(ctx) {
 		return
 	}
 	wer, err := a.mailEmpfaenger(ctx)
@@ -56,7 +56,7 @@ func (a *app) postausgangTakt(ctx context.Context) {
 }
 
 func (a *app) versendeAusstehende(ctx context.Context) {
-	if !a.konf.mailAktiv() {
+	if !a.mailAktiv(ctx) {
 		return
 	}
 	a.versendeRueckmeldungen(ctx)

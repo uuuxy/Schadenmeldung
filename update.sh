@@ -84,6 +84,14 @@ else
     gut "${VORHER} → ${JETZT}: $(git log -1 --format=%s)"
 fi
 
+# Schlüssel für das Passwort des Versand-Postfachs (Einstellungen → Mail): einmal zufällig erzeugt,
+# bleibt er in der .env und damit außerhalb von Datenbank und Sicherungen.
+if [ -f .env ] && ! grep -q '^SCHLUESSEL=.' .env; then
+    sed -i '/^SCHLUESSEL=$/d' .env
+    printf '\nSCHLUESSEL=%s\n' "$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')" >> .env
+    gut "SCHLUESSEL in der .env angelegt."
+fi
+
 # ── 3. Bauen und starten ──────────────────────────────────────────────────────
 schritt "3. Bauen und starten"
 if docker compose pull --quiet db && docker compose build --pull schaden && docker compose up -d; then

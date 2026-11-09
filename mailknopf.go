@@ -10,7 +10,7 @@ func (a *app) benachrichtigungLesen(w http.ResponseWriter, r *http.Request, b be
 		intern(w, err)
 		return
 	}
-	schreibeJSON(w, http.StatusOK, map[string]any{"mailAktiv": a.konf.mailAktiv(), "mail": an})
+	schreibeJSON(w, http.StatusOK, map[string]any{"mailAktiv": a.mailAktiv(r.Context()), "mail": an})
 }
 
 // benachrichtigungSetzen: Ohne Angabe bleibt alles, wie es ist; so stört ein alter, noch

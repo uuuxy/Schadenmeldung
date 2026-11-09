@@ -5,8 +5,9 @@
 	import RaeumeVerwalten from '../components/einstellungen/RaeumeVerwalten.svelte';
 	import ArtenSchalten from '../components/einstellungen/ArtenSchalten.svelte';
 	import PersonenVerwalten from '../components/einstellungen/PersonenVerwalten.svelte';
+	import VersandPostfach from '../components/einstellungen/VersandPostfach.svelte';
 
-	/** Einstellungen für alle, die alles dürfen: Räume mit QR-Aufklebern, Kacheln des Formulars, Personen. */
+	/** Einstellungen für alle, die alles dürfen: Räume mit QR-Aufklebern, Kacheln des Formulars, Personen, Postfach für den Versand. */
 	let reiter = $state('raeume');
 </script>
 
@@ -18,7 +19,8 @@
 		reiter={[
 			{ id: 'raeume', label: 'Räume' },
 			{ id: 'arten', label: 'Arten' },
-			{ id: 'personen', label: 'Personen' }
+			{ id: 'personen', label: 'Personen' },
+			{ id: 'mail', label: 'Mail' }
 		]}
 		aktiv={reiter}
 		onwahl={(id) => (reiter = id)}
@@ -29,6 +31,8 @@
 	<RaeumeVerwalten />
 {:else if reiter === 'arten'}
 	<ArtenSchalten />
-{:else}
+{:else if reiter === 'personen'}
 	<PersonenVerwalten />
+{:else}
+	<VersandPostfach />
 {/if}

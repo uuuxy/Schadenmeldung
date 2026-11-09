@@ -21,14 +21,23 @@ type versender interface {
 	sende(ctx context.Context, an, betreff, text, html string) error
 }
 
-type smtpVersender struct{ k konfiguration }
+// smtpVersender holt sich den Zugang vor jedem Versand (versandpostfach.go): fest aus der .env oder
+// unter Einstellungen → Mail eingetragen.
+type smtpVersender struct {
+	k      konfiguration
+	zugang func(context.Context) (zugang, error)
+}
 
 func (v smtpVersender) sende(ctx context.Context, an, betreff, text, html string) error {
-	absender, err := mail.ParseAddress(v.k.MailAbsender)
+	z, err := v.zugang(ctx)
 	if err != nil {
-		return fmt.Errorf("MAIL_ABSENDER: %w", err)
+		return err
 	}
-	c, err := v.verbinde(ctx)
+	absender, err := mail.ParseAddress(z.absender)
+	if err != nil {
+		return fmt.Errorf("Absender: %w", err)
+	}
+	c, err := v.verbinde(ctx, z)
 	if err != nil {
 		return err
 	}
@@ -37,7 +46,7 @@ func (v smtpVersender) sende(ctx context.Context, an, betreff, text, html string
 }
 
 // verbinde öffnet die Verbindung zum Mailserver: auf Port 465 gleich über TLS, sonst per STARTTLS.
-func (v smtpVersender) verbinde(ctx context.Context) (*smtp.Client, error) {
+func (v smtpVersender) verbinde(ctx context.Context, z zugang) (*smtp.Client, error) {
 	adresse := net.JoinHostPort(v.k.SMTPHost, v.k.SMTPPort)
 	tlsKonfig := &tls.Config{ServerName: v.k.SMTPHost, MinVersion: tls.VersionTLS12}
 	verbinder := &net.Dialer{Timeout: 15 * time.Second}
@@ -58,7 +67,7 @@ func (v smtpVersender) verbinde(ctx context.Context) (*smtp.Client, error) {
 		_ = verbindung.Close()
 		return nil, err
 	}
-	if err := v.sichereUndMeldeAn(c, direktTLS, tlsKonfig); err != nil {
+	if err := v.sichereUndMeldeAn(c, direktTLS, tlsKonfig, z); err != nil {
 		_ = c.Close()
 		return nil, err
 	}
@@ -67,7 +76,7 @@ func (v smtpVersender) verbinde(ctx context.Context) (*smtp.Client, error) {
 
 // sichereUndMeldeAn schaltet ohne direktes TLS auf STARTTLS um und meldet sich an. PlainAuth
 // verweigert sich ohne TLS (außer auf localhost): Das Passwort geht nie im Klartext.
-func (v smtpVersender) sichereUndMeldeAn(c *smtp.Client, direktTLS bool, tlsKonfig *tls.Config) error {
+func (v smtpVersender) sichereUndMeldeAn(c *smtp.Client, direktTLS bool, tlsKonfig *tls.Config, z zugang) error {
 	if !direktTLS {
 		// Ohne STARTTLS gingen Mail und Knopf-Links im Klartext; das geht nur lokal (Mailpit).
 		if ok, _ := c.Extension("STARTTLS"); ok {
@@ -78,10 +87,10 @@ func (v smtpVersender) sichereUndMeldeAn(c *smtp.Client, direktTLS bool, tlsKonf
 			return errors.New("der Mailserver bietet kein STARTTLS an")
 		}
 	}
-	if v.k.SMTPBenutzer == "" {
+	if z.benutzer == "" {
 		return nil
 	}
-	return c.Auth(smtp.PlainAuth("", v.k.SMTPBenutzer, v.k.SMTPPasswort, v.k.SMTPHost))
+	return c.Auth(smtp.PlainAuth("", z.benutzer, z.passwort, v.k.SMTPHost))
 }
 
 // uebergebe reicht eine fertige Nachricht an einen Empfänger weiter.

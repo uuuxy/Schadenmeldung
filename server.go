@@ -15,9 +15,12 @@ type app struct {
 	sp           *speicher
 	statisch     fs.FS
 	pruefeZugang func(ctx context.Context, email, passwort string) error
-	kontoBremse  *bremse
-	ipBremse     *bremse
-	meldeBremse  *bremse
+	// pruefeVersand schickt mit einem neu eingetragenen Postfach eine Testmail (versandpostfach.go).
+	pruefeVersand  func(ctx context.Context, z zugang, an string) error
+	postfachBremse *bremse
+	kontoBremse    *bremse
+	ipBremse       *bremse
+	meldeBremse    *bremse
 	// imapPlaetze begrenzt die gleichzeitigen Prüfungen beim Mailserver der Schule.
 	imapPlaetze chan struct{}
 	jetzt       func() time.Time
@@ -41,12 +44,15 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		sp:          sp,
 		statisch:    statisch,
 		kontoBremse: neueBremse(5, 15*time.Minute),
-		ipBremse:    neueBremse(20, 15*time.Minute),
-		meldeBremse: neueBremse(20, time.Hour),
-		imapPlaetze: make(chan struct{}, 4),
-		jetzt:       time.Now,
-		verteiler:   neuerVerteiler(),
-		postWecker:  make(chan struct{}, 1),
+		// Drei Versuche je Viertelstunde: Der Mailserver der Schule sperrt nach ein paar falschen
+		// Passwörtern die ganze App, auch die Anmeldung aller.
+		postfachBremse: neueBremse(3, 15*time.Minute),
+		ipBremse:       neueBremse(20, 15*time.Minute),
+		meldeBremse:    neueBremse(20, time.Hour),
+		imapPlaetze:    make(chan struct{}, 4),
+		jetzt:          time.Now,
+		verteiler:      neuerVerteiler(),
+		postWecker:     make(chan struct{}, 1),
 		// Keine Weiterleitungen: Der Server spricht nur mit der geprüften Adresse des Push-Dienstes.
 		pushClient: &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -54,8 +60,9 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		pushPause: time.Second,
 	}
 	a.pruefeZugang = a.pruefeIMAP
-	if konf.mailAktiv() {
-		a.versender = smtpVersender{k: konf}
+	a.pruefeVersand = a.pruefeVersandSMTP
+	if konf.SMTPHost != "" {
+		a.versender = smtpVersender{k: konf, zugang: a.versandZugang}
 	}
 	return a
 }
@@ -82,6 +89,9 @@ func (a *app) routen() http.Handler {
 	mux.HandleFunc("GET /api/rollen", a.mitBenutzer(a.nurBearbeiter(a.rollenListe)))
 	mux.HandleFunc("POST /api/rollen", a.mitBenutzer(a.nurBearbeiter(a.rolleSetzen)))
 	mux.HandleFunc("DELETE /api/rollen/{email}", a.mitBenutzer(a.nurBearbeiter(a.rolleLoeschen)))
+	mux.HandleFunc("GET /api/postfach", a.mitBenutzer(a.nurBearbeiter(a.postfachLesen)))
+	mux.HandleFunc("PUT /api/postfach", a.mitBenutzer(a.nurBearbeiter(a.postfachSetzen)))
+	mux.HandleFunc("DELETE /api/postfach", a.mitBenutzer(a.nurBearbeiter(a.postfachLoeschen)))
 	mux.HandleFunc("GET /api/benachrichtigung", a.mitBenutzer(a.nurBackend(a.benachrichtigungLesen)))
 	mux.HandleFunc("POST /api/benachrichtigung", a.mitBenutzer(a.nurBackend(a.benachrichtigungSetzen)))
 	mux.HandleFunc("GET /api/push", a.mitBenutzer(a.nurBackend(a.pushLesen)))

@@ -58,7 +58,7 @@ func (a *app) einstellungen(w http.ResponseWriter, r *http.Request) {
 		"domain":           domain,
 		"fotoTage":         a.konf.FotoTage,
 		"aufbewahrungTage": a.konf.AufbewahrungTage,
-		"mailAktiv":        a.konf.mailAktiv(),
+		"mailAktiv":        a.mailAktiv(r.Context()),
 		"artenAus":         aus,
 	})
 }

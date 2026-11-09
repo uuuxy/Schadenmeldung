@@ -33,7 +33,7 @@ func (a *app) sichtFuerKollegium(ctx context.Context, b benutzer, offen []meldun
 			Status: m.Status, GemeldetAm: m.GemeldetAm}
 	}
 	fertig := []meldungErledigt{}
-	if !a.konf.mailAktiv() {
+	if !a.mailAktiv(ctx) {
 		eigene, err := a.sp.abfrage(ctx, `WHERE m.gemeldet_von = $1 AND m.status = 'erledigt' AND m.erledigt_am >= $2
 			ORDER BY m.erledigt_am DESC, m.id DESC LIMIT 5`, b.Email, a.jetzt().AddDate(0, 0, -30))
 		if err != nil {

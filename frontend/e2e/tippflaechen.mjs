@@ -60,7 +60,8 @@ const seiten = [
 	['Blatt Bereich', 'hausmeister', async (s) => { await s.goto(B + '/'); await s.getByRole('button', { name: 'Bereich' }).click(); await s.waitForTimeout(500); }],
 	['Räume', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.waitForTimeout(400); }],
 	['Arten', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Arten' }).click(); await s.waitForTimeout(400); }],
-	['Personen', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }]
+	['Personen', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Personen' }).click(); await s.waitForTimeout(400); }],
+	['Mail', 'admin', async (s) => { await s.goto(B + '/einstellungen'); await s.getByRole('tab', { name: 'Mail' }).click(); await s.waitForTimeout(400); }]
 ];
 let gesamt = 0, zuKlein = 0, auffaellig = 0;
 for (const [breite, hoehe] of groessen) {
