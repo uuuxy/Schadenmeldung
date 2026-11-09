@@ -176,5 +176,14 @@ const zuletzt = await (await admin.request.get(B + '/api/meldungen')).json();
 pruefe(zuletzt.erledigt.some((m) => m.was === 'WC verstopft'), 'Überholte Seite öffnet die erledigte Meldung nicht wieder');
 await k.close();
 
+// 8. „Wieder öffnen“ führt wie „Erledigt“ zurück in die Liste; bliebe die Seite stehen, lüde der große
+// Knopf „Erledigt“ zum Wieder-Abhaken ein.
+const as = await admin.newPage();
+await as.goto(B + '/uebersicht'); await as.getByRole('tab', { name: 'Erledigt' }).click();
+await as.getByRole('button', { name: /WC verstopft/ }).first().click();
+await as.getByRole('button', { name: 'Wieder öffnen' }).click();
+await as.getByText('Wieder offen: WC Mädchen 1. OG').waitFor();
+pruefe(!new URL(as.url()).pathname.startsWith('/meldung/'), '„Wieder öffnen“ führt zurück in die Liste, mit „Rückgängig“');
+
 await browser.close();
 console.log(fehler.length ? 'FEHLER:\n' + fehler.join('\n') : 'alles in Ordnung');

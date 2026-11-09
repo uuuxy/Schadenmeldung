@@ -3,12 +3,13 @@
 	import { kategorieNach } from '../../lib/kategorien.js';
 	import Icon from '../Icon.svelte';
 	import Blatt from '../Blatt.svelte';
-	import Button from '../ui/Button.svelte';
 
 	/**
 	 * Export für alle mit Übersicht. Das PDF zeigt die Liste, wie sie gerade steht (Reiter und
 	 * Filter), zum Drucken oder Weiterschicken; die Excel-Tabelle alle gespeicherten Meldungen zum
 	 * Sortieren und Filtern. Beide ohne Namen der Meldenden: Die Dateien verlassen die App.
+	 * Als Symbol in der Kopfleiste (M3: Aktionen für den ganzen Bildschirm stehen in der App Bar),
+	 * nicht zwischen den Filtern, wo es am Rechner verloren am Rand stand.
 	 */
 	let { liste, bereich, art = null, anzahl } = $props();
 	let offen = $state(false);
@@ -34,7 +35,7 @@
 	</li>
 {/snippet}
 
-<Button variant="ghost" class="-mr-3" onclick={() => (offen = true)}><Icon name="download" groesse={18} />Exportieren</Button>
+<button class="icon-btn text-on-surface-variant" aria-label="Exportieren" title="Exportieren" onclick={() => (offen = true)}><Icon name="download" /></button>
 
 <Blatt bind:offen titel="Exportieren">
 	<ul class="pb-2">

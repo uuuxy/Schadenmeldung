@@ -43,6 +43,14 @@
 		abhaken(meldung, zusatz);
 	}
 
+	// Wie „Erledigt“ zurück in die Liste, bestätigt mit „Wieder offen · Rückgängig“. Bliebe die Seite
+	// stehen, zeigte sie sofort den großen Knopf „Erledigt“, und der verleitete zum Wieder-Abhaken.
+	function oeffnen() {
+		const meldung = m;
+		zurueck('/');
+		wiederOeffnen(meldung);
+	}
+
 	function stand(s) {
 		const [meldung, zusatz] = [m, mitVermerk()];
 		zurueck('/');
@@ -123,9 +131,10 @@
 	</main>
 
 	{#if darfBearbeiten()}
-		<div class="fixed inset-x-0 bottom-0 z-20 bg-surface-container px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+		<!-- Zentriert wie beim Melden: Ein Knopf ist inline-flex, mx-auto allein ließe ihn am Rechner links stehen. -->
+		<div class="fixed inset-x-0 bottom-0 z-20 flex justify-center bg-surface-container px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
 			{#if erledigt}
-				<Button size="lg" variant="tonal" class="mx-auto w-full max-w-3xl" onclick={() => wiederOeffnen(m)}><Icon name="undo" />Wieder öffnen</Button>
+				<Button size="lg" variant="tonal" class="mx-auto w-full max-w-3xl" onclick={oeffnen}><Icon name="undo" />Wieder öffnen</Button>
 			{:else}
 				<Button size="lg" class="mx-auto w-full max-w-3xl" onclick={fertig}><Icon name="check" />Erledigt</Button>
 			{/if}
