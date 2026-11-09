@@ -17,7 +17,7 @@ const namen = [
 // Gefüllt zeigt M3 das gewählte Ziel und die gewählte Art; nur dafür kommt die zweite Form mit.
 const gefuellt = new Set([
 	'lightbulb', 'heat', 'water_drop', 'door_front', 'chair', 'tv', 'cleaning_services', 'more_horiz',
-	'meeting_room', 'location_on', 'warning', 'check_circle', 'build'
+	'meeting_room', 'location_on', 'warning', 'check_circle', 'build', 'schedule'
 ]);
 
 const ordner = new URL('../node_modules/@material-symbols/svg-400/rounded/', import.meta.url);

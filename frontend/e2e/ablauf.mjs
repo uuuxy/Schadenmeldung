@@ -184,6 +184,12 @@ await as.getByRole('button', { name: /WC verstopft/ }).first().click();
 await as.getByRole('button', { name: 'Wieder öffnen' }).click();
 await as.getByText('Wieder offen: WC Mädchen 1. OG').waitFor();
 pruefe(!new URL(as.url()).pathname.startsWith('/meldung/'), '„Wieder öffnen“ führt zurück in die Liste, mit „Rückgängig“');
+const gewaehlt = (name) => as.getByRole('tab', { name }).getAttribute('aria-selected').then((w) => w === 'true');
+pruefe(await gewaehlt('Erledigt'), 'Zurück aus der Meldung: wieder bei „Erledigt“');
+// Nach einer längeren Pause (Frist zehn Minuten) beginnt die Übersicht wieder bei „Offen“.
+await as.evaluate(() => { const m = JSON.parse(sessionStorage.getItem('schaden.uebersicht')); sessionStorage.setItem('schaden.uebersicht', JSON.stringify({ ...m, zeit: m.zeit - 11 * 60 * 1000 })); });
+await as.reload(); await as.getByRole('tab', { name: /^Offen/ }).waitFor();
+pruefe(await gewaehlt(/^Offen/), 'Nach längerer Pause beginnt die Übersicht bei „Offen“');
 
 await browser.close();
 console.log(fehler.length ? 'FEHLER:\n' + fehler.join('\n') : 'alles in Ordnung');
