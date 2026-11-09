@@ -31,8 +31,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
   (`/meldung/<id>`). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
   nebeneinander sind aber zu viel. Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`),
   nie über `confirm()`. Mehrere Meldungen wählt man nach M3 (selection, wie Gmail): lange drücken oder
-  „Meldungen auswählen“, dann ist die ganze Zeile die Auswahl, ohne „Erledigt“; die Kopfleiste zeigt
-  Kreuz, Zahl und Aktionen (`AuswahlLeiste`). Gedruckt wird als PDF vom Server (`druck.go`).
+  ⋮ → „Drucken“, dann ist die ganze Zeile die Auswahl, ohne „Erledigt“; die Kopfleiste zeigt Kreuz, Zahl
+  und Aktionen (`AuswahlLeiste`). Gedruckt wird als PDF vom Server (`druck.go`). Texte nach M3 knapp:
+  Menüeinträge nur Symbol und Wort, keine Erklärzeilen; was die Oberfläche zeigt, braucht keine Anleitung.
 - **Kacheln:** In einem Raster sind alle Kacheln gleich groß (M3: das Standard-Raster zeigt Karten
   gleich groß), die letzte Reihe darf kürzer sein; Form `rounded-xl`, Fläche `bg-surface-container-low`,
   Abstand `gap-3`. Passt ein Name nicht, bekommt die Kachel ein Symbol statt einer größeren Fläche.

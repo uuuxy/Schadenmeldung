@@ -2,7 +2,7 @@ import { chromium } from 'playwright-core';
 import { writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 // Drucken: auf der Seite einer Meldung ein Blatt, in der Liste mehrere über die Auswahl (M3 selection,
-// wie in Gmail): langes Drücken oder „Meldungen auswählen“, Tippen wählt dazu oder ab, Kreuz, Zurück
+// wie in Gmail): langes Drücken oder ⋮ → Drucken, Tippen wählt dazu oder ab, Kreuz, Zurück
 // und Drucken beenden. Braucht die Testdaten; gedruckt wird nur gelesen. Bild und PDF landen im Ordner
 // aus argv[2], sonst im Temp-Ordner.
 const B = process.env.ADRESSE ?? 'http://127.0.0.1:8090';
@@ -34,7 +34,7 @@ async function drueckeLange(zeile) {
 // 1. Langes Drücken beginnt die Auswahl, ohne die Meldung zu öffnen
 await s.goto(B + '/');
 await zeilen().first().waitFor();
-pruefe(await s.getByRole('button', { name: 'Drucken und exportieren' }).isVisible(), 'Kopfleiste: Drucken und exportieren');
+pruefe(await s.getByRole('button', { name: 'Weitere Optionen' }).isVisible(), 'Kopfleiste: ⋮ Weitere Optionen');
 await drueckeLange(zeilen().first());
 pruefe((await titel()) === '1 ausgewählt' && new URL(s.url()).pathname === '/', `Langes Drücken wählt aus und bleibt in der Liste (${await titel()})`);
 pruefe((await zeilen().first().getAttribute('aria-pressed')) === 'true', 'Die Zeile ist gewählt (aria-pressed)');
@@ -64,16 +64,18 @@ await zeilen().first().tap();
 await ruhe();
 pruefe(await s.getByRole('group', { name: 'Ansicht' }).isVisible(), 'Letzte abgewählt: Auswahl beendet');
 
-// 4. Über das Blatt: „Meldungen auswählen“, Alle, keine; Zurück beendet
-await s.getByRole('button', { name: 'Drucken und exportieren' }).click();
-await s.getByRole('button', { name: /Meldungen auswählen/ }).click();
+// 4. Über das Menü: ⋮ → Drucken, Alle, keine; Zurück beendet
+await s.getByRole('button', { name: 'Weitere Optionen' }).click();
 await ruhe();
-pruefe((await titel()) === 'Meldungen antippen' && (await s.getByRole('button', { name: 'Drucken' }).isDisabled()), 'Aus dem Blatt: „Meldungen antippen“, Drucken gesperrt');
+await s.screenshot({ path: `${ordner}/menue.png` });
+await s.getByRole('dialog').getByRole('button', { name: 'Drucken' }).click();
+await ruhe();
+pruefe((await titel()) === 'Meldungen auswählen' && (await s.getByRole('button', { name: 'Drucken' }).isDisabled()), 'Aus dem Menü: „Meldungen auswählen“, Drucken gesperrt');
 const anzahl = await zeilen().count();
 await s.getByRole('button', { name: 'Alle auswählen' }).click();
 pruefe((await titel()) === `${anzahl} ausgewählt`, `Alle auswählen: ${anzahl} ausgewählt`);
 await s.getByRole('button', { name: 'Alle abwählen' }).click();
-pruefe((await titel()) === 'Meldungen antippen', 'Alle abwählen: keine, die Auswahl bleibt offen');
+pruefe((await titel()) === 'Meldungen auswählen', 'Alle abwählen: keine, die Auswahl bleibt offen');
 await s.evaluate(() => history.back());
 await ruhe();
 pruefe(await s.getByRole('group', { name: 'Ansicht' }).isVisible(), 'Zurück-Geste beendet die Auswahl');

@@ -19,5 +19,5 @@
 {#if geht}
 	<a class="icon-btn text-on-surface-variant" href="/api/druck.pdf?ids={ids.join(',')}" download aria-label="Drucken" title="Drucken" {onclick}><Icon name="print" /></a>
 {:else}
-	<button class="icon-btn text-on-surface-variant opacity-38" disabled aria-label="Drucken" title={ids.length ? `Höchstens ${HOECHSTENS} auf einmal` : 'Erst Meldungen antippen'}><Icon name="print" /></button>
+	<button class="icon-btn text-on-surface-variant opacity-38" disabled aria-label="Drucken" title={ids.length ? `Höchstens ${HOECHSTENS} auf einmal` : 'Drucken'}><Icon name="print" /></button>
 {/if}
