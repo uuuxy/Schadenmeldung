@@ -35,6 +35,8 @@ type konfiguration struct {
 	SMTPPasswort        string
 	MailAbsender        string
 	OeffentlicheAdresse string
+	// Schluessel verschlüsselt das unter Einstellungen → Mail eingetragene Postfach (schluessel.go).
+	Schluessel []byte
 	// Zeitzone für die Uhrzeiten in Mail und Export.
 	Zeitzone *time.Location
 }
@@ -69,6 +71,9 @@ func ladeKonfiguration() (konfiguration, error) {
 	k.SMTPBenutzer = strings.TrimSpace(os.Getenv("SMTP_BENUTZER"))
 	k.SMTPPasswort = os.Getenv("SMTP_PASSWORT")
 	k.MailAbsender = strings.TrimSpace(os.Getenv("MAIL_ABSENDER"))
+	if k.Schluessel, err = schluesselAus(os.Getenv("SCHLUESSEL")); err != nil {
+		return k, err
+	}
 	k.OeffentlicheAdresse = strings.TrimRight(strings.TrimSpace(os.Getenv("OEFFENTLICHE_ADRESSE")), "/")
 	if k.Zeitzone, err = time.LoadLocation(wert("ZEITZONE", "Europe/Berlin")); err != nil {
 		return k, fmt.Errorf("ZEITZONE: %w", err)
@@ -90,13 +95,12 @@ func (k konfiguration) pruefe() error {
 	if len(k.Aliase) > 0 && len(k.Domains) != 1 {
 		return errors.New("ALIAS_DOMAINS braucht genau eine Domain in ANMELDE_DOMAINS: auf sie werden die Kurzadressen umgeschrieben")
 	}
-	if k.SMTPHost != "" && (k.MailAbsender == "" || k.OeffentlicheAdresse == "") {
-		return errors.New("mit SMTP_HOST braucht es auch MAIL_ABSENDER und OEFFENTLICHE_ADRESSE (für die Knöpfe in der Mail)")
+	// MAIL_ABSENDER darf fehlen: Dann kommt das Postfach aus Einstellungen → Mail.
+	if k.SMTPHost != "" && k.OeffentlicheAdresse == "" {
+		return errors.New("mit SMTP_HOST braucht es auch OEFFENTLICHE_ADRESSE (für die Knöpfe in der Mail)")
 	}
 	return nil
 }
-
-func (k konfiguration) mailAktiv() bool { return k.SMTPHost != "" }
 
 // vervollstaendige macht aus der Eingabe die volle Adresse, die der Mailserver als Benutzernamen
 // kennt: Bei genau einer Schuldomain genügt der Name vor dem @, und eine Kurzdomain aus

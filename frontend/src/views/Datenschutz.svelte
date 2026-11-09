@@ -35,7 +35,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Mail an den Hausmeister</h2>
 			<p class="text-on-surface-variant">
-				Der Hausmeister bekommt jede neue Meldung sofort per Mail; das lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie auf „In Arbeit“ gesetzt wurde.
+				Der Hausmeister bekommt jede neue Meldung sofort per Mail; das lässt sich in der App abschalten. Die Knöpfe in der Mail gelten 14 Tage und nur für die jeweilige Meldung. Angezeigt wird der Stand einer Meldung, nicht der Zeitpunkt, zu dem sie auf „In Arbeit“ gesetzt wurde. Verschickt werden die Mails über ein Postfach der Schule. Ist es in der App eingetragen, liegt sein Passwort nur verschlüsselt auf dem Server, wird nie angezeigt und bleibt, bis es jemand in den Einstellungen entfernt oder ersetzt.
 			</p>
 		</section>
 		<section>

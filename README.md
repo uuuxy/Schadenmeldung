@@ -133,7 +133,8 @@ laufen, schaltet der Caddy-Abschnitt das mit `SCHULNETZ` ein (zwei Zeilen, siehe
 | `ADMINS` | feste Verwaltung, auch als Name oder in Kurzform; weitere Rollen vergibt sie in der App | – |
 | `SMTP_HOST`, `SMTP_PORT` | Mailserver für den Versand an den Hausmeister; Name wie im Zertifikat; ohne Host keine Mails | –, `587` |
 | `SMTP_BENUTZER`, `SMTP_PASSWORT` | Anmeldung am Mailserver (nur über TLS) | – |
-| `MAIL_ABSENDER` | Absender der Mails | Pflicht mit SMTP |
+| `MAIL_ABSENDER` | Absender der Mails; leer, wenn das Postfach unter Einstellungen → Mail eingetragen wird | – |
+| `SCHLUESSEL` | 64 Hex-Zeichen; verschlüsselt das Passwort eines in der App eingetragenen Postfachs, `update.sh` legt ihn an | – |
 | `OEFFENTLICHE_ADRESSE` | Adresse der App für die Knöpfe in der Mail | Pflicht mit SMTP |
 | `ZEITZONE` | für die Uhrzeiten in Mail und Export | `Europe/Berlin` |
 | `SCHULNAME` | Name auf Anmeldung und Datenschutzseite | – |

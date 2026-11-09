@@ -64,6 +64,9 @@ PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das 
 - Kollegium sieht nur das Meldeformular; Hausmeister, Leitung und Admin dürfen alles, die
   Verwaltung (Sekretariat) sieht und druckt QR-Aufkleber, ändert aber nichts (`rollen.go`,
   `zustand.svelte.js`). Jede neue Tür prüft die Rolle im Server, nicht nur die Oberfläche.
+- Das Postfach für den Versand steht fest in der .env (`MAIL_ABSENDER`) oder wird unter Einstellungen →
+  Mail eingetragen, am besten von der Person, der es gehört: Testmail vor dem Speichern, das Passwort
+  nur verschlüsselt (`SCHLUESSEL` in der .env, `update.sh` legt ihn an) und nie wieder angezeigt.
 - Mails und Mitteilungen aufs Handy sollen den Hausmeister nicht hetzen: eine je Meldung, keine
   Erinnerungen, keine Eskalation, keine Zeitstempel von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
 - Wer meldet, bekommt eine Mail, sobald die Meldung erledigt ist: eine je Meldung, erst nach zehn

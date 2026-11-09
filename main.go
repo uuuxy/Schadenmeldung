@@ -79,8 +79,8 @@ func starte() error {
 	if len(konf.Admins) == 0 {
 		slog.Warn("ADMINS ist leer: Niemand kann Räume anlegen, Rollen vergeben oder QR-Codes drucken.")
 	}
-	if !konf.mailAktiv() {
-		slog.Warn("SMTP_HOST ist leer: Der Hausmeister bekommt keine Mails.")
+	if konf.SMTPHost == "" {
+		slog.Warn("SMTP_HOST ist leer: Die App verschickt keine Mails.")
 	}
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
