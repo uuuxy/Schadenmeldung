@@ -52,16 +52,16 @@
 
 <p class="mt-6 mb-2 text-label-large text-on-surface-variant">Freiwillig</p>
 <div class="flex flex-wrap items-center gap-x-2 gap-y-4">
-	<label class="schicht treffer flex h-8 cursor-pointer items-center gap-2 rounded-sm border border-outline pr-4 pl-2 text-label-large text-on-surface">
+	<label class="schicht treffer flex h-8 cursor-pointer items-center gap-2 rounded-sm border border-outline-variant pr-4 pl-2 text-label-large text-on-surface">
 		<Icon name="photo_camera" groesse={18} class="text-primary" />{foto ? 'Anderes Foto' : 'Foto'}
 		<input type="file" accept="image/*" capture="environment" class="sr-only" onchange={fotoGewaehlt} />
 	</label>
 	{#if !freiBeschreiben}
-		<button class={['treffer flex h-8 items-center gap-2 rounded-sm border pr-4 pl-2 text-label-large transition-colors', notizOffen ? 'border-transparent bg-secondary-container text-on-secondary-container' : 'border-outline text-on-surface']} aria-pressed={notizOffen} onclick={() => (notizOffen = !notizOffen)}>
+		<button class={['treffer flex h-8 items-center gap-2 rounded-sm border pr-4 pl-2 text-label-large transition-colors', notizOffen ? 'border-transparent bg-secondary-container text-on-secondary-container' : 'border-outline-variant text-on-surface']} aria-pressed={notizOffen} onclick={() => (notizOffen = !notizOffen)}>
 			<Icon name={notizOffen ? 'check' : 'edit_note'} groesse={18} class={notizOffen ? '' : 'text-primary'} />Notiz
 		</button>
 	{/if}
-	<button class={['treffer flex h-8 items-center gap-2 rounded-sm border pr-4 pl-2 text-label-large transition-colors', dringend ? 'border-transparent bg-error-container text-on-error-container' : 'border-outline text-on-surface']} aria-pressed={dringend} onclick={() => (dringend = !dringend)}>
+	<button class={['treffer flex h-8 items-center gap-2 rounded-sm border pr-4 pl-2 text-label-large transition-colors', dringend ? 'border-transparent bg-error-container text-on-error-container' : 'border-outline-variant text-on-surface']} aria-pressed={dringend} onclick={() => (dringend = !dringend)}>
 		<Icon name="warning" groesse={18} gefuellt={dringend} class={dringend ? '' : 'text-error'} />Dringend / Gefahr
 	</button>
 </div>

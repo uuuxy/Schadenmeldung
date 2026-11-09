@@ -85,7 +85,7 @@
 		</span>
 	</button>
 	{#if darfBearbeiten() && !erledigt && !auswahl}
-		<button class="icon-btn mr-2 shrink-0 border border-outline text-on-surface-variant" aria-label="Erledigt: {m.ort}, {m.was}" title="Erledigt" onclick={() => abhaken(m)}>
+		<button class="icon-btn mr-2 shrink-0 border border-outline-variant text-on-surface-variant" aria-label="Erledigt: {m.ort}, {m.was}" title="Erledigt" onclick={() => abhaken(m)}>
 			<Icon name="check" groesse={22} />
 		</button>
 	{/if}

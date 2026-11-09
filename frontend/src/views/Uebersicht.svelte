@@ -187,7 +187,7 @@
 					<ul class="flex flex-col gap-0.5">
 						{#each a.meldungen as m (m.id)}
 							<!-- Gewählt: ganze Zeile auf secondary-container, Ecken rundum 16 px (M3 Expressive, selected list item). -->
-							<li class={['transition-[border-radius,background-color] duration-200 ease-[var(--ease-standard)]', auswahl?.includes(m.id) ? 'rounded-lg bg-secondary-container' : 'rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg']} animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
+							<li class={['transition-[border-radius,background-color] duration-200 ease-standard', auswahl?.includes(m.id) ? 'rounded-lg bg-secondary-container' : 'rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg']} animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
 								<MeldungZeile meldung={m} {auswahl} onauswahl={waehle} />
 							</li>
 						{/each}
