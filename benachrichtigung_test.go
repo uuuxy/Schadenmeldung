@@ -152,8 +152,24 @@ func TestKnopfAusDerMail(t *testing.T) {
 	if status, _ := gast.json("POST", pfad, map[string]string{"status": "offen"}); status != http.StatusBadRequest {
 		t.Fatalf("offen aus der Mail: Status %d, erwartet 400", status)
 	}
-	if status, m := gast.json("POST", pfad, map[string]string{"status": "erledigt"}); status != 200 || m["status"] != "erledigt" {
+	if status, m := gast.json("POST", pfad, map[string]string{"status": "erledigt", "vorher": "offen"}); status != 200 || m["status"] != "erledigt" {
 		t.Fatalf("Erledigt aus der Mail: %d, %v", status, m)
+	}
+
+	// Der zweite Hausmeister tippt auf einer Seite, die noch „offen“ zeigte: Die Meldung bleibt erledigt.
+	if status, _ := gast.json("POST", pfad, map[string]string{"status": "in_arbeit", "vorher": "offen"}); status != http.StatusConflict {
+		t.Fatalf("In Arbeit auf überholter Seite: Status %d, erwartet 409", status)
+	}
+	if _, m := gast.json("GET", pfad, nil); m["status"] != "erledigt" {
+		t.Fatalf("nach dem abgelehnten Tipp: %v, erwartet weiter erledigt", m["status"])
+	}
+	// Noch einmal „Erledigt“ ändert nichts und ist kein Fehler.
+	if status, m := gast.json("POST", pfad, map[string]string{"status": "erledigt", "vorher": "offen"}); status != 200 || m["status"] != "erledigt" {
+		t.Fatalf("zweimal Erledigt: %d, %v", status, m)
+	}
+	// Wer „Schon erledigt“ gesehen hat und bewusst ändert, darf wieder öffnen.
+	if status, m := gast.json("POST", pfad, map[string]string{"status": "in_arbeit", "vorher": "erledigt"}); status != 200 || m["status"] != "in_arbeit" {
+		t.Fatalf("bewusst wieder geöffnet: %d, %v", status, m)
 	}
 
 	// Wer nur noch lesen darf (Verwaltung), kann auch mit einem alten Link nichts mehr ändern.

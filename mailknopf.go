@@ -72,6 +72,7 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 	}
 	var ein struct {
 		Status string `json:"status"`
+		Vorher string `json:"vorher"` // der Stand, den die Seite gezeigt hat
 	}
 	if !leseJSON(w, r, &ein) {
 		return
@@ -80,6 +81,13 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 	// vielleicht weitergeleiteten Mail.
 	if statusNamen[ein.Status] == "" || ein.Status == "offen" {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
+		return
+	}
+	// Zwei Hausmeister bekommen dieselbe Meldung. Hat einer erledigt, während die Seite des anderen noch
+	// den alten Stand zeigte, öffnet dessen Tipp die Meldung nicht wieder; die Seite zeigt dann „Schon
+	// erledigt“, und wer wirklich ändern will, tut es von dort bewusst. Ohne Vorher (alte Seite) wie bisher.
+	if m.Status == "erledigt" && ein.Vorher != "" && ein.Vorher != "erledigt" && ein.Status != "erledigt" {
+		fehler(w, http.StatusConflict, "Inzwischen hat jemand die Meldung erledigt.")
 		return
 	}
 	neu, err := a.sp.setzeStatus(r.Context(), m.ID, &ein.Status, nil, b.Email, a.jetzt())

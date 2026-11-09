@@ -28,23 +28,37 @@
 	let fehler = $state('');
 	let laeuft = $state('');
 	let getan = $state('');
+	// Ist die Meldung schon erledigt, ist die Mail überholt, etwa weil der andere Hausmeister schneller
+	// war. Dann stehen die Knöpfe erst nach einem bewussten Tipp da, sonst öffnete ein schneller Tipp auf
+	// den hervorgehobenen Knopf aus der Mail die Meldung aus Versehen wieder.
+	let aendern = $state(false);
+	const schonErledigt = $derived(meldung?.status === 'erledigt' && !aendern);
 
-	onMount(async () => {
+	async function laden() {
 		try {
 			meldung = await api(`/api/aktion/${token}`);
 		} catch (e) {
 			fehler = e.message;
 		}
-	});
+	}
+	onMount(laden);
 
 	async function setze(status) {
 		laeuft = status;
 		try {
-			meldung = await api(`/api/aktion/${token}`, { methode: 'POST', json: { status } });
+			// Mit dem gezeigten Stand: Hat inzwischen jemand erledigt, lehnt der Server ab (409), statt die
+			// Meldung wieder zu öffnen, und die Seite zeigt den neuen Stand.
+			meldung = await api(`/api/aktion/${token}`, { methode: 'POST', json: { status, vorher: meldung.status } });
 			getan = status;
+			aendern = true; // „Doch anders“ führt dann zurück zu den Knöpfen.
 			rueckmeldung();
 		} catch (e) {
-			fehler = e.message;
+			if (e.status === 409) {
+				aendern = false;
+				await laden();
+			} else {
+				fehler = e.message;
+			}
 		} finally {
 			laeuft = '';
 		}
@@ -90,6 +104,13 @@
 				<p class="mt-1 text-body-medium text-on-surface-variant">Das Kollegium sieht es sofort.</p>
 			</div>
 			<Button variant="ghost" onclick={() => (getan = '')}>Doch anders</Button>
+		{:else if schonErledigt}
+			<div class="flex flex-col items-center py-4 text-center" in:fade={{ duration: 200 }}>
+				<span class="mb-4 grid size-16 place-items-center rounded-xl bg-success-container text-on-success-container"><Icon name="check" groesse={32} /></span>
+				<p class="text-title-large text-on-surface">Schon erledigt</p>
+				<p class="mt-1 text-body-medium text-on-surface-variant">Hier ist nichts mehr zu tun. Ist doch noch etwas kaputt, lässt sich der Stand ändern.</p>
+			</div>
+			<Button variant="ghost" onclick={() => (aendern = true)}>Stand ändern</Button>
 		{:else}
 			<div class="flex flex-col gap-3">
 				{#each angebote as s (s)}
