@@ -93,6 +93,8 @@ alle Stellen. Welche Arten das Formular zeigt, schaltet die App selbst (Tabelle 
 Keine fremden Dienste, CDNs oder Schriften von außen. Einzige Ausnahme (Entscheidung vom 4. November
 2026): Mitteilungen aufs Handy laufen über den Push-Dienst des Browsers, nur an die Dienste in
 `pushDienste` (push.go) und Ende-zu-Ende verschlüsselt (webpush.go). Keine Namen oder Freitexte ins Log.
+Der QR-Scanner (`QrScanner.svelte`) liest auf dem Handy selbst (jsQR, erst beim Öffnen geladen); das
+Kamerabild geht nie an den Server.
 Neue Felder mit Personenbezug brauchen eine Löschfrist (`aufraeumen.go`) und eine Zeile auf der
 Datenschutzseite.
 

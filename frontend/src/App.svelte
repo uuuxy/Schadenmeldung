@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { zustand, starte, darfSehen, darfBearbeiten } from './lib/zustand.svelte.js';
 	import { auffrischen } from './lib/nachreichen.js';
-	import { weg } from './lib/weg.svelte.js';
+	import { weg, raumCodeAus } from './lib/weg.svelte.js';
 	import { gesehen } from './lib/mitteilungen.js';
 	import Anmelden from './views/Anmelden.svelte';
 	import Melden from './views/Melden.svelte';
@@ -32,7 +32,7 @@
 		if (p === '/raeume/qr' && darfSehen()) return 'qr';
 		return darfSehen() ? 'uebersicht' : 'melden';
 	});
-	const raumCode = $derived(weg.pfad.startsWith('/r/') ? decodeURIComponent(weg.pfad.slice(3)) : '');
+	const raumCode = $derived(raumCodeAus(weg.pfad));
 
 	// Live für alle mit Übersicht: Der Server meldet jede Änderung über /api/ereignisse, die App holt
 	// dann den Stand. Nur solange sie sichtbar ist, denn ein offener Strom hält das Funkmodul wach.

@@ -2,6 +2,7 @@
 	import { zustand, darfBearbeiten } from '../../lib/zustand.svelte.js';
 	import { rueckmeldung } from '../../lib/haptik.js';
 	import { zuletztGewaehlt, merkeRaum } from '../../lib/zuletzt.js';
+	import { raumCodeAus } from '../../lib/weg.svelte.js';
 	import Icon from '../Icon.svelte';
 	import Button from '../ui/Button.svelte';
 	import ZurueckZeile from '../ZurueckZeile.svelte';
@@ -9,10 +10,12 @@
 	import FilterChips from '../ui/FilterChips.svelte';
 	import RaumWahl from '../RaumWahl.svelte';
 	import HierGemeldet from './HierGemeldet.svelte';
+	import QrScanner from './QrScanner.svelte';
 
 	/**
 	 * Wo? Mit QR-Code ist der Raum schon gewählt. Sonst die Raumwahl (suchen oder Bereich, dann Raum),
 	 * darüber „Zuletzt“ als Vorschläge für einen Tipp. Für alles ohne Raum gibt es „Anderer Ort“.
+	 * Am Handy liest das Symbol rechts in der Suche den QR-Aufkleber auch in der App.
 	 * Gewählt schrumpft die Frage auf eine Zeile mit „Ändern“.
 	 */
 	let { raum = $bindable(), ortFrei = $bindable(), freierOrt = $bindable(), codeUnbekannt = false, ongewaehlt } = $props();
@@ -21,6 +24,26 @@
 	let zuletzt = $state(zuletztGewaehlt());
 	const zuletztRaeume = $derived(zuletzt.map((id) => zustand.raeume.find((r) => r.id === id)).filter(Boolean));
 	const nurFreitext = $derived(zustand.raeume.length === 0 || freierOrt);
+	// Den Scanner gibt es, wo man mit dem Finger tippt und die Kamera erreichbar ist; am Rechner führt
+	// die Suche schneller ans Ziel.
+	const kamera = !!navigator.mediaDevices?.getUserMedia && matchMedia('(pointer: coarse)').matches;
+	let scannen = $state(false);
+
+	// Gelesen wird nur der Raum-Code aus /r/…, die Adresse davor nicht: Die App öffnet nie, was im Code
+	// steht, sie wählt höchstens einen eigenen Raum.
+	function codeGelesen(text) {
+		let pfad = '';
+		try {
+			pfad = new URL(text).pathname;
+		} catch {
+			// kein Link, also kein Aufkleber von uns
+		}
+		const code = raumCodeAus(pfad);
+		const r = code && zustand.raeume.find((x) => x.code === code);
+		if (!r) return code ? 'Dieser QR-Code gehört zu keinem Raum mehr.' : 'Das ist kein QR-Aufkleber der Schadenmeldung.';
+		scannen = false;
+		waehleRaum(r);
+	}
 
 	function waehleRaum(r) {
 		raum = r;
@@ -63,8 +86,11 @@
 	{#if !zustand.raeume.length && darfBearbeiten()}
 		<p class="mt-2 text-body-small text-on-surface-variant">Tipp: Unter Einstellungen (Kontomenü) die Raumliste anlegen – dann genügt hier ein Tipp.</p>
 	{/if}
+{:else if scannen}
+	<ZurueckZeile titel="QR-Code scannen" etikett="Zurück zu den Räumen" onzurueck={() => (scannen = false)} />
+	<div class="mt-1"><QrScanner onlesen={codeGelesen} /></div>
 {:else}
-	<RaumWahl raeume={zustand.raeume} bind:suche onwahl={waehleRaum} anderOrt={() => (freierOrt = true)}>
+	<RaumWahl raeume={zustand.raeume} bind:suche onwahl={waehleRaum} anderOrt={() => (freierOrt = true)} scannen={kamera ? () => (scannen = true) : null}>
 		{#snippet vorschlaege()}
 			{#if zuletztRaeume.length}
 				<h3 class="mt-5 mb-2 text-label-large text-on-surface-variant">Zuletzt</h3>

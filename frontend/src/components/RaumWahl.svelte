@@ -1,5 +1,6 @@
 <script>
 	import { raumGruppen } from '../lib/raumgruppen.js';
+	import Icon from './Icon.svelte';
 	import Suchpille from './ui/Suchpille.svelte';
 	import BereichKacheln from './melden/BereichKacheln.svelte';
 	import ZurueckZeile from './ZurueckZeile.svelte';
@@ -14,8 +15,9 @@
 	 * ohneTreffer unter den Treffern, wenn kein Raum genau so heißt. anderOrt (nur beim Melden) führt zur
 	 * freien Ortsangabe: als letzte Kachel bei den Bereichen, bei wenigen Räumen als Kachel unter ihnen;
 	 * bei Suche und in einem Bereich nicht, dort gibt es „… als Ort nehmen“ und den Pfeil zurück.
+	 * scannen (nur beim Melden, nur am Handy) setzt das Scanner-Symbol rechts in die Suche.
 	 */
-	let { raeume, onwahl, suche = $bindable(''), vorschlaege, ohneTreffer, anderOrt = null } = $props();
+	let { raeume, onwahl, suche = $bindable(''), vorschlaege, ohneTreffer, anderOrt = null, scannen = null } = $props();
 
 	// Bis zu so vielen Räumen genügt ein Blick; darüber erst der Bereich, dann der Raum.
 	const AUF_EINEN_BLICK = 15;
@@ -41,7 +43,13 @@
 	}
 </script>
 
-<Suchpille bind:wert={suche} platzhalter="Raum suchen, z. B. 204" etikett="Raum suchen" onkeydown={(e) => e.key === 'Enter' && treffer[0] && waehle(treffer[0])} />
+{#snippet scanKnopf()}
+	<button type="button" class="icon-btn text-on-surface-variant" aria-label="QR-Code scannen" title="QR-Code scannen" onclick={scannen}>
+		<Icon name="qr_code_scanner" />
+	</button>
+{/snippet}
+
+<Suchpille bind:wert={suche} platzhalter="Raum suchen, z. B. 204" etikett="Raum suchen" onkeydown={(e) => e.key === 'Enter' && treffer[0] && waehle(treffer[0])} aktion={scannen ? scanKnopf : undefined} />
 
 {#if begriff}
 	<div class="mt-4"><RaumRaster raeume={treffer} mitBereich onwahl={waehle} /></div>

@@ -144,6 +144,8 @@ Browserprüfungen (Chromium von Playwright ist auf dem Mac installiert):
 - `npm run pruefen:funkloch` setzt ohne Netz einen Stand und prüft, dass er nachgereicht wird (Testdaten nötig).
 - `npm run pruefen:zurueck` prüft „Zurück“ über Pfeil, Geste und Wischen (App vom Home-Bildschirm am
   iPhone nachgestellt); bringt eigene Räume mit und schickt nichts ab, braucht also keine frischen Testdaten.
+- `npm run pruefen:scannen` prüft den QR-Scanner in der App mit einer nachgestellten Kamera, die einen
+  echten QR-Code zeigt (Raum gewählt, veraltete und fremde Codes, verweigerte Kamera, Kamera danach aus).
 - Betrieb: `waechter.sh`, `sicherung.sh` und `sicherung-pruefen.sh` lassen sich lokal mit
   `COMPOSE_FILE=…/docker-compose.local.yml` in einem Probeordner mit eigener `.env` ausprobieren
   (`APP_ENV=local`, `SMTP_HOST=localhost`, `SMTP_PORT=1025`); die Mails landen in Mailpit.
