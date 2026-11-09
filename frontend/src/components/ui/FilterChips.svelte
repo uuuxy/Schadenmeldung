@@ -9,7 +9,7 @@
 	 *
 	 * Maße aus den M3-Token (filter chip): 32 px hoch, Ecke 8 px, Beschriftung label-large; getroffen
 	 * wird auf 48 px (.treffer). Ungewählt:
-	 * Umriss outline, Text on-surface-variant. Gewählt: Fläche secondary-container ohne Umriss, vorn
+	 * Umriss outline-variant (M3, Stand November 2026), Text on-surface-variant. Gewählt: Fläche secondary-container ohne Umriss, vorn
 	 * ein 18-px-Häkchen; der Rand bleibt durchsichtig stehen, damit die Höhe gleich bleibt.
 	 *
 	 * @prop {{ wert: string, text: string, icon?: string }[]} optionen
@@ -30,7 +30,7 @@
 			onclick={() => onwahl(gewaehlt && abwaehlbar ? null : o.wert)}
 			class={[
 				'treffer flex h-8 items-center gap-2 rounded-sm border text-label-large transition-colors duration-200',
-				gewaehlt ? 'border-transparent bg-secondary-container pr-4 pl-2 text-on-secondary-container' : 'border-outline px-4 text-on-surface-variant',
+				gewaehlt ? 'border-transparent bg-secondary-container pr-4 pl-2 text-on-secondary-container' : 'border-outline-variant px-4 text-on-surface-variant',
 				!gewaehlt && o.icon && 'pl-2'
 			]}
 		>

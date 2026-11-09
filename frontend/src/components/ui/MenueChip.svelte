@@ -33,7 +33,7 @@
 <button
 	class={[
 		'treffer flex h-8 min-w-0 items-center gap-2 rounded-sm border pr-2 text-label-large transition-colors duration-200',
-		gewaehlt ? 'border-transparent bg-secondary-container pl-2 text-on-secondary-container' : 'border-outline pl-4 text-on-surface-variant'
+		gewaehlt ? 'border-transparent bg-secondary-container pl-2 text-on-secondary-container' : 'border-outline-variant pl-4 text-on-surface-variant'
 	]}
 	aria-haspopup="dialog"
 	aria-label={gewaehlt ? `${titel}: ${gewaehlt.text}` : titel}
