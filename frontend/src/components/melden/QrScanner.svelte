@@ -12,9 +12,9 @@
 	 */
 	let { onlesen } = $props();
 
-	const VERBOTEN = 'Die Kamera ist nicht erlaubt. Das lässt sich in den Einstellungen des Handys ändern, bis dahin bitte den Raum suchen.';
-	const KEINE = 'Hier gibt es keine Kamera, die sich nutzen lässt.';
-	const BELEGT = 'Die Kamera ist gerade belegt, etwa von einer anderen App.';
+	const VERBOTEN = 'Kamera nicht erlaubt – in den Einstellungen freigeben';
+	const KEINE = 'Keine Kamera gefunden';
+	const BELEGT = 'Kamera wird gerade benutzt';
 	const FEHLER = { NotAllowedError: VERBOTEN, SecurityError: VERBOTEN, NotFoundError: KEINE, OverconstrainedError: KEINE, NotReadableError: BELEGT, AbortError: BELEGT };
 
 	let video = $state();
@@ -37,7 +37,7 @@
 			try {
 				lies ??= (await import('jsqr')).default;
 			} catch {
-				if (meiner === lauf) fehler = 'Der Scanner ließ sich nicht laden. Mit Netz geht es wieder.';
+				if (meiner === lauf) fehler = 'Ohne Netz nicht verfügbar';
 				return;
 			}
 			try {
@@ -50,7 +50,7 @@
 				laeuft = true;
 				schaue(meiner);
 			} catch (e) {
-				if (meiner === lauf) fehler = FEHLER[e?.name] ?? 'Die Kamera ließ sich nicht starten.';
+				if (meiner === lauf) fehler = FEHLER[e?.name] ?? 'Kamera startet nicht';
 			}
 		}
 
@@ -107,8 +107,5 @@
 		<div class="relative text-primary"><Ladekreis groesse={32} /></div>
 	{/if}
 </div>
-{#if !fehler}
-	<p class={['mt-3 text-body-medium', hinweis ? 'rounded-md bg-warning-container px-4 py-3 text-on-warning-container' : 'text-center text-on-surface-variant']} aria-live="polite">
-		{hinweis || 'Den QR-Aufkleber an der Tür ins Quadrat halten.'}
-	</p>
-{/if}
+<!-- Ohne Anleitung: Titel und Sucher sprechen für sich (M3). Nur ein Code, der nicht passt, sagt warum. -->
+<p class="mt-3 rounded-md bg-warning-container px-4 py-3 text-body-medium text-on-warning-container empty:hidden" aria-live="polite">{fehler ? '' : hinweis}</p>

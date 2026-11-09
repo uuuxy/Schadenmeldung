@@ -85,11 +85,11 @@ pruefe(await s.evaluate(() => history.state?.unter === undefined), 'Der Eintrag 
 await s.goto(B + '/');
 await s.evaluate(() => (window.__kamera.inhalt = 'alt'));
 await symbol(s).tap();
-await s.getByText('Dieser QR-Code gehört zu keinem Raum mehr.').waitFor({ timeout: 8000 });
+await s.getByText('Dieser Code gehört zu keinem Raum mehr').waitFor({ timeout: 8000 });
 pruefe(true, 'Veralteter Code: „gehört zu keinem Raum mehr“');
 await s.evaluate(() => (window.__kamera.inhalt = 'fremd'));
-await s.getByText('Das ist kein QR-Aufkleber der Schadenmeldung.').waitFor({ timeout: 8000 });
-pruefe(true, 'Fremder Code: „kein QR-Aufkleber der Schadenmeldung“');
+await s.getByText('Kein QR-Code der Schadenmeldung').waitFor({ timeout: 8000 });
+pruefe(true, 'Fremder Code: „Kein QR-Code der Schadenmeldung“');
 pruefe(await s.getByText('QR-Code scannen', { exact: true }).isVisible(), 'Scanner bleibt offen und liest weiter');
 await s.evaluate(() => history.back());
 await symbol(s).waitFor();
@@ -103,8 +103,8 @@ pruefe(true, 'Pfeil führt zurück zu den Räumen');
 // 3. Kamera nicht erlaubt: verständlicher Grund statt eines Fehlers
 await s.evaluate(() => (window.__kamera.verweigern = true));
 await symbol(s).tap();
-await s.getByRole('alert').filter({ hasText: 'Die Kamera ist nicht erlaubt' }).waitFor();
-pruefe(true, 'Verweigerte Kamera: Hinweis auf die Einstellungen');
+await s.getByRole('alert').filter({ hasText: 'Kamera nicht erlaubt' }).waitFor();
+pruefe(true, 'Verweigerte Kamera: „Kamera nicht erlaubt – in den Einstellungen freigeben“');
 await pfeil(s).click();
 
 // 4. Beim Tippen weicht das Symbol dem Löschkreuz

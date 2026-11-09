@@ -65,7 +65,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">QR-Code scannen</h2>
 			<p class="text-on-surface-variant">
-				Das Symbol rechts im Feld „Raum suchen“ liest den QR-Aufkleber mit der Kamera des Handys. Das geschieht auf dem Handy selbst: Das Kamerabild verlässt es nicht und wird nicht gespeichert, und die Kamera läuft nur, solange das Scannen offen ist.
+				Der Scanner im Feld „Raum suchen“ liest den QR-Aufkleber auf dem Handy selbst. Das Kamerabild verlässt das Handy nicht und wird nicht gespeichert; die Kamera läuft nur, solange der Scanner offen ist.
 			</p>
 		</section>
 		<section>

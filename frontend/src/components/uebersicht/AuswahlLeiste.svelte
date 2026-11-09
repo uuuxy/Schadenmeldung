@@ -1,7 +1,7 @@
 <script>
 	import Icon from '../Icon.svelte';
 	import KopfLeiste from '../KopfLeiste.svelte';
-	import DruckKnopf, { HOECHSTENS } from './DruckKnopf.svelte';
+	import DruckKnopf from './DruckKnopf.svelte';
 
 	/**
 	 * Die Kopfleiste während einer Auswahl, wie in Gmail, Fotos und Dateien von Google: vorn das Kreuz,
@@ -9,8 +9,7 @@
 	 * beendet die Auswahl, denn eine Aktion schließt sie ab (M3 selection).
 	 */
 	let { gewaehlt, alle, onbeenden, ongedruckt, onalle } = $props();
-	const n = $derived(gewaehlt.length);
-	const titel = $derived(n ? `${n} ausgewählt${n > HOECHSTENS ? ` · höchstens ${HOECHSTENS}` : ''}` : 'Meldungen antippen');
+	const titel = $derived(gewaehlt.length ? `${gewaehlt.length} ausgewählt` : 'Meldungen auswählen');
 </script>
 
 <KopfLeiste {titel} zurueck={onbeenden} zurueckSymbol="close" zurueckEtikett="Auswahl beenden" konto={false}>

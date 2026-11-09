@@ -26,9 +26,9 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   „Bestellt“, „Fachfirma“), ein interner Vermerk (sehen alle mit Übersicht, nicht das Kollegium),
   Löschen mit Rückfrage. Ziehen zum Aktualisieren.
 - **Drucken:** Auf der Seite einer Meldung druckt das Drucker-Symbol sie als PDF, eine A4-Seite mit großem
-  Foto. Mehrere wählt man in der Liste wie in Gmail (lange drücken, dann antippen, oder „Drucken und
-  exportieren“ → „Meldungen auswählen“); das PDF hat dann eine Seite je Meldung. Ohne Namen der Meldenden.
-- **Export:** „Drucken und exportieren“ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
+  Foto. Mehrere wählt man in der Liste wie in Gmail (lange drücken, dann antippen, oder ⋮ → „Drucken“);
+  das PDF hat dann eine Seite je Meldung. Ohne Namen der Meldenden.
+- **Export:** ⋮ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
   erledigt, auf Wunsch nur ein Bereich; nach Bereichen gegliedert, mit kleinen Fotos, zum Drucken oder
   für den Schulträger), oder eine Excel-Tabelle mit allen gespeicherten Meldungen (echte Datumszellen,
   feste Kopfzeile, Filter). Beide ohne Namen der Meldenden.
