@@ -1,6 +1,7 @@
 <script>
 	import Icon from '../Icon.svelte';
 	import Blatt from '../Blatt.svelte';
+	import { pdfLink } from './DruckKnopf.svelte';
 
 	/**
 	 * Das Überlaufmenü der Übersicht (M3: weitere Aktionen hinter ⋮, am Handy als Blatt). „Drucken“
@@ -26,7 +27,7 @@
 				<Icon name="print" class="text-on-surface-variant" />Drucken
 			</button>
 		</li>
-		<li><a class={zeile} href={pdf} download onclick={zu}><Icon name="picture_as_pdf" class="text-on-surface-variant" />Liste als PDF</a></li>
+		<li><a class={zeile} {...pdfLink(pdf)} onclick={zu}><Icon name="picture_as_pdf" class="text-on-surface-variant" />Liste als PDF</a></li>
 		<li><a class={zeile} href="/api/export.xlsx" download onclick={zu}><Icon name="table_view" class="text-on-surface-variant" />Excel-Tabelle</a></li>
 	</ul>
 </Blatt>

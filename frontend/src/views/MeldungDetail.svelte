@@ -5,6 +5,7 @@
 	import { kategorieNach } from '../lib/kategorien.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { zurueck } from '../lib/weg.svelte.js';
+	import { gemerkt, merke } from '../lib/merker.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
 	import DruckKnopf from '../components/uebersicht/DruckKnopf.svelte';
@@ -48,6 +49,8 @@
 	// stehen, zeigte sie sofort den großen Knopf „Erledigt“, und der verleitete zum Wieder-Abhaken.
 	function oeffnen() {
 		const meldung = m;
+		// Danach steht sie unter „Offen“, also führt der Weg zurück dorthin, nicht zu „Erledigt“.
+		merke({ ...gemerkt(), reiter: 'offen' });
 		zurueck('/');
 		wiederOeffnen(meldung);
 	}

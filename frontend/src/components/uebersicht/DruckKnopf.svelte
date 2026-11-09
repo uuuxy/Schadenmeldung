@@ -1,6 +1,11 @@
 <script module>
 	// So viele druckt der Server auf einmal (druckHoechstens in druck.go); mehr macht die Datei zu groß.
 	export const HOECHSTENS = 50;
+
+	// Am Rechner öffnet ein PDF gleich im Browser, gedruckt ist es dann mit einem Klick; am Handy wird es
+	// wie bisher geladen, denn ein neuer Tab aus der App vom Home-Bildschirm kennt am iPhone die Anmeldung nicht.
+	const imBrowser = matchMedia('(pointer: fine)').matches && navigator.standalone !== true;
+	export const pdfLink = (adresse) => (imBrowser ? { href: `${adresse}&zeigen=1`, target: '_blank', rel: 'noopener' } : { href: adresse, download: '' });
 </script>
 
 <script>
@@ -17,7 +22,7 @@
 </script>
 
 {#if geht}
-	<a class="icon-btn text-on-surface-variant" href="/api/druck.pdf?ids={ids.join(',')}" download aria-label="Drucken" title="Drucken" {onclick}><Icon name="print" /></a>
+	<a class="icon-btn text-on-surface-variant" {...pdfLink(`/api/druck.pdf?ids=${ids.join(',')}`)} aria-label="Drucken" title="Drucken" {onclick}><Icon name="print" /></a>
 {:else}
 	<button class="icon-btn text-on-surface-variant opacity-38" disabled aria-label="Drucken" title={ids.length ? `Höchstens ${HOECHSTENS} auf einmal` : 'Drucken'}><Icon name="print" /></button>
 {/if}

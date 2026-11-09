@@ -43,7 +43,7 @@ func (a *app) druckPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
 	if len(liste) == 1 {
 		name = fmt.Sprintf("Schadenmeldung-%d", liste[0].ID)
 	}
-	a.liefereDatei(w, roh, "application/pdf", name, "pdf")
+	a.liefereDatei(w, roh, "application/pdf", name, "pdf", r.URL.Query().Get("zeigen") == "1")
 }
 
 // druckIDs liest „3,1,2“ in der Reihenfolge der Liste; doppelte zählen einmal.

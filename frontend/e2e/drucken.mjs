@@ -88,6 +88,18 @@ const einzeln = s.getByRole('link', { name: 'Drucken' });
 pruefe((await einzeln.getAttribute('href')) === `/api/druck.pdf?ids=${id}`, 'Seite der Meldung: Drucken druckt sie');
 pruefe(seiten(await (await k.request.get(`${B}/api/druck.pdf?ids=${id}`)).body()) === 1, 'Ein Blatt mit einer Seite');
 
+// 6. Am Rechner öffnet das PDF gleich im Browser, zum Drucken mit einem Klick; am Handy wird es geladen
+pruefe((await einzeln.getAttribute('download')) !== null && (await einzeln.getAttribute('target')) === null, 'Handy: Drucken lädt das PDF wie bisher');
+const rechner = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'de-DE' });
+await rechner.request.post(`${B}/api/anmelden`, { headers: { 'X-Schaden': '1' }, data: { email: 'hausmeister', passwort: 'x' } });
+const r = await rechner.newPage();
+await r.goto(`${B}/meldung/${id}`);
+const link = r.getByRole('link', { name: 'Drucken' });
+await link.waitFor();
+const adresse = await link.getAttribute('href');
+pruefe((await link.getAttribute('target')) === '_blank' && adresse.endsWith('&zeigen=1') && (await link.getAttribute('download')) === null, 'Rechner: Drucken öffnet das PDF im Browser');
+pruefe((await rechner.request.get(B + adresse)).headers()['content-disposition'].startsWith('inline;'), 'Rechner: Der Server schickt es zum Ansehen');
+
 await browser.close();
 if (fehler.length) {
 	console.log('\n' + fehler.join('\n'));
