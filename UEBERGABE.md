@@ -146,6 +146,8 @@ Browserprüfungen (Chromium von Playwright ist auf dem Mac installiert):
   iPhone nachgestellt); bringt eigene Räume mit und schickt nichts ab, braucht also keine frischen Testdaten.
 - `npm run pruefen:scannen` prüft den QR-Scanner in der App mit einer nachgestellten Kamera, die einen
   echten QR-Code zeigt (Raum gewählt, veraltete und fremde Codes, verweigerte Kamera, Kamera danach aus).
+- `npm run pruefen:drucken` prüft das Drucken: Auswahl mit langem Drücken und über das Blatt, Alle,
+  Zurück, das PDF mit einer Seite je Meldung und das Blatt einer einzelnen Meldung (Testdaten nötig).
 - Betrieb: `waechter.sh`, `sicherung.sh` und `sicherung-pruefen.sh` lassen sich lokal mit
   `COMPOSE_FILE=…/docker-compose.local.yml` in einem Probeordner mit eigener `.env` ausprobieren
   (`APP_ENV=local`, `SMTP_HOST=localhost`, `SMTP_PORT=1025`); die Mails landen in Mailpit.

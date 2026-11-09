@@ -30,6 +30,12 @@ func (s *speicher) offeneMeldungen(ctx context.Context) ([]meldung, error) {
 	return s.abfrage(ctx, "WHERE m.status <> 'erledigt' ORDER BY m.dringend DESC, m.gemeldet_am DESC, m.id DESC")
 }
 
+// meldungenMitIDs liest die zum Drucken gewählten Meldungen in der Reihenfolge der IDs, also so, wie
+// sie in der Liste standen; gelöschte fehlen einfach.
+func (s *speicher) meldungenMitIDs(ctx context.Context, ids []int64) ([]meldung, error) {
+	return s.abfrage(ctx, "WHERE m.id = ANY($1::bigint[]) ORDER BY array_position($1::bigint[], m.id::bigint)", ids)
+}
+
 func (s *speicher) erledigteMeldungen(ctx context.Context, seit time.Time) ([]meldung, error) {
 	return s.abfrage(ctx, "WHERE m.status = 'erledigt' AND m.erledigt_am >= $1 ORDER BY m.erledigt_am DESC, m.id DESC LIMIT 300", seit)
 }

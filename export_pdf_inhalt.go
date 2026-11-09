@@ -63,16 +63,17 @@ func (b *pdfBild) massstab() float64 {
 
 func (b *pdfBild) hoeheMM() float64 { return float64(b.hoehe) * b.massstab() }
 
-func (s *pdfSatz) zeichneFoto(b *pdfBild, oben float64) {
+// zeichneFoto setzt das Foto links oben bei x, oben im Maßstab massstab (Millimeter je Pixel).
+func (s *pdfSatz) zeichneFoto(b *pdfBild, x, oben, massstab float64) {
 	opt := gofpdf.ImageOptions{ImageType: "JPG"}
 	s.p.RegisterImageOptionsReader(b.name, opt, bytes.NewReader(b.daten))
-	m := b.massstab()
-	s.p.ImageOptions(b.name, pdfRand+pdfBreite-float64(b.breite)*m, oben, float64(b.breite)*m, b.hoeheMM(), false, opt, 0, "")
+	s.p.ImageOptions(b.name, x, oben, float64(b.breite)*massstab, float64(b.hoehe)*massstab, false, opt, 0, "")
 }
 
-// pdfFoto holt das Foto einer Meldung klein: 400 Pixel genügen für 3 cm Druck und halten das PDF
-// klein genug für eine Mail. Fehlt es oder lässt es sich nicht lesen, bleibt der Platz leer.
-func (a *app) pdfFoto(ctx context.Context, name string) *pdfBild {
+// pdfFoto holt das Foto einer Meldung verkleinert auf kante Pixel: 400 genügen für 3 cm in der Liste,
+// 1200 für die ganze Breite des Einzelblatts, und das PDF bleibt klein genug für eine Mail. Fehlt
+// das Foto oder lässt es sich nicht lesen, bleibt der Platz leer.
+func (a *app) pdfFoto(ctx context.Context, name string, kante int) *pdfBild {
 	if name == "" {
 		return nil
 	}
@@ -84,7 +85,7 @@ func (a *app) pdfFoto(ctx context.Context, name string) *pdfBild {
 	if err != nil {
 		return nil
 	}
-	klein := aufWeiss(bild, 400)
+	klein := aufWeiss(bild, kante)
 	var aus bytes.Buffer
 	if err := jpeg.Encode(&aus, klein, &jpeg.Options{Quality: 75}); err != nil {
 		return nil

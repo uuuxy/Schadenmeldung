@@ -53,7 +53,7 @@
 		<section>
 			<h2 class="mb-2 text-title-medium">Export</h2>
 			<p class="text-on-surface-variant">
-				Hausmeister, Leitung und Verwaltung können die Meldungen als PDF oder Excel-Tabelle herunterladen, etwa für den Schulträger. Die Dateien enthalten keine Namen der Meldenden. Die Löschfristen gelten nur in der App: Wer eine Datei herunterlädt, löscht sie, sobald sie nicht mehr gebraucht wird.
+				Hausmeister, Leitung und Verwaltung können die Meldungen als PDF oder Excel-Tabelle herunterladen, etwa für den Schulträger, und einzelne Meldungen als PDF drucken. Die Dateien enthalten keine Namen der Meldenden. Die Löschfristen gelten nur in der App: Wer eine Datei herunterlädt, löscht sie, sobald sie nicht mehr gebraucht wird.
 			</p>
 		</section>
 		<section>

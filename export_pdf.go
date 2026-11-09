@@ -43,30 +43,48 @@ type absatz struct {
 }
 
 func (a *app) schreibePDF(ctx context.Context, liste []meldung, aus pdfAuswahl) ([]byte, error) {
+	titel := "Offene Schadenmeldungen"
+	if aus.erledigt {
+		titel = "Erledigte Schadenmeldungen der letzten 30 Tage"
+	}
+	s := a.neuesPDF(titel)
+	s.p.AddPage()
+	s.kopf(titel, a.pdfUnterzeile(len(liste), aus))
+	for _, m := range liste {
+		s.eintrag(m, a.pdfFoto(ctx, m.Foto, 400), pdfAbsaetze(m, aus.erledigt, a.konf.Zeitzone))
+	}
+	if len(liste) == 0 {
+		s.setze(pdfBreite, absatz{"Keine Meldungen.", "", 11, 6, pdfLeise})
+	}
+	return s.fertig()
+}
+
+// neuesPDF: A4 hoch mit Rändern, Titel und Fußzeile, wie Liste und Einzelblatt sie teilen.
+func (a *app) neuesPDF(titel string) *pdfSatz {
 	p := gofpdf.New("P", "mm", "A4", "")
 	p.SetMargins(pdfRand, pdfRand, pdfRand)
 	p.SetAutoPageBreak(false, 0)
 	p.AliasNbPages("{seiten}")
 	s := &pdfSatz{p: p, tr: pdfUebersetzer(p.UnicodeTranslatorFromDescriptor(""))}
-	titel := "Offene Schadenmeldungen"
-	if aus.erledigt {
-		titel = "Erledigte Schadenmeldungen der letzten 30 Tage"
-	}
 	p.SetTitle(titel, true)
 	p.SetCreator("Schadenmeldung", true)
 	p.SetFooterFunc(func() { s.fuss(a.konf.Schulname) })
-	p.AddPage()
-	s.kopf(titel, a.pdfUnterzeile(len(liste), aus))
-	for _, m := range liste {
-		s.eintrag(m, a.pdfFoto(ctx, m.Foto), pdfAbsaetze(m, aus.erledigt, a.konf.Zeitzone))
-	}
-	if len(liste) == 0 {
-		s.schrift("", 11, pdfLeise)
-		p.MultiCell(pdfBreite, 6, s.tr("Keine Meldungen."), "", "L", false)
-	}
+	return s
+}
+
+func (s *pdfSatz) fertig() ([]byte, error) {
 	var puffer bytes.Buffer
-	err := p.Output(&puffer)
+	err := s.p.Output(&puffer)
 	return puffer.Bytes(), err
+}
+
+// setze schreibt Absätze in der gegebenen Breite untereinander, jeden in seiner Schrift.
+func (s *pdfSatz) setze(breite float64, absaetze ...absatz) {
+	for _, z := range absaetze {
+		s.schrift(z.stil, z.groesse, z.farbe)
+		s.p.SetX(pdfRand)
+		s.p.MultiCell(breite, z.hoehe, s.tr(z.text), "", "L", false)
+	}
 }
 
 // eintrag setzt eine Meldung. Passt sie nicht mehr auf die Seite, beginnt eine neue; ein Eintrag
@@ -99,13 +117,10 @@ func (s *pdfSatz) eintrag(m meldung, foto *pdfBild, absaetze []absatz) {
 		s.p.CellFormat(breite, 5.5, "DRINGEND", "", 0, "R", false, 0, "")
 	}
 	s.p.SetXY(pdfRand, oben)
-	for _, z := range absaetze {
-		s.schrift(z.stil, z.groesse, z.farbe)
-		s.p.SetX(pdfRand)
-		s.p.MultiCell(breite, z.hoehe, s.tr(z.text), "", "L", false)
-	}
+	s.setze(breite, absaetze...)
 	if foto != nil {
-		s.zeichneFoto(foto, oben)
+		m := foto.massstab()
+		s.zeichneFoto(foto, pdfRand+pdfBreite-float64(foto.breite)*m, oben, m)
 	}
 	s.p.SetY(oben + hoehe + 3)
 	s.linie()

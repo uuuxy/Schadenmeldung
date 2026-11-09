@@ -13,8 +13,9 @@
 	 * ebene ('uebersicht' | 'melden'): Wer die Übersicht sieht, wechselt hier zwischen ihr und dem
 	 * Meldeformular. M3 nimmt für zwei Ansichten einen Segmented Button, keinen Switch („Avoid using
 	 * switches to toggle between opposing options“); in der Kopfleiste bleibt er beim Scrollen da.
+	 * Während einer Auswahl steht vorn das Kreuz statt des Pfeils (zurueckSymbol), wie in Gmail.
 	 */
-	let { titel, zurueck = null, konto = true, aktionen, ebene = null } = $props();
+	let { titel, zurueck = null, zurueckSymbol = 'arrow_back', zurueckEtikett = 'Zurück', konto = true, aktionen, ebene = null } = $props();
 	const ebenen = [
 		{ wert: 'uebersicht', text: 'Übersicht' },
 		{ wert: 'melden', text: 'Melden' }
@@ -43,7 +44,7 @@
 <header class={['sticky top-0 z-20 pt-[env(safe-area-inset-top)] transition-colors duration-300', gescrollt ? 'bg-surface-container' : 'bg-surface']}>
 	<div class="mx-auto flex h-16 max-w-3xl items-center gap-1 px-1">
 		{#if zurueck}
-			<button class="icon-btn text-on-surface" aria-label="Zurück" data-zurueck onclick={zurueck}><Icon name="arrow_back" /></button>
+			<button class="icon-btn text-on-surface" aria-label={zurueckEtikett} data-zurueck onclick={zurueck}><Icon name={zurueckSymbol} /></button>
 		{:else}
 			<span class="w-3"></span>
 		{/if}
