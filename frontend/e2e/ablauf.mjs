@@ -11,7 +11,8 @@ async function kontext(name, schema = 'light') {
 	if (name) await k.request.post(`${B}/api/anmelden`, { headers: { 'X-Schaden': '1' }, data: { email: name, passwort: 'x' } });
 	const s = await k.newPage();
 	s.on('pageerror', (e) => fehler.push(String(e)));
-	s.on('console', (m) => m.type() === 'error' && !/401|410/.test(m.text()) && fehler.push(m.text()));
+	// Erwartete Absagen: 401 abgemeldet, 409 überholte Seite hinter dem Mail-Knopf, 410 alter Link.
+	s.on('console', (m) => m.type() === 'error' && !/401|409|410/.test(m.text()) && fehler.push(m.text()));
 	return [k, s];
 }
 const bild = async (s, d, ganz = false) => { await s.waitForTimeout(600); await s.screenshot({ path: `${ziel}/${d}.png`, fullPage: ganz }); };
@@ -154,6 +155,25 @@ await s.getByText('„Erledigt“ ist gesetzt').waitFor();
 await bild(s, '14-mail-erledigt');
 const nachher = await (await admin.request.get(B + '/api/meldungen')).json();
 pruefe(nachher.erledigt.some((m) => m.was === 'WC verstopft'), 'Knopf aus der Mail hat die Meldung erledigt – ohne Anmeldung');
+
+// 7. Später derselbe Link mit einem anderen Knopf, etwa beim zweiten Hausmeister: „Schon erledigt“
+// statt eines Knopfes, der die Meldung aus Versehen wieder öffnet; ändern erst nach „Stand ändern“.
+await s.goto(`${B}/aktion/${token}?tun=in_arbeit`);
+await s.getByText('Schon erledigt').waitFor();
+pruefe(!(await s.getByRole('button', { name: 'In Arbeit' }).isVisible()), 'Schon erledigt: kein Knopf „In Arbeit“ auf den ersten Blick');
+await bild(s, '15-mail-schon-erledigt');
+await s.getByRole('button', { name: 'Stand ändern' }).click();
+pruefe(await s.getByRole('button', { name: 'In Arbeit' }).isVisible(), 'Nach „Stand ändern“ stehen die Knöpfe da');
+await s.getByRole('button', { name: 'In Arbeit' }).click();
+await s.getByText('„In Arbeit“ ist gesetzt').waitFor();
+// Die Seite zeigt noch „In Arbeit“, da erledigt der andere in der App: Der nächste Tipp öffnet nicht wieder.
+await s.getByRole('button', { name: 'Doch anders' }).click();
+const wc = (await (await admin.request.get(B + '/api/meldungen')).json()).offen.find((m) => m.was === 'WC verstopft');
+await admin.request.post(`${B}/api/meldungen/${wc.id}/status`, { headers: { 'X-Schaden': '1' }, data: { status: 'erledigt' } });
+await s.getByRole('button', { name: 'Fachfirma' }).click();
+await s.getByText('Schon erledigt').waitFor();
+const zuletzt = await (await admin.request.get(B + '/api/meldungen')).json();
+pruefe(zuletzt.erledigt.some((m) => m.was === 'WC verstopft'), 'Überholte Seite öffnet die erledigte Meldung nicht wieder');
 await k.close();
 
 await browser.close();
