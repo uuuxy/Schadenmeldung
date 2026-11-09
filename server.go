@@ -86,6 +86,7 @@ func (a *app) routen() http.Handler {
 	mux.HandleFunc("POST /api/arten", a.mitBenutzer(a.nurBearbeiter(a.artSchalten)))
 	mux.HandleFunc("GET /api/export.xlsx", a.mitBenutzer(a.nurBackend(a.exportExcel)))
 	mux.HandleFunc("GET /api/export.pdf", a.mitBenutzer(a.nurBackend(a.exportPDF)))
+	mux.HandleFunc("GET /api/druck.pdf", a.mitBenutzer(a.nurBackend(a.druckPDF)))
 	mux.HandleFunc("GET /api/rollen", a.mitBenutzer(a.nurBearbeiter(a.rollenListe)))
 	mux.HandleFunc("POST /api/rollen", a.mitBenutzer(a.nurBearbeiter(a.rolleSetzen)))
 	mux.HandleFunc("DELETE /api/rollen/{email}", a.mitBenutzer(a.nurBearbeiter(a.rolleLoeschen)))

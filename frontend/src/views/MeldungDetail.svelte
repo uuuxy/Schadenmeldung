@@ -7,6 +7,7 @@
 	import { zurueck } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
+	import DruckKnopf from '../components/uebersicht/DruckKnopf.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import Feld from '../components/ui/Feld.svelte';
 	import StatusChip from '../components/ui/StatusChip.svelte';
@@ -62,7 +63,9 @@
 	}
 </script>
 
-<KopfLeiste titel={m?.ort ?? 'Meldung'} zurueck={() => zurueck('/')} />
+<KopfLeiste titel={m?.ort ?? 'Meldung'} zurueck={() => zurueck('/')}>
+	{#snippet aktionen()}{#if m}<DruckKnopf ids={[m.id]} />{/if}{/snippet}
+</KopfLeiste>
 
 {#if !m}
 	<main class="mx-auto flex max-w-xl flex-col items-center px-6 py-16 text-center">

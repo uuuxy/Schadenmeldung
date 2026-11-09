@@ -4,6 +4,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
 	import { auffrischen } from '../lib/nachreichen.js';
+	import { unteransicht } from '../lib/weg.svelte.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
 	import Ziehen from '../components/Ziehen.svelte';
@@ -12,6 +13,7 @@
 	import MenueChip from '../components/ui/MenueChip.svelte';
 	import MeldungZeile from '../components/uebersicht/MeldungZeile.svelte';
 	import Export from '../components/uebersicht/Export.svelte';
+	import AuswahlLeiste from '../components/uebersicht/AuswahlLeiste.svelte';
 	import MailStoerung from '../components/uebersicht/MailStoerung.svelte';
 	import { kategorien } from '../lib/kategorien.js';
 
@@ -71,6 +73,31 @@
 	$effect(() => {
 		if (art && !arten.some((a) => a.wert === art)) art = null;
 	});
+
+	// Auswahl zum Drucken (M3 selection, wie in Gmail), mit Eintrag im Verlauf wie eine Unteransicht; wer
+	// alles abwählt, beendet sie. Gezählt und gedruckt wird nur Sichtbares, in der Reihenfolge der Liste.
+	let auswahl = $state(null);
+	let auswahlEintrag = null;
+	const sichtbar = $derived(abschnitte.flatMap((a) => a.meldungen.map((m) => m.id)));
+	const gewaehlt = $derived(auswahl ? sichtbar.filter((id) => auswahl.includes(id)) : []);
+	const alleGewaehlt = $derived(sichtbar.length > 0 && gewaehlt.length === sichtbar.length);
+	function waehle(m) {
+		if (!auswahl) {
+			auswahl = m ? [m.id] : [];
+			auswahlEintrag = unteransicht(beendeAuswahl);
+		} else if (auswahl.includes(m.id)) {
+			auswahl = auswahl.filter((id) => id !== m.id);
+			if (!sichtbar.some((id) => auswahl.includes(id))) beendeAuswahl();
+		} else {
+			auswahl = [...auswahl, m.id];
+		}
+	}
+	function beendeAuswahl() {
+		auswahl = null;
+		auswahlEintrag?.ende();
+		auswahlEintrag = null;
+	}
+	onDestroy(beendeAuswahl);
 	// Gemerkt wird bei jeder Wahl und beim Verlassen, etwa beim Tipp auf eine Meldung: Die kurze Frist
 	// zählt ab dem letzten Blick auf die Liste.
 	function merke() {
@@ -99,9 +126,13 @@
 	});
 </script>
 
-<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} ebene="uebersicht">
-	{#snippet aktionen()}<Export liste={reiter} {bereich} {art} anzahl={liste.length} />{/snippet}
-</KopfLeiste>
+{#if auswahl}
+	<AuswahlLeiste {gewaehlt} alle={alleGewaehlt} onbeenden={() => auswahlEintrag.zurueck()} ongedruckt={beendeAuswahl} onalle={() => (auswahl = alleGewaehlt ? [] : [...sichtbar])} />
+{:else}
+	<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} ebene="uebersicht">
+		{#snippet aktionen()}<Export liste={reiter} {bereich} {art} anzahl={liste.length} onauswaehlen={() => waehle(null)} />{/snippet}
+	</KopfLeiste>
+{/if}
 
 <Ziehen aktualisieren={auffrischen}>
 	<main class="mx-auto max-w-3xl px-4 pb-12">
@@ -155,8 +186,9 @@
 					{#if a.titel}<h2 class="px-1 pt-2 text-title-small text-on-surface-variant">{a.titel}</h2>{/if}
 					<ul class="flex flex-col gap-0.5">
 						{#each a.meldungen as m (m.id)}
-							<li class="rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg" animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
-								<MeldungZeile meldung={m} />
+							<!-- Gewählt: ganze Zeile auf secondary-container, Ecken rundum 16 px (M3 Expressive, selected list item). -->
+							<li class={['transition-[border-radius,background-color] duration-200 ease-[var(--ease-standard)]', auswahl?.includes(m.id) ? 'rounded-lg bg-secondary-container' : 'rounded-xs bg-surface-container-low first:rounded-t-lg last:rounded-b-lg']} animate:flip={{ duration: 300 }} out:slide={{ duration: 200 }}>
+								<MeldungZeile meldung={m} {auswahl} onauswahl={waehle} />
 							</li>
 						{/each}
 					</ul>

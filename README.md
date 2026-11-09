@@ -25,7 +25,10 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   Ein Tipp auf die Zeile öffnet die Meldung: Foto groß, Zwischenstand mit einem Tipp („In Arbeit“,
   „Bestellt“, „Fachfirma“), ein interner Vermerk (sehen alle mit Übersicht, nicht das Kollegium),
   Löschen mit Rückfrage. Ziehen zum Aktualisieren.
-- **Export:** „Exportieren“ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
+- **Drucken:** Auf der Seite einer Meldung druckt das Drucker-Symbol sie als PDF, eine A4-Seite mit großem
+  Foto. Mehrere wählt man in der Liste wie in Gmail (lange drücken, dann antippen, oder „Drucken und
+  exportieren“ → „Meldungen auswählen“); das PDF hat dann eine Seite je Meldung. Ohne Namen der Meldenden.
+- **Export:** „Drucken und exportieren“ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
   erledigt, auf Wunsch nur ein Bereich; nach Bereichen gegliedert, mit kleinen Fotos, zum Drucken oder
   für den Schulträger), oder eine Excel-Tabelle mit allen gespeicherten Meldungen (echte Datumszellen,
   feste Kopfzeile, Filter). Beide ohne Namen der Meldenden.
@@ -221,6 +224,7 @@ Detailseite, Häkchen mit Rückgängig, Räume umbenennen und Arten an- und auss
 | `aufraeumen.go` | Löschfristen |
 | `einstellungen.go` | Einstellungen für die Oberfläche, Namen der Arten und Stati, Arten an und aus |
 | `export.go`, `export_pdf*.go` | Export als Excel-Tabelle und PDF (gofpdf wie in der Bibliothek) |
+| `druck.go` | Einzelne Meldungen als PDF zum Drucken, je eine Seite mit Foto |
 | `xlsx.go`, `xlsx_schreiben.go` | Excel lesen (Raumimport) und schreiben, ohne fremde Bibliothek |
 | `frontend/` | Svelte 5, Tailwind 4, Material 3 (Rollen in `src/styles/rollen.css`, Bausteine in `src/components/ui/`) |
 | `frontend/public/sw.js` | Service Worker (Start ohne Netz) |
