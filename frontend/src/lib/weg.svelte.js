@@ -4,6 +4,17 @@ import { flushSync } from 'svelte';
 export const weg = $state({ pfad: location.pathname });
 
 export const wenigBewegung = matchMedia('(prefers-reduced-motion: reduce)');
+
+// Der Raum-Code aus einem Pfad wie /r/abc: für den Link im QR-Aufkleber und für den Scanner in der App,
+// damit beide denselben Code lesen. Ein kaputtes %-Zeichen ergibt keinen Code statt eines Fehlers.
+export function raumCodeAus(pfad) {
+	if (!pfad.startsWith('/r/')) return '';
+	try {
+		return decodeURIComponent(pfad.slice(3));
+	} catch {
+		return '';
+	}
+}
 // Die Stelle in der Liste stellt die App beim Zurückgehen selbst wieder her (siehe popstate).
 history.scrollRestoration = 'manual';
 

@@ -5,7 +5,8 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
 
 ## Was es kann
 
-- **Wo? – mit oder ohne QR-Code:** Der QR-Aufkleber an der Tür füllt den Raum aus. Ohne Code genügt
+- **Wo? – mit oder ohne QR-Code:** Der QR-Aufkleber an der Tür füllt den Raum aus, gescannt mit der
+  Kamera-App oder mit dem Symbol rechts in „Raum suchen“, dann bleibt man in der App. Ohne Code genügt
   ein Tipp auf „Zuletzt“, zwei Tipps über Bereich → Raum, oder kurz „204“ ins Suchfeld. Für alles
   ohne Raum gibt es „Anderer Ort“.
 - **Was? – antippen statt tippen:** Art (Licht, Heizung, Wasser …) → typischer Fall („Lampe defekt“)
