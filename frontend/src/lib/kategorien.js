@@ -16,7 +16,7 @@ export const kategorien = [
 		name: 'Heizung & Lüftung',
 		icon: 'heat',
 		farbe: { symbol: 'text-kat-heizung', flaeche: 'bg-kat-heizung-container text-on-kat-heizung-container' },
-		faelle: ['Zu kalt', 'Zu warm', 'Heizkörper tropft', 'Lüftung defekt']
+		faelle: ['Zu kalt', 'Zu warm', 'Lüftung defekt']
 	},
 	{
 		key: 'wasser',
