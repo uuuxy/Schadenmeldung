@@ -1,4 +1,5 @@
 <script>
+	import { onDestroy } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { fade, slide } from 'svelte/transition';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
@@ -18,12 +19,16 @@
 	 * Die Übersicht für Hausmeister, Leitung, Verwaltung und Admins: eine schlanke Liste, Dringendes
 	 * unter eigener Überschrift oben, alles andere neueste zuerst. Ein Tipp öffnet die Meldung mit allem
 	 * Weiteren (M3 list-detail: am Handy immer nur eine der beiden Ansichten). Filtern lässt sie sich
-	 * nach Bereich und Art, je ein Chip mit Blatt statt Reihen von Chips (M3). Reiter und Filter merkt
-	 * sich die Sitzung, damit „Zurück“ dort landet.
+	 * nach Bereich und Art, je ein Chip mit Blatt statt Reihen von Chips (M3).
 	 */
+	// Reiter und Filter merkt sie sich nur kurz, damit „Zurück“ aus einer Meldung dort landet. Wer die
+	// App später wieder öffnet, beginnt bei „Offen“ ohne Filter, sonst hielte man die erledigten
+	// Meldungen von gestern für die offenen.
+	const merkzeit = 10 * 60 * 1000;
 	const merker = (() => {
 		try {
-			return JSON.parse(sessionStorage.getItem('schaden.uebersicht') ?? '{}');
+			const m = JSON.parse(sessionStorage.getItem('schaden.uebersicht') ?? '{}');
+			return Date.now() - (m.zeit ?? 0) < merkzeit ? m : {};
 		} catch {
 			return {};
 		}
@@ -66,12 +71,31 @@
 	$effect(() => {
 		if (art && !arten.some((a) => a.wert === art)) art = null;
 	});
-	$effect(() => {
+	// Gemerkt wird bei jeder Wahl und beim Verlassen, etwa beim Tipp auf eine Meldung: Die kurze Frist
+	// zählt ab dem letzten Blick auf die Liste.
+	function merke() {
 		try {
-			sessionStorage.setItem('schaden.uebersicht', JSON.stringify({ reiter, bereich, art }));
+			sessionStorage.setItem('schaden.uebersicht', JSON.stringify({ reiter, bereich, art, zeit: Date.now() }));
 		} catch {
 			/* Ohne Speicher beginnt die Übersicht eben bei „Offen“. */
 		}
+	}
+	$effect(merke);
+	onDestroy(merke);
+	// Bleibt die App im Hintergrund offen, gilt dasselbe: Nach der Pause steht sie wieder auf „Offen“.
+	$effect(() => {
+		let weg = 0;
+		const sicht = () => {
+			if (document.visibilityState === 'hidden') {
+				weg = Date.now();
+			} else if (weg && Date.now() - weg > merkzeit) {
+				reiter = 'offen';
+				bereich = null;
+				art = null;
+			}
+		};
+		document.addEventListener('visibilitychange', sicht);
+		return () => document.removeEventListener('visibilitychange', sicht);
 	});
 </script>
 
@@ -86,8 +110,8 @@
 			<Reiter
 				etikett="Meldungen"
 				reiter={[
-					{ id: 'offen', label: `Offen · ${zustand.offen.length}` },
-					{ id: 'erledigt', label: 'Erledigt' }
+					{ id: 'offen', label: `Offen · ${zustand.offen.length}`, icon: 'schedule' },
+					{ id: 'erledigt', label: 'Erledigt', icon: 'check_circle' }
 				]}
 				aktiv={reiter}
 				onwahl={(w) => (reiter = w)}
