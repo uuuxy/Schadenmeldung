@@ -45,6 +45,8 @@
 			.map((k) => ({ wert: k.key, text: k.name, kurz: k.name.split(' & ')[0], icon: k.icon, symbol: k.farbe.symbol, flaeche: k.farbe.flaeche }))
 	);
 	const liste = $derived(quelle.filter((m) => (!bereich || m.bereich === bereich) && (!art || m.kategorie === art)));
+	const zeigeBereich = $derived(bereiche.length > 1 || !!bereich);
+	const zeigeArt = $derived(arten.length > 1 || !!art);
 
 	// Dringendes steht unter eigener Überschrift oben, damit eine Gefahr nicht unter neueren Meldungen
 	// verschwindet, und die Überschrift erklärt, warum. Eine Wahl der Sortierung gibt es bewusst nicht:
@@ -73,7 +75,9 @@
 	});
 </script>
 
-<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} ebene="uebersicht" />
+<KopfLeiste titel={darfBearbeiten() ? 'Aufgaben' : 'Übersicht'} ebene="uebersicht">
+	{#snippet aktionen()}<Export liste={reiter} {bereich} {art} anzahl={liste.length} />{/snippet}
+</KopfLeiste>
 
 <Ziehen aktualisieren={auffrischen}>
 	<main class="mx-auto max-w-3xl px-4 pb-12">
@@ -91,14 +95,17 @@
 		</div>
 		<MailStoerung />
 
-		<!-- Ein Filter mit nur einer Möglichkeit fehlt (M3), außer er ist gerade gewählt. -->
-		<!-- py-2: Die 48-px-Trefferflächen der Chips ragen 8 px über den Chip; so bleiben sie unter den Reitern. -->
-		<div class="flex min-h-14 flex-wrap content-center items-center gap-x-2 gap-y-4 py-2">
-			{#if bereiche.length > 1 || bereich}<MenueChip titel="Bereich" alle="Alle Bereiche" optionen={bereiche.map((b) => ({ wert: b, text: b }))} bind:wert={bereich} />{/if}
-			{#if arten.length > 1 || art}<MenueChip titel="Art" alle="Alle Arten" optionen={arten} bind:wert={art} />{/if}
-			<span class="flex-1"></span>
-			<Export liste={reiter} {bereich} {art} anzahl={liste.length} />
-		</div>
+		<!-- Ein Filter mit nur einer Möglichkeit fehlt (M3), außer er ist gerade gewählt; ohne Filter
+		     fehlt die Zeile. py-2: Die 48-px-Trefferflächen der Chips ragen 8 px über den Chip; so
+		     bleiben sie unter den Reitern. -->
+		{#if zeigeBereich || zeigeArt}
+			<div class="flex min-h-14 flex-wrap content-center items-center gap-x-2 gap-y-4 py-2">
+				{#if zeigeBereich}<MenueChip titel="Bereich" alle="Alle Bereiche" optionen={bereiche.map((b) => ({ wert: b, text: b }))} bind:wert={bereich} />{/if}
+				{#if zeigeArt}<MenueChip titel="Art" alle="Alle Arten" optionen={arten} bind:wert={art} />{/if}
+			</div>
+		{:else}
+			<div class="h-3"></div>
+		{/if}
 
 		{#if liste.length === 0 && quelle.length > 0}
 			<div class="flex flex-col items-center px-6 py-16 text-center" in:fade={{ duration: 200 }}>

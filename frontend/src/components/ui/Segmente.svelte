@@ -32,7 +32,9 @@
 				gewaehlt ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface'
 			]}
 		>
-			<Icon name="check" groesse={18} class={gewaehlt ? '' : 'invisible'} />
+			<!-- Unter 360 px fällt das Häkchen weg, sonst passten die Beschriftungen neben Export und Konto nicht
+			     mehr in die Kopfleiste; die Wahl zeigt dann die Fläche allein. -->
+			<Icon name="check" groesse={18} class={gewaehlt ? 'max-[359px]:hidden' : 'invisible max-[359px]:hidden'} />
 			<span class="truncate">{o.text}</span>
 		</button>
 	{/each}
