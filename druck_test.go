@@ -47,6 +47,12 @@ func TestDruckJeMeldungEineSeiteMitFoto(t *testing.T) {
 	if !strings.Contains(kopf.Get("Content-Disposition"), fmt.Sprintf(`"Schadenmeldung-%v-2026-11-02.pdf"`, lampe["id"])) {
 		t.Errorf("Druck einer Meldung durch die Verwaltung: %v", kopf)
 	}
+	// Am Rechner öffnet die App das PDF im Browser (zeigen=1), sonst wird es geladen; die Liste ebenso.
+	for pfad, art := range map[string]string{fmt.Sprintf("/api/druck.pdf?ids=%v&zeigen=1", lampe["id"]): "inline;", "/api/export.pdf?zeigen=1": "inline;", fmt.Sprintf("/api/druck.pdf?ids=%v", lampe["id"]): "attachment;"} {
+		if _, kopf, _ := hm.holeDatei(pfad); !strings.HasPrefix(kopf.Get("Content-Disposition"), art) {
+			t.Errorf("%s: Content-Disposition %q, erwartet %s", pfad, kopf.Get("Content-Disposition"), art)
+		}
+	}
 	if status, _, _ := lehrer.holeDatei(fmt.Sprintf("/api/druck.pdf?ids=%v", lampe["id"])); status != http.StatusForbidden {
 		t.Errorf("Kollegium druckt: Status %d", status)
 	}

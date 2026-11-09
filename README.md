@@ -27,7 +27,8 @@ ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt
   Löschen mit Rückfrage. Ziehen zum Aktualisieren.
 - **Drucken:** Auf der Seite einer Meldung druckt das Drucker-Symbol sie als PDF, eine A4-Seite mit großem
   Foto. Mehrere wählt man in der Liste wie in Gmail (lange drücken, dann antippen, oder ⋮ → „Drucken“);
-  das PDF hat dann eine Seite je Meldung. Ohne Namen der Meldenden.
+  das PDF hat dann eine Seite je Meldung. Ohne Namen der Meldenden. Am Rechner öffnet das PDF gleich im
+  Browser, am Handy wird es geladen.
 - **Export:** ⋮ in der Übersicht lädt ein PDF der Liste, wie sie gerade steht (offen oder
   erledigt, auf Wunsch nur ein Bereich; nach Bereichen gegliedert, mit kleinen Fotos, zum Drucken oder
   für den Schulträger), oder eine Excel-Tabelle mit allen gespeicherten Meldungen (echte Datumszellen,

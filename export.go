@@ -25,7 +25,7 @@ func (a *app) exportExcel(w http.ResponseWriter, r *http.Request, _ benutzer) {
 		intern(w, err)
 		return
 	}
-	a.liefereDatei(w, roh, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Schadenmeldungen", "xlsx")
+	a.liefereDatei(w, roh, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Schadenmeldungen", "xlsx", false)
 }
 
 func meldungsTabelle(liste []meldung) tabelle {
@@ -71,7 +71,7 @@ func (a *app) exportPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
 	if auswahl.erledigt {
 		name = "Schadenmeldungen-erledigt"
 	}
-	a.liefereDatei(w, roh, "application/pdf", name, "pdf")
+	a.liefereDatei(w, roh, "application/pdf", name, "pdf", q.Get("zeigen") == "1")
 }
 
 type pdfAuswahl struct {
@@ -173,12 +173,17 @@ func vorneZahl(s string) (int, string) {
 	return n, s[i:]
 }
 
-// liefereDatei schickt eine Datei zum Herunterladen, mit Datum im Namen, damit zwei Stände
-// nebeneinander liegen können. Nichts davon bleibt in einem Cache.
-func (a *app) liefereDatei(w http.ResponseWriter, roh []byte, typ, name, endung string) {
+// liefereDatei schickt eine Datei mit Datum im Namen, damit zwei Stände nebeneinander liegen können.
+// zeigen öffnet sie im Browser (ein PDF am Rechner, gleich zum Drucken), sonst wird sie geladen.
+// Nichts davon bleibt in einem Cache.
+func (a *app) liefereDatei(w http.ResponseWriter, roh []byte, typ, name, endung string, zeigen bool) {
+	art := "attachment"
+	if zeigen {
+		art = "inline"
+	}
 	h := w.Header()
 	h.Set("Content-Type", typ)
-	h.Set("Content-Disposition", `attachment; filename="`+name+"-"+a.jetzt().In(a.konf.Zeitzone).Format("2006-01-02")+"."+endung+`"`)
+	h.Set("Content-Disposition", art+`; filename="`+name+"-"+a.jetzt().In(a.konf.Zeitzone).Format("2006-01-02")+"."+endung+`"`)
 	h.Set("Cache-Control", "no-store")
 	h.Set("Content-Length", strconv.Itoa(len(roh)))
 	_, _ = w.Write(roh)

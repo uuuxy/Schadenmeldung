@@ -176,7 +176,8 @@ const zuletzt = await (await admin.request.get(B + '/api/meldungen')).json();
 pruefe(zuletzt.erledigt.some((m) => m.was === 'WC verstopft'), 'Überholte Seite öffnet die erledigte Meldung nicht wieder');
 await k.close();
 
-// 8. „Wieder öffnen“ führt wie „Erledigt“ zurück in die Liste; bliebe die Seite stehen, lüde der große
+// 8. „Wieder öffnen“ führt wie „Erledigt“ zurück in die Liste, und zwar zu „Offen“, wo die Meldung jetzt
+// steht. Bliebe die Seite stehen, lüde der große
 // Knopf „Erledigt“ zum Wieder-Abhaken ein.
 const as = await admin.newPage();
 await as.goto(B + '/uebersicht'); await as.getByRole('tab', { name: 'Erledigt' }).click();
@@ -185,8 +186,9 @@ await as.getByRole('button', { name: 'Wieder öffnen' }).click();
 await as.getByText('Wieder offen: WC Mädchen 1. OG').waitFor();
 pruefe(!new URL(as.url()).pathname.startsWith('/meldung/'), '„Wieder öffnen“ führt zurück in die Liste, mit „Rückgängig“');
 const gewaehlt = (name) => as.getByRole('tab', { name }).getAttribute('aria-selected').then((w) => w === 'true');
-pruefe(await gewaehlt('Erledigt'), 'Zurück aus der Meldung: wieder bei „Erledigt“');
+pruefe(await gewaehlt(/^Offen/) && (await as.getByRole('button', { name: /WC verstopft/ }).first().isVisible()), '„Wieder öffnen“ springt auf „Offen“, dort steht die Meldung');
 // Nach einer längeren Pause (Frist zehn Minuten) beginnt die Übersicht wieder bei „Offen“.
+await as.getByRole('tab', { name: 'Erledigt' }).click();
 await as.evaluate(() => { const m = JSON.parse(sessionStorage.getItem('schaden.uebersicht')); sessionStorage.setItem('schaden.uebersicht', JSON.stringify({ ...m, zeit: m.zeit - 11 * 60 * 1000 })); });
 await as.reload(); await as.getByRole('tab', { name: /^Offen/ }).waitFor();
 pruefe(await gewaehlt(/^Offen/), 'Nach längerer Pause beginnt die Übersicht bei „Offen“');

@@ -5,6 +5,7 @@
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
 	import { auffrischen } from '../lib/nachreichen.js';
 	import { unteransicht } from '../lib/weg.svelte.js';
+	import { gemerkt, merke as merkeStand, MERKZEIT } from '../lib/merker.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
 	import Ziehen from '../components/Ziehen.svelte';
@@ -23,18 +24,8 @@
 	 * Weiteren (M3 list-detail: am Handy immer nur eine der beiden Ansichten). Filtern lässt sie sich
 	 * nach Bereich und Art, je ein Chip mit Blatt statt Reihen von Chips (M3).
 	 */
-	// Reiter und Filter merkt sie sich nur kurz, damit „Zurück“ aus einer Meldung dort landet. Wer die
-	// App später wieder öffnet, beginnt bei „Offen“ ohne Filter, sonst hielte man die erledigten
-	// Meldungen von gestern für die offenen.
-	const merkzeit = 10 * 60 * 1000;
-	const merker = (() => {
-		try {
-			const m = JSON.parse(sessionStorage.getItem('schaden.uebersicht') ?? '{}');
-			return Date.now() - (m.zeit ?? 0) < merkzeit ? m : {};
-		} catch {
-			return {};
-		}
-	})();
+	// Reiter und Filter merkt sie sich nur kurz (lib/merker.js).
+	const merker = gemerkt();
 	let reiter = $state(merker.reiter ?? 'offen');
 	let bereich = $state(merker.bereich ?? null);
 	let art = $state(merker.art ?? null);
@@ -101,11 +92,7 @@
 	// Gemerkt wird bei jeder Wahl und beim Verlassen, etwa beim Tipp auf eine Meldung: Die kurze Frist
 	// zählt ab dem letzten Blick auf die Liste.
 	function merke() {
-		try {
-			sessionStorage.setItem('schaden.uebersicht', JSON.stringify({ reiter, bereich, art, zeit: Date.now() }));
-		} catch {
-			/* Ohne Speicher beginnt die Übersicht eben bei „Offen“. */
-		}
+		merkeStand({ reiter, bereich, art });
 	}
 	$effect(merke);
 	onDestroy(merke);
@@ -115,7 +102,7 @@
 		const sicht = () => {
 			if (document.visibilityState === 'hidden') {
 				weg = Date.now();
-			} else if (weg && Date.now() - weg > merkzeit) {
+			} else if (weg && Date.now() - weg > MERKZEIT) {
 				reiter = 'offen';
 				bereich = null;
 				art = null;
