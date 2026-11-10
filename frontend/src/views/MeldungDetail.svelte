@@ -8,6 +8,8 @@
 	import { gemerkt, merke } from '../lib/merker.js';
 	import Icon from '../components/Icon.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
+	import LeerZustand from '../components/LeerZustand.svelte';
+	import UntereLeiste from '../components/UntereLeiste.svelte';
 	import DruckKnopf from '../components/uebersicht/DruckKnopf.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import Feld from '../components/ui/Feld.svelte';
@@ -71,11 +73,10 @@
 </KopfLeiste>
 
 {#if !m}
-	<main class="mx-auto flex max-w-xl flex-col items-center px-6 py-16 text-center">
-		<span class="mb-5 grid size-20 place-items-center rounded-2xl bg-surface-container-highest text-on-surface-variant"><Icon name="task_alt" groesse={40} /></span>
-		<p class="text-title-large text-on-surface">Diese Meldung gibt es hier nicht mehr</p>
-		<p class="mt-2 text-body-medium text-on-surface-variant">Sie wurde gelöscht oder ist seit mehr als 30 Tagen erledigt.</p>
-		<Button class="mt-8" onclick={() => zurueck('/')}>Zur Übersicht</Button>
+	<main class="mx-auto max-w-xl">
+		<LeerZustand icon="task_alt" titel="Diese Meldung gibt es hier nicht mehr" text="Sie wurde gelöscht oder ist seit mehr als 30 Tagen erledigt.">
+			<Button onclick={() => zurueck('/')}>Zur Übersicht</Button>
+		</LeerZustand>
 	</main>
 {:else}
 	<main class="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-2 pb-32">
@@ -137,13 +138,12 @@
 	</main>
 
 	{#if darfBearbeiten()}
-		<!-- Zentriert wie beim Melden: Ein Knopf ist inline-flex, mx-auto allein ließe ihn am Rechner links stehen. -->
-		<div class="fixed inset-x-0 bottom-0 z-20 flex justify-center bg-surface-container px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+		<UntereLeiste>
 			{#if erledigt}
-				<Button size="lg" variant="tonal" class="mx-auto w-full max-w-3xl" onclick={oeffnen}><Icon name="undo" />Wieder öffnen</Button>
+				<Button size="lg" variant="tonal" class="w-full" onclick={oeffnen}><Icon name="undo" />Wieder öffnen</Button>
 			{:else}
-				<Button size="lg" class="mx-auto w-full max-w-3xl" onclick={fertig}><Icon name="check" />Erledigt</Button>
+				<Button size="lg" class="w-full" onclick={fertig}><Icon name="check" />Erledigt</Button>
 			{/if}
-		</div>
+		</UntereLeiste>
 	{/if}
 {/if}

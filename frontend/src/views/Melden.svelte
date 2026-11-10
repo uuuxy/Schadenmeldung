@@ -12,6 +12,7 @@
 	import Icon from '../components/Icon.svelte';
 	import Ladekreis from '../components/Ladekreis.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
+	import UntereLeiste from '../components/UntereLeiste.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import Frage from '../components/melden/Frage.svelte';
 	import WoWahl from '../components/melden/WoWahl.svelte';
@@ -164,12 +165,10 @@
 		{/if}
 	</main>
 
-	<!-- Die Hauptaktion unten in Daumenreichweite, auf einer angedockten Leiste (M3 docked toolbar mit
-	     eingebetteter Hauptaktion). Solange etwas fehlt, sieht der Knopf gesperrt aus, bleibt aber
-	     antippbar und zeigt dann, welche Frage offen ist (aria-disabled statt disabled). Die Leiste
-	     zentriert ihn: Ein Knopf ist inline-flex, mx-auto allein ließe ihn am Rechner links stehen. -->
-	<div class="fixed inset-x-0 bottom-0 z-20 flex justify-center bg-surface-container px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
-		<Button size="lg" class="mx-auto w-full max-w-3xl" aria-disabled={offen !== ''} disabled={sendet} onclick={knopf}>
+	<!-- Solange etwas fehlt, sieht der Knopf gesperrt aus, bleibt aber antippbar und zeigt dann, welche
+	     Frage offen ist (aria-disabled statt disabled). -->
+	<UntereLeiste>
+		<Button size="lg" class="w-full" aria-disabled={offen !== ''} disabled={sendet} onclick={knopf}>
 			{#if sendet}
 				<Ladekreis />
 			{:else}
@@ -177,5 +176,5 @@
 				<span class="truncate">{ort ? `Melden · ${ort}` : 'Melden'}</span>
 			{/if}
 		</Button>
-	</div>
+	</UntereLeiste>
 {/if}
