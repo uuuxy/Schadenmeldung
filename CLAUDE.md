@@ -117,6 +117,10 @@ Werkzeug-Hinweis, wie in der Bibliothek.
 - `docker compose -f docker-compose.local.yml up -d`, dann
   `TEST_DATABASE_URL='postgres://schaden:schaden@localhost:5435/schaden?sslmode=disable' go test ./...`
 - `go vet ./...` und `cd frontend && npm run build` (0 Warnungen); Skripte mit `shellcheck *.sh`
+- Browserprüfungen (`frontend/e2e/`) nur gegen eine Wegwerf-Datenbank (`schaden_e2e`, siehe README);
+  die lokale `schaden` wird nie geleert.
 - Die schnellen Prüfungen laufen vor jedem Commit von selbst, wenn der Hook eingeschaltet ist:
   einmal je Klon `chmod +x .githooks/pre-commit && git config core.hooksPath .githooks`.
 - Code auf Deutsch benennen wie in der Bibliothek; Kommentare erklären in ein, zwei Sätzen das Warum.
+- Doku kurz: README (Betrieb, Einstellungen, Entwicklung) und diese Datei, keine weiteren Anleitungen.
+  Texte über den Hausmeister neutral, ohne „er“ oder „sein“.
