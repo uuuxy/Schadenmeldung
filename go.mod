@@ -1,4 +1,4 @@
-module schadenprogramm
+module schadensmeldung
 
 go 1.27.3
 

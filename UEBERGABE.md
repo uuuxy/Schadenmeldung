@@ -1,11 +1,11 @@
-# Übergabe: Schadenmeldung (Stand 2. November 2026, abends)
+# Übergabe: Schadensmeldung (Stand 2. November 2026, abends)
 
 Für die nächste Claude-Code-Sitzung. Zuerst `CLAUDE.md` (Arbeitsregeln) und `README.md` lesen; diese
 Datei sagt, wo wir stehen, was entschieden ist und was als Nächstes kommt.
 
 ## Worum es geht
 
-Schadenmeldung für eine Gesamtschule in Hessen. Lehrkräfte melden Schäden
+Schadensmeldung für eine Gesamtschule in Hessen. Lehrkräfte melden Schäden
 am Handy, der Hausmeister bearbeitet sie und bekommt Mails. Verlinkt wird die App aus LANiS
 (Schulportal Hessen); dort gibt es keine Anmeldung, die man weiterreichen könnte, deshalb meldet die
 App selbst über das Schul-Postfach an (IMAP), wie die Bibliothek und schul-orga des Nutzers.

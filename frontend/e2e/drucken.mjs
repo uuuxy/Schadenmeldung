@@ -54,7 +54,7 @@ writeFileSync(`${ordner}/druck.pdf`, pdf);
 pruefe(antwort.ok() && antwort.headers()['content-type'] === 'application/pdf' && seiten(pdf) === 2, `PDF mit 2 Seiten (${href})`);
 const [download] = await Promise.all([s.waitForEvent('download'), drucken.click()]);
 await ruhe();
-pruefe(download.suggestedFilename().startsWith('Schadenmeldungen-'), `Download heißt ${download.suggestedFilename()}`);
+pruefe(download.suggestedFilename().startsWith('Schadensmeldungen-'), `Download heißt ${download.suggestedFilename()}`);
 pruefe(await s.getByRole('group', { name: 'Ansicht' }).isVisible(), 'Nach dem Drucken ist die Auswahl beendet');
 pruefe(await s.evaluate(() => history.state?.unter === undefined), 'Der Eintrag der Auswahl ist abgeräumt');
 

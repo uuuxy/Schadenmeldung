@@ -7,7 +7,7 @@
 	import { installieren, alsApp, anleitung, hinweisWeg, hinweisAusblenden } from '../../lib/installieren.svelte.js';
 
 	/**
-	 * Gleich beim ersten Öffnen das Angebot, die Schadenmeldung als App auf den Startbildschirm zu legen
+	 * Gleich beim ersten Öffnen das Angebot, die Schadensmeldung als App auf den Startbildschirm zu legen
 	 * (Anmeldung und Meldeseite): Auf dem iPhone ist der Anfang der beste Moment, wer zuerst installiert,
 	 * meldet sich gleich in der App an. Bietet der Browser es selbst an (Chrome), genügt ein Knopf. Sonst
 	 * führen nummerierte Schritte durch sein Menü, damit es auch gelingt, wer so etwas nie gemacht hat:
@@ -20,7 +20,7 @@
 	let bereit = $state(false);
 	onMount(() => (bereit = true));
 	const vonHand = anleitung();
-	const karte = $derived(installieren.angebot ? { titel: 'Als App installieren', danach: 'Dann ist die Schadenmeldung mit einem Tipp da.' } : vonHand);
+	const karte = $derived(installieren.angebot ? { titel: 'Als App installieren', danach: 'Dann ist die Schadensmeldung mit einem Tipp da.' } : vonHand);
 
 	function ausblenden() {
 		hinweisAusblenden();

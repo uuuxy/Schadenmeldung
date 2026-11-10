@@ -14,7 +14,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 window.addEventListener('appinstalled', () => (installieren.angebot = null));
 
-/** Läuft die Schadenmeldung schon als installierte App? */
+/** Läuft die Schadensmeldung schon als installierte App? */
 export const alsApp = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
 const ua = navigator.userAgent;
@@ -44,7 +44,7 @@ export function anleitung() {
 	if (apfelGeraet()) {
 		const apfel = {
 			titel: 'Als App auf den Home-Bildschirm',
-			danach: 'Danach die Schadenmeldung über das neue Symbol öffnen und dort anmelden.'
+			danach: 'Danach die Schadensmeldung über das neue Symbol öffnen und dort anmelden.'
 		};
 		if (ipad()) {
 			return { ...apfel, schritte: [schritt('Oben auf {icon} tippen, bei manchen Ansichten erst auf die drei Punkte.', teilen), schritt('„Zu Home-Bildschirm hinzufügen“ tippen (ältere iPads: „Zum Home-Bildschirm“).'), hinzufuegen] };
@@ -69,7 +69,7 @@ export function anleitung() {
 	}
 	// In Apps eingebettete Browser (Kennung „wv“) können nichts installieren.
 	if (!/Android/.test(ua) || /; wv\)/.test(ua)) return null;
-	const android = { titel: 'Als App auf den Startbildschirm', danach: 'Danach ist die Schadenmeldung mit einem Tipp auf das neue Symbol da.' };
+	const android = { titel: 'Als App auf den Startbildschirm', danach: 'Danach ist die Schadensmeldung mit einem Tipp auf das neue Symbol da.' };
 	if (/Firefox\//.test(ua)) {
 		return { ...android, schritte: [schritt('Auf {icon} tippen, oben oder unten rechts.', punkte), schritt('„Mehr“ tippen.'), schritt('„App zum Startbildschirm hinzufügen“ tippen.'), schritt('Im nächsten Fenster „Hinzufügen“ tippen.')] };
 	}

@@ -32,7 +32,7 @@ func TestExportExcelAlleMeldungenOhneNamen(t *testing.T) {
 	hm.json("POST", fmt.Sprintf("/api/meldungen/%v/status", fertig["id"]), map[string]string{"status": "erledigt", "antwort": "Dichtung neu"})
 
 	status, kopf, roh := u.nutzer("admin").holeDatei("/api/export.xlsx")
-	if status != http.StatusOK || !strings.Contains(kopf.Get("Content-Disposition"), `filename="Schadenmeldungen-2026-11-02.xlsx"`) {
+	if status != http.StatusOK || !strings.Contains(kopf.Get("Content-Disposition"), `filename="Schadensmeldungen-2026-11-02.xlsx"`) {
 		t.Fatalf("Excel: Status %d, %v", status, kopf)
 	}
 	zeilen, err := leseXLSX(roh)
@@ -63,11 +63,11 @@ func TestExportPDFNachListeMitFoto(t *testing.T) {
 	hm.json("POST", fmt.Sprintf("/api/meldungen/%v/status", fertig["id"]), map[string]string{"status": "erledigt"})
 
 	status, kopf, roh := hm.holeDatei("/api/export.pdf")
-	if status != http.StatusOK || !bytes.HasPrefix(roh, []byte("%PDF-")) || !strings.Contains(kopf.Get("Content-Disposition"), "Schadenmeldungen-offen-2026-11-02.pdf") {
+	if status != http.StatusOK || !bytes.HasPrefix(roh, []byte("%PDF-")) || !strings.Contains(kopf.Get("Content-Disposition"), "Schadensmeldungen-offen-2026-11-02.pdf") {
 		t.Fatalf("PDF offen: Status %d, %v", status, kopf)
 	}
 	text := pdfInhalt(t, roh)
-	for _, soll := range []string{"(Offene Schadenmeldungen)", "(Lampe defekt)", "(Ayse sagt: flackert)", "(Weitere Orte)"} {
+	for _, soll := range []string{"(Offene Schadensmeldungen)", "(Lampe defekt)", "(Ayse sagt: flackert)", "(Weitere Orte)"} {
 		if !strings.Contains(text, soll) {
 			t.Errorf("PDF offen ohne %s", soll)
 		}
@@ -76,7 +76,7 @@ func TestExportPDFNachListeMitFoto(t *testing.T) {
 		t.Errorf("PDF offen: erledigte Meldung, Name oder fehlendes Foto")
 	}
 	_, kopf, roh = hm.holeDatei("/api/export.pdf?liste=erledigt&bereich=Neubau")
-	if !strings.Contains(kopf.Get("Content-Disposition"), "Schadenmeldungen-erledigt") || !strings.Contains(pdfInhalt(t, roh), "(Keine Meldungen.)") {
+	if !strings.Contains(kopf.Get("Content-Disposition"), "Schadensmeldungen-erledigt") || !strings.Contains(pdfInhalt(t, roh), "(Keine Meldungen.)") {
 		t.Errorf("PDF erledigt, Bereich ohne Meldungen: %v", kopf)
 	}
 	// Die Art filtert wie in der Übersicht; eine unbekannte filtert gar nicht.

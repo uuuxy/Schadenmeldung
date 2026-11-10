@@ -117,7 +117,7 @@ func neueTestUmgebung(t *testing.T) *testUmgebung {
 		OeffentlicheAdresse: "https://schaden.schule.de",
 		Zeitzone:            berlin,
 	}
-	statisch := fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>Schadenmeldung</title>")}}
+	statisch := fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>Schadensmeldung</title>")}}
 	a := neueApp(konf, testSpeicher(t), statisch)
 	u := &testUmgebung{t: t, app: a, uhr: time.Date(2026, 11, 2, 9, 0, 0, 0, berlin), post: &testPost{}}
 	a.jetzt = func() time.Time { return u.uhr }

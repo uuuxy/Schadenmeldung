@@ -1,4 +1,4 @@
-# Schadenmeldung
+# Schadensmeldung
 
 Das Kollegium meldet Schäden im Schulgebäude in wenigen Sekunden vom Handy, der Hausmeister hakt sie
 ab. Statt einer Tabelle gibt es große Kacheln und Knöpfe zum Antippen; getippt wird fast nichts.

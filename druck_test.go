@@ -23,14 +23,14 @@ func TestDruckJeMeldungEineSeiteMitFoto(t *testing.T) {
 
 	// Zwei gewählt, in der Reihenfolge der Liste: der Hahn zuerst.
 	status, kopf, roh := hm.holeDatei(fmt.Sprintf("/api/druck.pdf?ids=%v,%v", hahn["id"], lampe["id"]))
-	if status != http.StatusOK || !bytes.HasPrefix(roh, []byte("%PDF-")) || !strings.Contains(kopf.Get("Content-Disposition"), `"Schadenmeldungen-2026-11-02.pdf"`) {
+	if status != http.StatusOK || !bytes.HasPrefix(roh, []byte("%PDF-")) || !strings.Contains(kopf.Get("Content-Disposition"), `"Schadensmeldungen-2026-11-02.pdf"`) {
 		t.Fatalf("Druck zweier Meldungen: Status %d, %v", status, kopf)
 	}
 	if seiten := len(regexp.MustCompile(`/Type /Page\b`).FindAll(roh, -1)); seiten != 2 {
 		t.Errorf("Druck zweier Meldungen hat %d Seiten statt 2", seiten)
 	}
 	text := pdfInhalt(t, roh)
-	for _, soll := range []string{"(Hahn tropft)", "(DRINGEND)", "(Dichtung bestellt)", "(In Arbeit)", "(Lampe defekt)", "(flackert seit Montag)", fmt.Sprintf("(Schadenmeldung Nr. %v", lampe["id"])} {
+	for _, soll := range []string{"(Hahn tropft)", "(DRINGEND)", "(Dichtung bestellt)", "(In Arbeit)", "(Lampe defekt)", "(flackert seit Montag)", fmt.Sprintf("(Schadensmeldung Nr. %v", lampe["id"])} {
 		if !strings.Contains(text, soll) {
 			t.Errorf("Druck ohne %s", soll)
 		}
@@ -44,7 +44,7 @@ func TestDruckJeMeldungEineSeiteMitFoto(t *testing.T) {
 
 	// Eine einzelne heißt nach ihrer Nummer; die Verwaltung darf drucken, das Kollegium nicht.
 	_, kopf, _ = sek.holeDatei(fmt.Sprintf("/api/druck.pdf?ids=%v", lampe["id"]))
-	if !strings.Contains(kopf.Get("Content-Disposition"), fmt.Sprintf(`"Schadenmeldung-%v-2026-11-02.pdf"`, lampe["id"])) {
+	if !strings.Contains(kopf.Get("Content-Disposition"), fmt.Sprintf(`"Schadensmeldung-%v-2026-11-02.pdf"`, lampe["id"])) {
 		t.Errorf("Druck einer Meldung durch die Verwaltung: %v", kopf)
 	}
 	// Am Rechner öffnet die App das PDF im Browser (zeigen=1), sonst wird es geladen; die Liste ebenso.

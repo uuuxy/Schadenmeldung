@@ -25,7 +25,7 @@ func (a *app) exportExcel(w http.ResponseWriter, r *http.Request, _ benutzer) {
 		intern(w, err)
 		return
 	}
-	a.liefereDatei(w, roh, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Schadenmeldungen", "xlsx", false)
+	a.liefereDatei(w, roh, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Schadensmeldungen", "xlsx", false)
 }
 
 func meldungsTabelle(liste []meldung) tabelle {
@@ -67,9 +67,9 @@ func (a *app) exportPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
 		intern(w, err)
 		return
 	}
-	name := "Schadenmeldungen-offen"
+	name := "Schadensmeldungen-offen"
 	if auswahl.erledigt {
-		name = "Schadenmeldungen-erledigt"
+		name = "Schadensmeldungen-erledigt"
 	}
 	a.liefereDatei(w, roh, "application/pdf", name, "pdf", q.Get("zeigen") == "1")
 }

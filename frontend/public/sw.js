@@ -1,4 +1,4 @@
-// Service Worker der Schadenmeldung: Die App startet sofort und auch ohne Netz.
+// Service Worker der Schadensmeldung: Die App startet sofort und auch ohne Netz.
 // Seiten kommen zuerst vom Netz (ein Update wirkt sofort) und nur im Funkloch aus dem Speicher. Die
 // gehashten Dateien unter /assets/ ändern sich nie und kommen gleich aus dem Speicher. API und Fotos
 // laufen nie über den Speicher: Sie sind persönlich und müssen aktuell sein.
@@ -68,7 +68,7 @@ self.addEventListener('push', (e) => {
 	const zahl = Number(n.zahl) || 0;
 	e.waitUntil(
 		Promise.all([
-			self.registration.showNotification(n.titel || 'Schadenmeldung', {
+			self.registration.showNotification(n.titel || 'Schadensmeldung', {
 				body: n.text || 'Eine neue Meldung ist da.',
 				tag: n.tag,
 				icon: '/icon-192.png',

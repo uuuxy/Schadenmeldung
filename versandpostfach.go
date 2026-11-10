@@ -152,17 +152,17 @@ func (a *app) postfachLoeschen(w http.ResponseWriter, r *http.Request, b benutze
 // Passwort und Absender.
 func (a *app) pruefeVersandSMTP(ctx context.Context, z zugang, an string) error {
 	v := smtpVersender{k: a.konf, zugang: func(context.Context) (zugang, error) { return z, nil }}
-	return v.sende(ctx, an, "Schadenmeldung: Postfach eingerichtet", testmailText, testmailHTML)
+	return v.sende(ctx, an, "Schadensmeldung: Postfach eingerichtet", testmailText, testmailHTML)
 }
 
 const testmailText = `Postfach eingerichtet
 
-Über dieses Postfach verschickt die Schadenmeldung ab jetzt ihre Mails: neue Meldungen an den Hausmeister und die Nachricht an die Meldenden, sobald etwas erledigt ist.
+Über dieses Postfach verschickt die Schadensmeldung ab jetzt ihre Mails: neue Meldungen an den Hausmeister und die Nachricht an die Meldenden, sobald etwas erledigt ist.
 `
 
 const testmailHTML = `<!doctype html><html lang="de"><body style="margin:0;padding:0;background:#faf9fd;color:#1a1c1e;font-family:Roboto,'Segoe UI',Helvetica,Arial,sans-serif;">
 <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
-<p style="margin:0 0 4px;font-size:14px;line-height:20px;color:#42474e;">Schadenmeldung</p>
+<p style="margin:0 0 4px;font-size:14px;line-height:20px;color:#42474e;">Schadensmeldung</p>
 <h1 style="margin:0 0 12px;font-size:24px;line-height:32px;font-weight:400;">Postfach eingerichtet</h1>
-<p style="margin:0;font-size:16px;line-height:24px;">Über dieses Postfach verschickt die Schadenmeldung ab jetzt ihre Mails: neue Meldungen an den Hausmeister und die Nachricht an die Meldenden, sobald etwas erledigt ist.</p>
+<p style="margin:0;font-size:16px;line-height:24px;">Über dieses Postfach verschickt die Schadensmeldung ab jetzt ihre Mails: neue Meldungen an den Hausmeister und die Nachricht an die Meldenden, sobald etwas erledigt ist.</p>
 </div></body></html>`

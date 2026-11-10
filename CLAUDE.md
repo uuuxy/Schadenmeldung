@@ -1,7 +1,12 @@
 # Arbeitsregeln für dieses Projekt
 
-Die Schadenmeldung soll schlank bleiben: ein Go-Programm mit eingebetteter Svelte-Oberfläche und
+Die Schadensmeldung soll schlank bleiben: ein Go-Programm mit eingebetteter Svelte-Oberfläche und
 PostgreSQL, keine weiteren Dienste. Bevor etwas Neues dazukommt: Braucht es das wirklich?
+
+Sie heißt „Schadensmeldung“, mit Fugen-s, wie man es meist sagt und schreibt (Entscheidung vom
+10. November 2026). Technische Namen bleiben „schadenmeldung“: GitHub, Docker-Image, Server und der Ausgang im
+Browser (`ausgang.js`). Das sieht niemand, und eine Umbenennung zöge den Server mit oder ließe
+wartende Meldungen verwaisen.
 
 ## Oberfläche
 

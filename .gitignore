@@ -1,6 +1,6 @@
 .env
 schaden
-schadenprogramm
+schadensmeldung
 frontend/node_modules/
 frontend/dist/*
 !frontend/dist/.gitkeep

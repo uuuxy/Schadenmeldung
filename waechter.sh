@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# waechter.sh — schaut alle fünf Minuten nach der Schadenmeldung und sagt Bescheid, wenn etwas nicht
+# waechter.sh — schaut alle fünf Minuten nach der Schadensmeldung und sagt Bescheid, wenn etwas nicht
 # stimmt. Einmal auf dem Server einrichten (crontab -e als root, Pfad anpassen):
 #   */5 * * * * /pfad/zur/schadenmeldung/waechter.sh 2>&1 | logger -t schadenmeldung
 # Ob die Mails ankommen, ohne echten Ausfall: ./waechter.sh --probe
@@ -60,7 +60,7 @@ melde() {
 }
 
 if [ "${1:-}" = --probe ]; then
-    melde "Schadenmeldung: Probe vom Wächter" "Diese Mail kommt vom Wächter (waechter.sh). Kommt sie an, kommt im Ernstfall auch die Warnung an."
+    melde "Schadensmeldung: Probe vom Wächter" "Diese Mail kommt vom Wächter (waechter.sh). Kommt sie an, kommt im Ernstfall auch die Warnung an."
     exit 0
 fi
 
@@ -86,7 +86,7 @@ for dienst in db schaden; do
 done
 if [ "${#kaputt[@]}" -eq 0 ]; then
     if [ "$gemeldet" = 1 ]; then
-        melde "Schadenmeldung läuft wieder" "Die Schadenmeldung läuft wieder normal (seit $(date '+%d.%m.%Y, %H:%M'))."
+        melde "Schadensmeldung läuft wieder" "Die Schadensmeldung läuft wieder normal (seit $(date '+%d.%m.%Y, %H:%M'))."
     fi
     blicke=0
     gemeldet=0
@@ -99,7 +99,7 @@ else
         docker compose up -d "${kaputt[@]}" >/dev/null 2>&1 || true
         docker compose restart "${kaputt[@]}" >/dev/null 2>&1 || true
     elif [ "$blicke" -ge 3 ] && [ "$gemeldet" != 1 ]; then
-        melde "Schadenmeldung gestört" "Die Schadenmeldung ist seit rund $(((blicke - 1) * 5)) Minuten gestört; ein Neustart hat nicht geholfen.
+        melde "Schadensmeldung gestört" "Die Schadensmeldung ist seit rund $(((blicke - 1) * 5)) Minuten gestört; ein Neustart hat nicht geholfen.
 Betroffen:${wie}
 
 Nachsehen auf dem Server im Projektordner:
@@ -115,7 +115,7 @@ ordner="$(docker info -f '{{.DockerRootDir}}' 2>/dev/null || true)"
 belegt="$(df -P "$ordner" | awk 'NR == 2 { sub("%", "", $5); print $5 }')"
 if [ "${belegt:-0}" -ge "$PLATTE_GRENZE" ]; then
     if [ "$platte" != 1 ]; then
-        melde "Schadenmeldung: Platte fast voll" "Die Platte des Servers ist zu ${belegt} % belegt. Ist sie voll, kann die Datenbank nichts mehr speichern.
+        melde "Schadensmeldung: Platte fast voll" "Die Platte des Servers ist zu ${belegt} % belegt. Ist sie voll, kann die Datenbank nichts mehr speichern.
 Platz schaffen, etwa mit: docker image prune"
         platte=1
     fi
@@ -129,7 +129,7 @@ fi
 if compgen -G "backups/nacht_*.sql.gz" >/dev/null; then
     if [ -z "$(find backups -name 'nacht_*.sql.gz' -mmin -$((SICHERUNG_STUNDEN * 60)) | head -n 1)" ]; then
         if [ "$sicherung" != 1 ]; then
-            melde "Schadenmeldung: Sicherung fehlt" "Die neueste nächtliche Sicherung ist älter als ${SICHERUNG_STUNDEN} Stunden.
+            melde "Schadensmeldung: Sicherung fehlt" "Die neueste nächtliche Sicherung ist älter als ${SICHERUNG_STUNDEN} Stunden.
 Nachsehen auf dem Server: journalctl -t schadenmeldung"
             sicherung=1
         fi
