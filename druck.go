@@ -39,9 +39,9 @@ func (a *app) druckPDF(w http.ResponseWriter, r *http.Request, _ benutzer) {
 		intern(w, err)
 		return
 	}
-	name := "Schadenmeldungen"
+	name := "Schadensmeldungen"
 	if len(liste) == 1 {
-		name = fmt.Sprintf("Schadenmeldung-%d", liste[0].ID)
+		name = fmt.Sprintf("Schadensmeldung-%d", liste[0].ID)
 	}
 	a.liefereDatei(w, roh, "application/pdf", name, "pdf", r.URL.Query().Get("zeigen") == "1")
 }
@@ -64,9 +64,9 @@ func druckIDs(text string) ([]int64, bool) {
 }
 
 func (a *app) schreibeDruck(ctx context.Context, liste []meldung) ([]byte, error) {
-	titel := "Schadenmeldungen"
+	titel := "Schadensmeldungen"
 	if len(liste) == 1 {
-		titel = "Schadenmeldung: " + liste[0].Ort
+		titel = "Schadensmeldung: " + liste[0].Ort
 	}
 	s := a.neuesPDF(titel)
 	gedruckt := "gedruckt " + langesDatum(a.jetzt().In(a.konf.Zeitzone))
@@ -89,7 +89,7 @@ func druckAngaben(m meldung, zone *time.Location) [][2]string {
 // druckSeite: oben klein Nummer und Druckdatum („Stand“ heißt hier der Bearbeitungsstand), groß der Ort mit Bereich, dann was kaputt ist, die Angaben,
 // Beschreibung und Vermerk; das Foto bekommt, was von der Seite bleibt.
 func (s *pdfSatz) druckSeite(m meldung, gedruckt string, angaben [][2]string, foto *pdfBild) {
-	s.setze(pdfBreite, absatz{fmt.Sprintf("Schadenmeldung Nr. %d · %s", m.ID, gedruckt), "", 9, 5, pdfLeise})
+	s.setze(pdfBreite, absatz{fmt.Sprintf("Schadensmeldung Nr. %d · %s", m.ID, gedruckt), "", 9, 5, pdfLeise})
 	s.p.Ln(5)
 	s.setze(pdfBreite, absatz{m.Ort, "B", 22, 10, pdfText})
 	if m.Bereich != "" {

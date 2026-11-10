@@ -65,7 +65,7 @@
 	}
 </script>
 
-<KopfLeiste titel="Schadenmeldung" konto={false} />
+<KopfLeiste titel="Schadensmeldung" konto={false} />
 
 <main class="mx-auto flex max-w-xl flex-col gap-6 px-4 pt-2 pb-12">
 	{#if fehler}

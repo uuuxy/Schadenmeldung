@@ -5,7 +5,7 @@ schaden.example.de {
 	# Nur im Schulnetz erreichbar machen (wie die Bibliothek): die nächsten zwei Zeilen einkommentieren
 	# und SCHULNETZ im Caddy-Container setzen, z. B. SCHULNETZ=10.20.0.0/16 192.168.5.0/24.
 	# @draussen not remote_ip {$SCHULNETZ}
-	# respond @draussen "Die Schadenmeldung ist nur im Schulnetz erreichbar." 403
+	# respond @draussen "Die Schadensmeldung ist nur im Schulnetz erreichbar." 403
 
 	reverse_proxy schaden:8090 {
 		header_up X-Real-IP {remote_host}

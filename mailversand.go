@@ -120,7 +120,7 @@ func baueNachricht(von *mail.Address, an, betreff, text, html string) []byte {
 	domain := von.Address[strings.LastIndex(von.Address, "@")+1:]
 	var b bytes.Buffer
 	kopf := func(name, wert string) { fmt.Fprintf(&b, "%s: %s\r\n", name, wert) }
-	kopf("From", (&mail.Address{Name: "Schadenmeldung", Address: von.Address}).String())
+	kopf("From", (&mail.Address{Name: "Schadensmeldung", Address: von.Address}).String())
 	kopf("To", an)
 	kopf("Subject", mime.QEncoding.Encode("utf-8", betreff))
 	kopf("Date", time.Now().Format(time.RFC1123Z))

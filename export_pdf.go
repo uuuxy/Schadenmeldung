@@ -43,9 +43,9 @@ type absatz struct {
 }
 
 func (a *app) schreibePDF(ctx context.Context, liste []meldung, aus pdfAuswahl) ([]byte, error) {
-	titel := "Offene Schadenmeldungen"
+	titel := "Offene Schadensmeldungen"
 	if aus.erledigt {
-		titel = "Erledigte Schadenmeldungen der letzten 30 Tage"
+		titel = "Erledigte Schadensmeldungen der letzten 30 Tage"
 	}
 	s := a.neuesPDF(titel)
 	s.p.AddPage()
@@ -67,7 +67,7 @@ func (a *app) neuesPDF(titel string) *pdfSatz {
 	p.AliasNbPages("{seiten}")
 	s := &pdfSatz{p: p, tr: pdfUebersetzer(p.UnicodeTranslatorFromDescriptor(""))}
 	p.SetTitle(titel, true)
-	p.SetCreator("Schadenmeldung", true)
+	p.SetCreator("Schadensmeldung", true)
 	p.SetFooterFunc(func() { s.fuss(a.konf.Schulname) })
 	return s
 }
@@ -161,7 +161,7 @@ func (s *pdfSatz) bereichsKopf(bereich string, fortsetzung bool) {
 func (s *pdfSatz) fuss(schulname string) {
 	s.p.SetXY(pdfRand, 297-pdfRand+3)
 	s.schrift("", 8, pdfLeise)
-	links := "Schadenmeldung"
+	links := "Schadensmeldung"
 	if schulname != "" {
 		links += " · " + schulname
 	}

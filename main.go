@@ -1,4 +1,4 @@
-// Schadenmeldung: Das Kollegium meldet Schäden im Schulgebäude, der Hausmeister hakt sie am Handy ab.
+// Schadensmeldung: Das Kollegium meldet Schäden im Schulgebäude, der Hausmeister hakt sie am Handy ab.
 package main
 
 import (
@@ -72,7 +72,7 @@ func starte() error {
 		_ = srv.Shutdown(ende)
 	}()
 
-	slog.Info("Schadenmeldung läuft", "port", konf.Port, "lokal", konf.Lokal)
+	slog.Info("Schadensmeldung läuft", "port", konf.Port, "lokal", konf.Lokal)
 	if konf.IMAPHost == "mock" {
 		slog.Warn("IMAP_HOST=mock: Jedes Passwort wird angenommen. Nur für die Entwicklung!")
 	}

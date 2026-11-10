@@ -40,7 +40,7 @@
 		}
 		const code = raumCodeAus(pfad);
 		const r = code && zustand.raeume.find((x) => x.code === code);
-		if (!r) return code ? 'Dieser Code gehört zu keinem Raum mehr' : 'Kein QR-Code der Schadenmeldung';
+		if (!r) return code ? 'Dieser Code gehört zu keinem Raum mehr' : 'Kein QR-Code der Schadensmeldung';
 		scannen = false;
 		waehleRaum(r);
 	}

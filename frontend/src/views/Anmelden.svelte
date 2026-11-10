@@ -45,7 +45,7 @@
 		<span class="mb-6 grid size-20 place-items-center rounded-2xl bg-primary-container text-on-primary-container">
 			<Icon name="build" groesse={40} gefuellt />
 		</span>
-		<h1 class="text-headline-medium text-on-surface">Schadenmeldung</h1>
+		<h1 class="text-headline-medium text-on-surface">Schadensmeldung</h1>
 		{#if zustand.einstellungen.schulname}<p class="mt-1 text-body-large text-on-surface-variant">{zustand.einstellungen.schulname}</p>{/if}
 	</div>
 	<AlsApp class="mb-6" />

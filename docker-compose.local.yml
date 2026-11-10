@@ -1,6 +1,8 @@
 # Nur für die Entwicklung: eine Datenbank für App und Tests auf Port 5435 (die Bibliothek nutzt 5434)
 # und Mailpit als Test-Mailserver: Mails an SMTP_HOST=localhost, SMTP_PORT=1025 landen unter
 # http://localhost:8025 statt bei echten Menschen.
+# Fester Projektname: So hängen Container und Daten nicht am Namen des Ordners.
+name: schadensmeldung
 services:
   db:
     image: postgres:18-alpine

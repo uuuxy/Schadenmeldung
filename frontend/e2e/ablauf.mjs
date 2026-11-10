@@ -25,7 +25,7 @@ const liste = await (await admin.request.get(B + '/api/raeume')).json();
 const r204 = liste.find((r) => r.name === '204');
 await s.goto(`${B}/r/${r204.code}`);
 await bild(s, '01-qr-anmelden');
-pruefe(await s.getByRole('heading', { name: 'Schadenmeldung' }).isVisible(), 'QR ohne Anmeldung zeigt die Anmeldung');
+pruefe(await s.getByRole('heading', { name: 'Schadensmeldung' }).isVisible(), 'QR ohne Anmeldung zeigt die Anmeldung');
 await s.getByLabel('Name oder E-Mail').fill('k.neumann');
 await s.getByLabel('Passwort des Schul-Postfachs').fill('geheim');
 await s.getByRole('button', { name: 'Anmelden' }).click();
