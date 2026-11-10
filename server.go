@@ -47,12 +47,14 @@ func neueApp(konf konfiguration, sp *speicher, statisch fs.FS) *app {
 		// Drei Versuche je Viertelstunde: Der Mailserver der Schule sperrt nach ein paar falschen
 		// Passwörtern die ganze App, auch die Anmeldung aller.
 		postfachBremse: neueBremse(3, 15*time.Minute),
-		ipBremse:       neueBremse(20, 15*time.Minute),
-		meldeBremse:    neueBremse(20, time.Hour),
-		imapPlaetze:    make(chan struct{}, 4),
-		jetzt:          time.Now,
-		verteiler:      neuerVerteiler(),
-		postWecker:     make(chan struct{}, 1),
+		// Im Schul-WLAN teilen sich alle eine Adresse: Melden sich am ersten Tag viele zugleich an,
+		// sperrten 20 Tippfehler alle aus. Den einzelnen Zugang schützt weiter die kontoBremse.
+		ipBremse:    neueBremse(60, 15*time.Minute),
+		meldeBremse: neueBremse(20, time.Hour),
+		imapPlaetze: make(chan struct{}, 4),
+		jetzt:       time.Now,
+		verteiler:   neuerVerteiler(),
+		postWecker:  make(chan struct{}, 1),
 		// Keine Weiterleitungen: Der Server spricht nur mit der geprüften Adresse des Push-Dienstes.
 		pushClient: &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
