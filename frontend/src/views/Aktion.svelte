@@ -10,6 +10,7 @@
 	import Icon from '../components/Icon.svelte';
 	import Ladekreis from '../components/Ladekreis.svelte';
 	import KopfLeiste from '../components/KopfLeiste.svelte';
+	import LeerZustand from '../components/LeerZustand.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import StatusChip from '../components/ui/StatusChip.svelte';
 
@@ -69,12 +70,9 @@
 
 <main class="mx-auto flex max-w-xl flex-col gap-6 px-4 pt-2 pb-12">
 	{#if fehler}
-		<div class="flex flex-col items-center px-4 py-16 text-center" in:fade>
-			<span class="mb-5 grid size-20 place-items-center rounded-2xl bg-surface-container-highest text-on-surface-variant"><Icon name="schedule" groesse={40} /></span>
-			<p class="text-title-large text-on-surface">Das hat nicht geklappt</p>
-			<p class="mt-2 text-body-medium text-on-surface-variant">{fehler}</p>
-			<Button class="mt-8" onclick={() => gehe('/', { ersetzen: true })}>App öffnen</Button>
-		</div>
+		<LeerZustand icon="schedule" titel="Das hat nicht geklappt" text={fehler}>
+			<Button onclick={() => gehe('/', { ersetzen: true })}>App öffnen</Button>
+		</LeerZustand>
 	{:else if !meldung}
 		<div class="grid place-items-center py-24 text-primary"><Ladekreis groesse={40} /></div>
 	{:else}
