@@ -3,6 +3,8 @@
 // deshalb kurz nach und lädt sich selbst neu, am liebsten unbemerkt im Hintergrund, aber nie mitten
 // in einer Eingabe.
 
+import { zeige } from './snackbar.svelte.js';
+
 const halter = new Set();
 const getippt = new Set();
 let neu = false;
@@ -45,6 +47,27 @@ async function pruefe() {
 		// Funkloch: Es bleibt bei der laufenden Fassung.
 	}
 }
+
+// Nach einem Update sagt die App es einmal deutlich, am Handy wie am Rechner, und die Snackbar bleibt,
+// bis jemand sie schließt: Am Rechner kommt die neue Fassung oft, während niemand hinsieht. Gemerkt
+// wird die zuletzt gesehene Fassung im Gerät; ohne Speicher (privates Fenster) bleibt der Hinweis aus.
+const SCHLUESSEL = 'schaden.fassung';
+function sageUpdate() {
+	const jetzt = startskript(document);
+	let vorher;
+	try {
+		vorher = localStorage.getItem(SCHLUESSEL);
+		if (jetzt) localStorage.setItem(SCHLUESSEL, jetzt);
+	} catch {
+		return;
+	}
+	if (!vorher || !jetzt || vorher === jetzt) return;
+	const sage = () => zeige('App aktualisiert', null, true);
+	// Beim Wechsel in den Hintergrund geladen: erst sagen, wenn man wieder hinsieht.
+	if (document.visibilityState === 'visible') sage();
+	else document.addEventListener('visibilitychange', sage, { once: true });
+}
+sageUpdate();
 
 // Wer während der Nachfrage schon wieder tippt, wird nicht unterbrochen: Dann kommt die neue Fassung
 // beim nächsten Wechsel.
