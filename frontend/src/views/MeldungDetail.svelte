@@ -13,8 +13,8 @@
 	import DruckKnopf from '../components/uebersicht/DruckKnopf.svelte';
 	import Button from '../components/ui/Button.svelte';
 	import Feld from '../components/ui/Feld.svelte';
+	import AssistChip from '../components/ui/AssistChip.svelte';
 	import StatusChip from '../components/ui/StatusChip.svelte';
-	import Switch from '../components/ui/Switch.svelte';
 	import Stand from '../components/meldung/Stand.svelte';
 
 	/**
@@ -30,8 +30,6 @@
 	const erledigt = $derived(m?.status === 'erledigt');
 	let vermerk = $state(null);
 	const vermerkGeaendert = $derived(m && vermerk !== null && vermerk.trim() !== m.antwort);
-	// Eine Zeile der Angaben (M3 Expressive, segmentierte Liste), 44 px hoch, ob mit Text oder Schalter.
-	const zeile = 'flex min-h-11 items-center justify-between gap-4 rounded-xs bg-surface-container-low px-4 py-1.5 first:rounded-t-lg last:rounded-b-lg';
 
 	$effect(() => {
 		if (m && vermerk === null) vermerk = m.antwort;
@@ -91,7 +89,12 @@
 				{#if m.notiz}<p class="mt-2 text-body-large text-on-surface-variant">{m.notiz}</p>{/if}
 				<div class="mt-3 flex flex-wrap items-center gap-2">
 					<StatusChip status={m.status} />
-					{#if m.dringend && !erledigt}<StatusChip dringend />{/if}
+					{#if darfBearbeiten() && !erledigt}
+						<!-- Derselbe Chip wie beim Melden, bei jeder Meldung: rot, wenn dringend; ein Tipp setzt oder nimmt es. -->
+						<AssistChip icon="warning" text="Dringend" gefahr gewaehlt={m.dringend} onclick={() => dringendSetzen(m, !m.dringend)} />
+					{:else if m.dringend && !erledigt}
+						<StatusChip dringend />
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -104,18 +107,11 @@
 
 		<dl class="flex flex-col gap-0.5 text-body-medium">
 			{#each [['Gemeldet', `${wann(m.gemeldetAm)}${m.gemeldetVon ? ` · ${kurzname(m.gemeldetVon)}` : ''}`], ...(erledigt && m.erledigtAm ? [['Erledigt', wann(m.erledigtAm)]] : [])] as [name, wert] (name)}
-				<div class={zeile}>
+				<div class="flex justify-between gap-4 rounded-xs bg-surface-container-low px-4 py-3 first:rounded-t-lg last:rounded-b-lg">
 					<dt class="text-on-surface-variant">{name}</dt>
 					<dd class="text-right text-on-surface">{wert}</dd>
 				</div>
 			{/each}
-			{#if darfBearbeiten() && !erledigt}
-				<!-- Dringend an und aus, bei jeder Meldung, gleich wer sie gemeldet hat (M3: Schalter für Ein/Aus). -->
-				<div class={zeile}>
-					<dt class="min-w-0 flex-1"><label for="dringend" class="block text-on-surface-variant">Dringend</label></dt>
-					<dd><Switch id="dringend" checked={m.dringend} onchange={(an) => dringendSetzen(m, an)} /></dd>
-				</div>
-			{/if}
 		</dl>
 
 		{#if darfBearbeiten() && !erledigt}
