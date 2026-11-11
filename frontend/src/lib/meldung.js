@@ -68,6 +68,23 @@ export function wiederOeffnen(meldung) {
 	return sofort(meldung, { status: 'offen' }, 'Wieder offen');
 }
 
+/**
+ * Dringend an oder aus, bei jeder Meldung: gilt sofort, die Übersicht sortiert gleich um. Wie ein Stand
+ * wartet es im Funkloch im Ausgang; lehnt der Server ab, kommt der alte Wert zurück. Der Schalter zeigt
+ * selbst, was gilt, eine Snackbar braucht es nur fürs Nachreichen oder bei einem Fehler.
+ */
+export async function dringendSetzen(meldung, dringend) {
+	const vorher = { ...meldung };
+	uebernimm(mitAenderung(vorher, { dringend }));
+	rueckmeldung();
+	try {
+		if (await speichere(vorher.id, { dringend })) zeige(`${dringend ? 'Dringend' : 'Nicht mehr dringend'} · wird nachgereicht`);
+	} catch (e) {
+		uebernimm(vorher);
+		zeige(e.message);
+	}
+}
+
 export async function vermerkSpeichern(meldung, text) {
 	const antwort = text.trim();
 	try {

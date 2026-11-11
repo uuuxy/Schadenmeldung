@@ -15,7 +15,7 @@
 	 * switches to toggle between opposing options“); in der Kopfleiste bleibt er beim Scrollen da.
 	 * Während einer Auswahl steht vorn das Kreuz statt des Pfeils (zurueckSymbol), wie in Gmail.
 	 */
-	let { titel, zurueck = null, zurueckSymbol = 'arrow_back', zurueckEtikett = 'Zurück', konto = true, aktionen, ebene = null } = $props();
+	let { titel, untertitel = '', zurueck = null, zurueckSymbol = 'arrow_back', zurueckEtikett = 'Zurück', konto = true, aktionen, ebene = null } = $props();
 	const ebenen = [
 		{ wert: 'uebersicht', text: 'Übersicht' },
 		{ wert: 'melden', text: 'Melden' }
@@ -54,7 +54,11 @@
 				<Segmente etikett="Ansicht" klasse="w-full max-w-xs" optionen={ebenen} wert={ebene} onwahl={(w) => w !== ebene && gehe(w === 'melden' ? '/melden' : '/')} />
 			</div>
 		{:else}
-			<h1 class="min-w-0 flex-1 truncate px-1 text-title-large text-on-surface">{titel}</h1>
+			<!-- Ein Untertitel steht unter dem Titel in der Höhe der Leiste (M3 Expressive, small app bar). -->
+			<div class="min-w-0 flex-1 px-1">
+				<h1 class="truncate text-title-large text-on-surface">{titel}</h1>
+				{#if untertitel}<p class="truncate text-label-medium text-on-surface-variant">{untertitel}</p>{/if}
+			</div>
 		{/if}
 		{@render aktionen?.()}
 		{#if konto}<KontoKnopf />{/if}

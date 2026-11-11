@@ -73,9 +73,7 @@
 			<span class={['block truncate text-title-medium', gewaehlt ? 'text-on-secondary-container' : 'text-on-surface']}>{m.ort}</span>
 			<span class={['block truncate text-body-large', gewaehlt ? 'text-on-secondary-container' : 'text-on-surface']}>{m.was}</span>
 			<span class="mt-1 flex items-center gap-2 text-body-small text-on-surface-variant">
-				{#if m.dringend && !erledigt}
-					<span class="inline-flex h-6 shrink-0 items-center gap-1 rounded-sm bg-error-container px-2 text-label-medium text-on-error-container"><Icon name="warning" groesse={16} gefuellt />Dringend</span>
-				{/if}
+				{#if m.dringend && !erledigt}<StatusChip dringend />{/if}
 				{#if !erledigt && m.status !== 'offen'}<StatusChip status={m.status} knapp />{/if}
 				<span class="truncate">{zeit}</span>
 				{#if m.foto}<Icon name="photo_camera" groesse={16} class="shrink-0" />{/if}

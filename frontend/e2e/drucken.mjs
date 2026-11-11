@@ -70,7 +70,7 @@ await ruhe();
 await s.screenshot({ path: `${ordner}/menue.png` });
 await s.getByRole('dialog').getByRole('button', { name: 'Drucken' }).click();
 await ruhe();
-pruefe((await titel()) === 'Meldungen auswählen' && (await s.getByRole('button', { name: 'Drucken' }).isDisabled()), 'Aus dem Menü: „Meldungen auswählen“, Drucken gesperrt');
+pruefe((await titel()) === 'Meldungen auswählen' && (await s.locator('header').getByText('Zum Auswählen antippen').isVisible()) && (await s.getByRole('button', { name: 'Drucken' }).isDisabled()), 'Aus dem Menü: „Meldungen auswählen“, darunter „Zum Auswählen antippen“, Drucken gesperrt');
 const anzahl = await zeilen().count();
 await s.getByRole('button', { name: 'Alle auswählen' }).click();
 pruefe((await titel()) === `${anzahl} ausgewählt`, `Alle auswählen: ${anzahl} ausgewählt`);
