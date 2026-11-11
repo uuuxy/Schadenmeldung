@@ -33,8 +33,9 @@ wartende Meldungen verwaisen.
   `/api/ereignisse`; jeder neue Schreibweg für Meldungen ruft `a.verteiler.melde()`.
 - **Liste und Detail (M3 list-detail):** Eine Zeile der Übersicht trägt bewusst nur eine Zusatzaktion
   (das Häkchen „Erledigt“), damit die Liste ruhig bleibt; alles Weitere steht auf der Seite der Meldung
-  (`/meldung/<id>`), auch der Schalter „Dringend“: Hausmeister, Leitung und Admin setzen und nehmen es
-  bei jeder Meldung, ohne neue Mail (Wunsch vom 11. November 2026). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
+  (`/meldung/<id>`), auch „Dringend“: derselbe Chip wie beim Melden, oben neben dem Stand; Hausmeister,
+  Leitung und Admin setzen und nehmen es bei jeder Meldung, ohne neue Mail (Wunsch vom 11. November
+  2026). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
   nebeneinander sind aber zu viel. Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`),
   nie über `confirm()`. Mehrere Meldungen wählt man nach M3 (selection, wie Gmail): lange drücken oder
   ⋮ → „Drucken“, dann ist die ganze Zeile die Auswahl, ohne „Erledigt“; die Kopfleiste zeigt Kreuz, Zahl
