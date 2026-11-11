@@ -1,6 +1,6 @@
 module schadensmeldung
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/emersion/go-imap v1.2.1
