@@ -22,7 +22,9 @@
 				>
 					{snackbar.aktion.name}
 				</button>
-				<!-- Mit Aktion bleibt die Snackbar stehen; das Kreuz schließt sie (M3: close affordance). -->
+			{/if}
+			{#if snackbar.bleibt}
+				<!-- Eine stehende Snackbar (mit Aktion oder als Hinweis) schließt das Kreuz (M3: close affordance). -->
 				<button class="icon-btn text-inverse-on-surface" aria-label="Schließen" onclick={schliesse}><Icon name="close" groesse={20} /></button>
 			{/if}
 		</div>

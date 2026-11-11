@@ -56,6 +56,34 @@ await frisch();
 pruefe(await wechsel('visible'), 'Zurück aus dem Hintergrund lädt sich die App neu');
 await s.getByRole('heading', { name: 'Schaden melden' }).waitFor();
 
+// Nach einem Update sagt die App es einmal, und die Snackbar bleibt, bis man sie schließt. Die alte
+// Fassung im Speicher steht für ein Update; die Nachfrage soll hier nicht dazwischen neu laden.
+neueFassung = false;
+const alteFassung = () => s.evaluate(() => localStorage.setItem('schaden.fassung', '/assets/index-alt.js'));
+const hinweis = (seite) => seite.getByRole('status').filter({ hasText: 'App aktualisiert' });
+const zuSehen = (seite) => hinweis(seite).waitFor({ timeout: 2000 }).then(() => true, () => false);
+await alteFassung();
+await frisch();
+pruefe(await zuSehen(s), 'Nach einem Update: Snackbar „App aktualisiert“');
+await s.waitForTimeout(5500);
+pruefe(await hinweis(s).isVisible(), 'Sie bleibt stehen, bis man sie schließt');
+await hinweis(s).getByRole('button', { name: 'Schließen' }).click();
+await frisch();
+pruefe(!(await zuSehen(s)), 'Einmal gesagt: beim nächsten Laden kein Hinweis mehr');
+
+// Am Handy kommt die neue Fassung beim Wechsel in den Hintergrund: Der Hinweis wartet aufs Hinsehen.
+await alteFassung();
+const h = await k.newPage();
+await h.addInitScript(() => Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }));
+await h.goto(B + '/');
+await h.getByRole('heading', { name: 'Schaden melden' }).waitFor();
+pruefe(!(await zuSehen(h)), 'Im Hintergrund geladen: noch kein Hinweis');
+await h.evaluate(() => {
+	Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+	document.dispatchEvent(new Event('visibilitychange'));
+});
+pruefe(await zuSehen(h), 'Wieder im Blick: „App aktualisiert“');
+
 await browser.close();
 if (fehler.length) {
 	console.log('\nFEHLER:\n' + fehler.join('\n'));
