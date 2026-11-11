@@ -33,11 +33,13 @@ wartende Meldungen verwaisen.
   `/api/ereignisse`; jeder neue Schreibweg für Meldungen ruft `a.verteiler.melde()`.
 - **Liste und Detail (M3 list-detail):** Eine Zeile der Übersicht trägt bewusst nur eine Zusatzaktion
   (das Häkchen „Erledigt“), damit die Liste ruhig bleibt; alles Weitere steht auf der Seite der Meldung
-  (`/meldung/<id>`). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
+  (`/meldung/<id>`), auch der Schalter „Dringend“: Hausmeister, Leitung und Admin setzen und nehmen es
+  bei jeder Meldung, ohne neue Mail (Wunsch vom 11. November 2026). M3 erlaubt mehrere Aktionen je Zeile (Stand November 2026), mehr als drei Knöpfe
   nebeneinander sind aber zu viel. Endgültiges fragt über `frage()` nach (`lib/rueckfrage.svelte.js`),
   nie über `confirm()`. Mehrere Meldungen wählt man nach M3 (selection, wie Gmail): lange drücken oder
   ⋮ → „Drucken“, dann ist die ganze Zeile die Auswahl, ohne „Erledigt“; die Kopfleiste zeigt Kreuz, Zahl
-  und Aktionen (`AuswahlLeiste`). Gedruckt wird als PDF vom Server (`druck.go`). Texte nach M3 knapp:
+  und Aktionen, darunter als Untertitel (M3 Expressive) den einzigen Hinweis „Zum Auswählen antippen“
+  (`AuswahlLeiste`). Gedruckt wird als PDF vom Server (`druck.go`). Texte nach M3 knapp:
   Menüeinträge nur Symbol und Wort, keine Erklärzeilen; was die Oberfläche zeigt, braucht keine Anleitung.
 - **Kacheln:** In einem Raster sind alle Kacheln gleich groß (M3: das Standard-Raster zeigt Karten
   gleich groß), die letzte Reihe darf kürzer sein; Form `rounded-xl`, Fläche `bg-surface-container-low`,

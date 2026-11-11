@@ -7,18 +7,20 @@
 	 * 24 px hoch, Ecke 8 px, getönte Fläche statt Rahmen, Farben aus den container/on-container-Paaren.
 	 * Jeder Ton steht für einen Stand: In Arbeit primary, Bestellt warning, Fachfirma tertiary, Erledigt
 	 * success, Offen neutral. `knapp` nimmt den kurzen Namen („Bestellt“ statt „Material bestellt“), wo eine Zeile eng ist.
+	 * `dringend` zeigt statt eines Stands „Dringend“ in error, denn das ist kein Stand, sondern kommt dazu.
 	 */
-	let { status, knapp = false } = $props();
-	const s = $derived(stati[status] ?? stati.offen);
+	let { status, knapp = false, dringend = false } = $props();
+	const s = $derived(dringend ? { name: 'Dringend', knapp: 'Dringend', icon: 'warning', ton: 'gefahr' } : (stati[status] ?? stati.offen));
 	const toene = {
 		neutral: 'bg-surface-container text-on-surface-variant',
 		primaer: 'bg-primary-container text-on-primary-container',
 		warten: 'bg-warning-container text-on-warning-container',
 		extern: 'bg-tertiary-container text-on-tertiary-container',
-		erfolg: 'bg-success-container text-on-success-container'
+		erfolg: 'bg-success-container text-on-success-container',
+		gefahr: 'bg-error-container text-on-error-container'
 	};
 </script>
 
 <span class={['inline-flex h-6 shrink-0 items-center gap-1 rounded-sm px-2 text-label-medium whitespace-nowrap', toene[s.ton]]}>
-	<Icon name={s.icon} groesse={16} gefuellt={status === 'erledigt'} />{knapp ? s.knapp : s.name}
+	<Icon name={s.icon} groesse={16} gefuellt={dringend || status === 'erledigt'} />{knapp ? s.knapp : s.name}
 </span>

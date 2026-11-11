@@ -117,10 +117,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	if !ok {
 		return
 	}
-	var ein struct {
-		Status  *string `json:"status"`
-		Antwort *string `json:"antwort"`
-	}
+	var ein aenderung
 	if !leseJSON(w, r, &ein) {
 		return
 	}
@@ -136,7 +133,7 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 		}
 		ein.Antwort = &t
 	}
-	neu, err := a.sp.setzeStatus(r.Context(), id, ein.Status, ein.Antwort, b.Email, a.jetzt())
+	neu, err := a.sp.setzeStatus(r.Context(), id, ein, b.Email, a.jetzt())
 	if err != nil {
 		nichtGefundenOderIntern(w, err)
 		return

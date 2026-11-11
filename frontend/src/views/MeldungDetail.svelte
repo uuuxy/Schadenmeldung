@@ -1,7 +1,7 @@
 <script>
 	import { slide } from 'svelte/transition';
 	import { zustand, darfBearbeiten } from '../lib/zustand.svelte.js';
-	import { abhaken, loeschen, vermerkSpeichern, wiederOeffnen, zwischenstand } from '../lib/meldung.js';
+	import { abhaken, dringendSetzen, loeschen, vermerkSpeichern, wiederOeffnen, zwischenstand } from '../lib/meldung.js';
 	import { kategorieNach } from '../lib/kategorien.js';
 	import { wann, kurzname } from '../lib/zeit.js';
 	import { zurueck } from '../lib/weg.svelte.js';
@@ -14,10 +14,11 @@
 	import Button from '../components/ui/Button.svelte';
 	import Feld from '../components/ui/Feld.svelte';
 	import StatusChip from '../components/ui/StatusChip.svelte';
+	import Switch from '../components/ui/Switch.svelte';
 	import Stand from '../components/meldung/Stand.svelte';
 
 	/**
-	 * Eine Meldung mit allem, was dazugehört: Foto in voller Breite, Stand, interner Vermerk. Die
+	 * Eine Meldung mit allem, was dazugehört: Foto in voller Breite, Dringend, Stand, interner Vermerk. Die
 	 * Hauptaktion „Erledigt“ liegt unten in Daumenreichweite wie „Melden“ im Formular. Die Seite
 	 * liest die Meldung aus der Liste und bleibt damit live. Ein Stand oder „Erledigt“ schließt die
 	 * Meldung ab und führt zurück zur Übersicht (wie Archivieren in Gmail); die Snackbar dort
@@ -29,6 +30,8 @@
 	const erledigt = $derived(m?.status === 'erledigt');
 	let vermerk = $state(null);
 	const vermerkGeaendert = $derived(m && vermerk !== null && vermerk.trim() !== m.antwort);
+	// Eine Zeile der Angaben (M3 Expressive, segmentierte Liste), 44 px hoch, ob mit Text oder Schalter.
+	const zeile = 'flex min-h-11 items-center justify-between gap-4 rounded-xs bg-surface-container-low px-4 py-1.5 first:rounded-t-lg last:rounded-b-lg';
 
 	$effect(() => {
 		if (m && vermerk === null) vermerk = m.antwort;
@@ -88,9 +91,7 @@
 				{#if m.notiz}<p class="mt-2 text-body-large text-on-surface-variant">{m.notiz}</p>{/if}
 				<div class="mt-3 flex flex-wrap items-center gap-2">
 					<StatusChip status={m.status} />
-					{#if m.dringend && !erledigt}
-						<span class="inline-flex h-6 items-center gap-1 rounded-sm bg-error-container px-2 text-label-medium text-on-error-container"><Icon name="warning" groesse={16} gefuellt />Dringend</span>
-					{/if}
+					{#if m.dringend && !erledigt}<StatusChip dringend />{/if}
 				</div>
 			</div>
 		</div>
@@ -103,11 +104,18 @@
 
 		<dl class="flex flex-col gap-0.5 text-body-medium">
 			{#each [['Gemeldet', `${wann(m.gemeldetAm)}${m.gemeldetVon ? ` · ${kurzname(m.gemeldetVon)}` : ''}`], ...(erledigt && m.erledigtAm ? [['Erledigt', wann(m.erledigtAm)]] : [])] as [name, wert] (name)}
-				<div class="flex justify-between gap-4 rounded-xs bg-surface-container-low px-4 py-3 first:rounded-t-lg last:rounded-b-lg">
+				<div class={zeile}>
 					<dt class="text-on-surface-variant">{name}</dt>
 					<dd class="text-right text-on-surface">{wert}</dd>
 				</div>
 			{/each}
+			{#if darfBearbeiten() && !erledigt}
+				<!-- Dringend an und aus, bei jeder Meldung, gleich wer sie gemeldet hat (M3: Schalter für Ein/Aus). -->
+				<div class={zeile}>
+					<dt class="min-w-0 flex-1"><label for="dringend" class="block text-on-surface-variant">Dringend</label></dt>
+					<dd><Switch id="dringend" checked={m.dringend} onchange={(an) => dringendSetzen(m, an)} /></dd>
+				</div>
+			{/if}
 		</dl>
 
 		{#if darfBearbeiten() && !erledigt}

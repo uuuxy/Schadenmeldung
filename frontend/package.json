@@ -17,7 +17,8 @@
 		"pruefen:funkloch": "node e2e/funkloch.mjs",
 		"pruefen:zurueck": "node e2e/zurueck.mjs",
 		"pruefen:scannen": "node e2e/scannen.mjs",
-		"pruefen:drucken": "node e2e/drucken.mjs"
+		"pruefen:drucken": "node e2e/drucken.mjs",
+		"pruefen:dringend": "node e2e/dringend.mjs"
 	},
 	"devDependencies": {
 		"@fontsource/roboto": "5.3.0",

@@ -5,14 +5,15 @@
 
 	/**
 	 * Die Kopfleiste während einer Auswahl, wie in Gmail, Fotos und Dateien von Google: vorn das Kreuz,
-	 * als Titel die Zahl der gewählten, rechts Drucken und Alle (alle sichtbaren oder keine). Drucken
+	 * als Titel die Zahl der gewählten, rechts Drucken und Alle (alle sichtbaren oder keine). Der
+	 * Untertitel sagt, wie es geht, denn wer über ⋮ → „Drucken“ kommt, sieht noch nichts gewählt. Drucken
 	 * beendet die Auswahl, denn eine Aktion schließt sie ab (M3 selection).
 	 */
 	let { gewaehlt, alle, onbeenden, ongedruckt, onalle } = $props();
 	const titel = $derived(gewaehlt.length ? `${gewaehlt.length} ausgewählt` : 'Meldungen auswählen');
 </script>
 
-<KopfLeiste {titel} zurueck={onbeenden} zurueckSymbol="close" zurueckEtikett="Auswahl beenden" konto={false}>
+<KopfLeiste {titel} untertitel="Zum Auswählen antippen" zurueck={onbeenden} zurueckSymbol="close" zurueckEtikett="Auswahl beenden" konto={false}>
 	{#snippet aktionen()}
 		<DruckKnopf ids={gewaehlt} onclick={() => setTimeout(ongedruckt)} />
 		<button class="icon-btn text-on-surface-variant" aria-label={alle ? 'Alle abwählen' : 'Alle auswählen'} title={alle ? 'Alle abwählen' : 'Alle auswählen'} onclick={onalle}>
