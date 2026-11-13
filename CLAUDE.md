@@ -121,7 +121,9 @@ Werkzeug-Hinweis, wie in der Bibliothek.
   `TEST_DATABASE_URL='postgres://schaden:schaden@localhost:5435/schaden?sslmode=disable' go test ./...`
 - `go vet ./...` und `cd frontend && npm run build` (0 Warnungen); Skripte mit `shellcheck *.sh`
 - Browserprüfungen (`frontend/e2e/`) nur gegen eine Wegwerf-Datenbank (`schaden_e2e`, siehe README);
-  die lokale `schaden` wird nie geleert.
+  die lokale `schaden` wird nie geleert. Mitteilungen prüft `npm run pruefen:mitteilungen` echt bis zu
+  Googles Push-Dienst: Es öffnet Google Chrome mit Fenster (Playwright-Chromium und Chrome ohne Fenster
+  bekommen kein Abo), braucht Netz, und währenddessen klickt niemand die Fenster oder Mitteilungen an.
 - Die schnellen Prüfungen laufen vor jedem Commit von selbst, wenn der Hook eingeschaltet ist:
   einmal je Klon `chmod +x .githooks/pre-commit && git config core.hooksPath .githooks`.
 - Code auf Deutsch benennen wie in der Bibliothek; Kommentare erklären in ein, zwei Sätzen das Warum.

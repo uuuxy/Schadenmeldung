@@ -18,7 +18,8 @@
 		"pruefen:zurueck": "node e2e/zurueck.mjs",
 		"pruefen:scannen": "node e2e/scannen.mjs",
 		"pruefen:drucken": "node e2e/drucken.mjs",
-		"pruefen:dringend": "node e2e/dringend.mjs"
+		"pruefen:dringend": "node e2e/dringend.mjs",
+		"pruefen:mitteilungen": "node e2e/mitteilungen.mjs"
 	},
 	"devDependencies": {
 		"@fontsource/roboto": "5.3.0",

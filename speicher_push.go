@@ -35,15 +35,17 @@ func (s *speicher) merkePushAbo(ctx context.Context, abo pushAbo, gesehen time.T
 	return err
 }
 
-// pushZiele: die Abos dieser Personen; eigene Meldungen zählen nicht als neu.
-func (s *speicher) pushZiele(ctx context.Context, emails []string) ([]pushZiel, error) {
+// pushZiele: die Abos dieser Personen und je Gerät die Zahl der neuen Meldungen seit dem letzten Öffnen;
+// eigene zählen nicht. Die gerade gemeldete zählt immer mit, auch wenn sie aus dem Funkloch kommt und die
+// Zeit trägt, zu der sie getippt wurde: Sonst käme ihre Mitteilung ohne Zahl.
+func (s *speicher) pushZiele(ctx context.Context, emails []string, meldungID int64) ([]pushZiel, error) {
 	return alle(ctx, s.db, func(row pgx.CollectableRow) (pushZiel, error) {
 		var z pushZiel
 		err := row.Scan(&z.Endpunkt, &z.Email, &z.P256dh, &z.Auth, &z.Neu)
 		return z, err
 	}, `SELECT a.endpunkt, a.email, a.p256dh, a.auth,
-			(SELECT count(*) FROM meldungen m WHERE m.gemeldet_am > a.gesehen AND m.gemeldet_von <> a.email)
-		FROM push_abos a WHERE a.email = ANY($1)`, emails)
+			(SELECT count(*) FROM meldungen m WHERE (m.gemeldet_am > a.gesehen OR m.id = $2) AND m.gemeldet_von <> a.email)
+		FROM push_abos a WHERE a.email = ANY($1)`, emails, meldungID)
 }
 
 // loeschePushAbo löscht ein Abo; mit email nur, wenn es dieser Person gehört.

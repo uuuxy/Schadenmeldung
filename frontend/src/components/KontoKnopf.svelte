@@ -21,10 +21,14 @@
 	let mail = $state(null);
 	let mitteilung = $state('');
 	let schaltet = $state(false);
+	// Das erste Einschalten kann eine halbe Minute dauern; solange steht da, dass es läuft.
 	const mitteilungDetail = $derived(
-		{ gesperrt: 'in den Einstellungen des Geräts gesperrt', homescreen: 'erst die App auf den Home-Bildschirm legen' }[mitteilung] ??
-			'bei jeder neuen Meldung'
+		schaltet && mitteilung === 'an'
+			? 'wird eingeschaltet …'
+			: ({ gesperrt: 'in den Einstellungen des Geräts gesperrt', homescreen: 'erst die App auf den Home-Bildschirm legen', veraltet: 'braucht iOS 16.4 oder neuer' }[mitteilung] ??
+					'bei jeder neuen Meldung')
 	);
+	const mitteilungGesperrt = $derived(schaltet || ['gesperrt', 'homescreen', 'veraltet'].includes(mitteilung));
 	const initial = $derived((zustand.benutzer?.email ?? '?').charAt(0).toUpperCase());
 
 	async function geoeffnet(e) {
@@ -145,7 +149,7 @@
 		<hr class="border-outline-variant" />
 		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mitteilung aufs Handy</p>
 		<div class="pb-1">
-			{@render zeile('mitteilung-neu', 'Auf diesem Gerät', mitteilungDetail, mitteilung === 'an', mitteilungSetzen, schaltet || mitteilung === 'gesperrt' || mitteilung === 'homescreen')}
+			{@render zeile('mitteilung-neu', 'Auf diesem Gerät', mitteilungDetail, mitteilung === 'an', mitteilungSetzen, mitteilungGesperrt)}
 		</div>
 	{/if}
 

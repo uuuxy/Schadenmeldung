@@ -135,7 +135,7 @@ func (a *app) pushVerschicken(ctx context.Context, m meldung) {
 			emails = append(emails, p.Email)
 		}
 	}
-	ziele, err := a.sp.pushZiele(ctx, emails)
+	ziele, err := a.sp.pushZiele(ctx, emails, m.ID)
 	if err != nil {
 		slog.Error("Push: Abos nicht gelesen", "fehler", err)
 		return

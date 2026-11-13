@@ -151,7 +151,7 @@ func TestPushErloschenesAboFaelltWeg(t *testing.T) {
 	}
 	u.nutzer("lehrer").melde(map[string]string{"ort": "Aula", "kategorie": "licht", "was": "Lampe flackert"}, nil)
 	u.app.pushLaeuft.Wait()
-	if ziele, err := u.app.sp.pushZiele(context.Background(), []string{"hm@schule.de"}); err != nil || len(ziele) != 0 {
+	if ziele, err := u.app.sp.pushZiele(context.Background(), []string{"hm@schule.de"}, 0); err != nil || len(ziele) != 0 {
 		t.Errorf("erloschenes Abo noch da: %v %v", ziele, err)
 	}
 }
@@ -179,7 +179,7 @@ func TestPushAbosRaeumenSichAuf(t *testing.T) {
 	if err := u.app.raeumePushAbosAuf(ctx, u.uhr); err != nil {
 		t.Fatal(err)
 	}
-	ziele, err := u.app.sp.pushZiele(ctx, []string{"hm@schule.de", "lehrer@schule.de"})
+	ziele, err := u.app.sp.pushZiele(ctx, []string{"hm@schule.de", "lehrer@schule.de"}, 0)
 	if err != nil || len(ziele) != 1 || !strings.HasSuffix(ziele[0].Endpunkt, "/frisch") {
 		t.Fatalf("nach dem Aufräumen: %v %v", ziele, err)
 	}
@@ -187,7 +187,7 @@ func TestPushAbosRaeumenSichAuf(t *testing.T) {
 	if status, _ := hm.json("POST", "/api/abmelden?ueberall=1", nil); status != http.StatusNoContent {
 		t.Fatalf("Abmelden: Status %d", status)
 	}
-	if ziele, _ := u.app.sp.pushZiele(ctx, []string{"hm@schule.de"}); len(ziele) != 0 {
+	if ziele, _ := u.app.sp.pushZiele(ctx, []string{"hm@schule.de"}, 0); len(ziele) != 0 {
 		t.Errorf("nach dem Abmelden überall noch %d Abos", len(ziele))
 	}
 }

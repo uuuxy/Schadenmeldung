@@ -14,9 +14,12 @@ async function aboHier() {
 	return (await reg?.pushManager.getSubscription()) ?? null;
 }
 
-/** Wie es auf diesem Gerät steht: 'an', 'aus', 'gesperrt', 'homescreen' (iPhone im Browser) oder '' (geht nicht). */
+/**
+ * Wie es auf diesem Gerät steht: 'an', 'aus', 'gesperrt', 'homescreen' (iPhone im Browser), 'veraltet'
+ * (iPhone vor iOS 16.4: Apple lässt Web-Apps dort keine Mitteilungen) oder '' (geht nicht).
+ */
 export async function mitteilungenStand() {
-	if (!moeglich()) return apfelGeraet() && !alsApp() ? 'homescreen' : '';
+	if (!moeglich()) return apfelGeraet() ? (alsApp() ? 'veraltet' : 'homescreen') : '';
 	if (Notification.permission === 'denied') return 'gesperrt';
 	return Notification.permission === 'granted' && (await aboHier()) ? 'an' : 'aus';
 }
@@ -27,9 +30,10 @@ export async function mitteilungenEin() {
 	if ((await Notification.requestPermission()) !== 'granted') return false;
 	const { schluessel } = await api('/api/push');
 	const reg = await navigator.serviceWorker.ready;
-	// Erreicht der Browser seinen Push-Dienst nicht, hinge das sonst ohne Ende; nach 15 Sekunden lieber
-	// ehrlich melden, dass es nicht geklappt hat.
-	const frist = new Promise((_, nein) => setTimeout(() => nein(new Error('Frist')), 15_000));
+	// Erreicht der Browser seinen Push-Dienst nicht, hinge das sonst ohne Ende. Das erste Abo eines Browsers
+	// braucht aber oft eine halbe Minute (gemessen mit Chrome: 4 bis 29 Sekunden), darum erst nach einer
+	// Minute ehrlich melden, dass es nicht geklappt hat.
+	const frist = new Promise((_, nein) => setTimeout(() => nein(new Error('Frist')), 60_000));
 	const abo = await Promise.race([reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: alsBytes(schluessel) }), frist]);
 	await meldeAn(abo);
 	return true;
