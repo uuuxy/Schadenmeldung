@@ -31,8 +31,22 @@ export async function mitteilungenEin() {
 	// ehrlich melden, dass es nicht geklappt hat.
 	const frist = new Promise((_, nein) => setTimeout(() => nein(new Error('Frist')), 15_000));
 	const abo = await Promise.race([reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: alsBytes(schluessel) }), frist]);
-	await api('/api/push', { methode: 'POST', json: abo.toJSON() });
+	await meldeAn(abo);
 	return true;
+}
+
+/**
+ * Meldet das Abo beim Server an. Lehnt er es ab, gilt es auch hier nicht mehr: Sonst stünde der Schalter
+ * auf „an“, und trotzdem käme nichts. Ohne Netz, abgemeldet, gebremst oder bei gestörtem Server bleibt es;
+ * beim nächsten Öffnen der App meldet es sich erneut (gesehen).
+ */
+async function meldeAn(abo) {
+	try {
+		await api('/api/push', { methode: 'POST', json: abo.toJSON() });
+	} catch (e) {
+		if (e.status >= 400 && e.status < 500 && e.status !== 401 && e.status !== 429) await abo.unsubscribe().catch(() => {});
+		throw e;
+	}
 }
 
 export async function mitteilungenAus() {
@@ -52,7 +66,7 @@ export async function gesehen() {
 	const reg = await navigator.serviceWorker.getRegistration();
 	for (const n of (await reg?.getNotifications?.()) ?? []) n.close();
 	const abo = Notification.permission === 'granted' ? await aboHier() : null;
-	if (abo) await api('/api/push', { methode: 'POST', json: abo.toJSON() }).catch(() => {});
+	if (abo) await meldeAn(abo).catch(() => {});
 }
 
 function alsBytes(text) {

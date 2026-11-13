@@ -88,6 +88,13 @@ func TestPushNurAnPushDienste(t *testing.T) {
 			t.Errorf("%s: Status %d, erwartet 400", adresse, status)
 		}
 	}
+	// Fürs Log nur der Dienst, gekürzt; was sich nicht lesen lässt, heißt so.
+	for adresse, dienst := range map[string]string{"https://web.push.apple.com/abc": "web.push.apple.com", "::kaputt": "unlesbar",
+		"https://" + strings.Repeat("a", 100) + ".example/x": strings.Repeat("a", 80)} {
+		if d := dienstVon(adresse); d != dienst {
+			t.Errorf("dienstVon(%.30s) = %q, erwartet %q", adresse, d, dienst)
+		}
+	}
 }
 
 func TestPushBeiNeuerMeldung(t *testing.T) {

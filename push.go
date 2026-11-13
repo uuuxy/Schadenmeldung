@@ -20,6 +20,15 @@ import (
 // pushDienste: Der Server schickt nur an die Push-Dienste der Browser, nie an beliebige Adressen.
 var pushDienste = []string{"fcm.googleapis.com", "push.services.mozilla.com", "push.apple.com", "notify.windows.com"}
 
+// dienstVon nennt fürs Log nur den Push-Dienst eines Abos, gekürzt, denn die Adresse kommt vom Gerät.
+func dienstVon(endpunkt string) string {
+	u, err := url.Parse(endpunkt)
+	if err != nil || u.Hostname() == "" {
+		return "unlesbar"
+	}
+	return strings.ToValidUTF8(u.Hostname()[:min(len(u.Hostname()), 80)], "")
+}
+
 func pushDienstErlaubt(endpunkt string) bool {
 	u, err := url.Parse(endpunkt)
 	if err != nil || u.Scheme != "https" || u.User != nil || len(endpunkt) > 1000 {
@@ -79,6 +88,9 @@ func (a *app) pushAnmelden(w http.ResponseWriter, r *http.Request, b benutzer) {
 	abo := pushAbo{Endpunkt: ein.Endpoint, Email: b.Email,
 		P256dh: strings.TrimRight(ein.Keys.P256dh, "="), Auth: strings.TrimRight(ein.Keys.Auth, "=")}
 	if !gueltigesAbo(abo) {
+		// Nur der Dienst, keine Person: So zeigt das Log, wenn ein Browser einen Push-Dienst nutzt, der
+		// noch nicht in pushDienste steht.
+		slog.Warn("Push: Gerät abgelehnt", "dienst", dienstVon(abo.Endpunkt))
 		fehler(w, http.StatusBadRequest, "Dieses Gerät kann keine Mitteilungen empfangen.")
 		return
 	}
@@ -152,6 +164,7 @@ func (a *app) stellePushZu(ctx context.Context, abo pushAbo, inhalt []byte) {
 			if err := a.sp.loeschePushAbo(ctx, abo.Endpunkt, ""); err != nil {
 				slog.Warn("Push: erloschenes Abo nicht gelöscht", "fehler", err)
 			}
+			slog.Info("Push: erloschenes Abo gelöscht", "dienst", dienstVon(abo.Endpunkt))
 			return
 		}
 		if err == nil {
