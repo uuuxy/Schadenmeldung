@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Mitteilungen aufs Handy: Wer aus dem Backend sie auf einem Gerät einschaltet, bekommt zu jeder neuen
+// Mitteilungen: Wer aus dem Backend sie auf einem Gerät einschaltet, bekommt zu jeder neuen
 // Meldung eine, neben der Mail oder statt ihr, dazu die Zahl der neuen Meldungen am App-Symbol. Wie die
 // Mail hetzt sie nicht: eine je Meldung, keine Erinnerungen. Sie zeigt was und wo, keinen Namen.
 // Verschlüsselung und Versand: webpush.go.

@@ -2,7 +2,7 @@ import { api } from './api.js';
 import { apfelGeraet, alsApp } from './installieren.svelte.js';
 
 /**
- * Mitteilungen aufs Handy (push.go): je Gerät ein Abo beim Push-Dienst des Browsers. Auf dem iPhone geht
+ * Mitteilungen (push.go): je Gerät ein Abo beim Push-Dienst des Browsers. Auf dem iPhone geht
  * das nur in der App vom Home-Bildschirm; der Schalter sagt das, statt einfach zu fehlen. Die Zahl am
  * App-Symbol setzt der Service Worker mit jeder Mitteilung, beim Öffnen der App verschwindet sie.
  */

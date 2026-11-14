@@ -80,8 +80,10 @@ wartende Meldungen verwaisen.
 - Das Postfach für den Versand steht fest in der .env (`MAIL_ABSENDER`) oder wird unter Einstellungen →
   Mail eingetragen, am besten von der Person, der es gehört: Testmail vor dem Speichern, das Passwort
   nur verschlüsselt (`SCHLUESSEL` in der .env, `update.sh` legt ihn an) und nie wieder angezeigt.
-- Mails und Mitteilungen aufs Handy sollen den Hausmeister nicht hetzen: eine je Meldung, keine
+- Mails und Mitteilungen sollen den Hausmeister nicht hetzen: eine je Meldung, keine
   Erinnerungen, keine Eskalation, keine Zeitstempel von „In Arbeit“ in der Oberfläche. Mail-Links lösen nie beim Öffnen etwas aus, nur beim Antippen.
+  „Antworten“ auf die Mail zu einer neuen Meldung geht an die meldende Person (Reply-To), etwa für
+  eine Rückfrage, nicht ins Postfach der App.
 - Wer meldet, bekommt eine Mail, sobald die Meldung erledigt ist: eine je Meldung, erst nach zehn
   Minuten (so lange greift „Rückgängig“), ohne den internen Vermerk; wer selbst erledigt, bekommt keine
   (`rueckmeldung.go`). Die Karte „Erledigt“ im Formular gibt es nur, wenn der Server keine Mail schickt.
@@ -104,7 +106,7 @@ alle Stellen. Welche Arten das Formular zeigt, schaltet die App selbst (Tabelle 
 ## Datenschutz
 
 Keine fremden Dienste, CDNs oder Schriften von außen. Einzige Ausnahme (Entscheidung vom 4. November
-2026): Mitteilungen aufs Handy laufen über den Push-Dienst des Browsers, nur an die Dienste in
+2026): Mitteilungen laufen über den Push-Dienst des Browsers, nur an die Dienste in
 `pushDienste` (push.go) und Ende-zu-Ende verschlüsselt (webpush.go). Keine Namen oder Freitexte ins Log.
 Der QR-Scanner (`QrScanner.svelte`) liest auf dem Handy selbst (jsQR, erst beim Öffnen geladen); das
 Kamerabild geht nie an den Server.

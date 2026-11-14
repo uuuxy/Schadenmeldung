@@ -18,7 +18,8 @@ import (
 
 // versender verschickt eine Mail; in den Tests steht hier eine Attrappe.
 type versender interface {
-	sende(ctx context.Context, an, betreff, text, html string) error
+	// antwortAn: wohin „Antworten“ im Mailprogramm geht; leer heißt an den Absender.
+	sende(ctx context.Context, an, antwortAn, betreff, text, html string) error
 }
 
 // smtpVersender holt sich den Zugang vor jedem Versand (versandpostfach.go): fest aus der .env oder
@@ -28,7 +29,7 @@ type smtpVersender struct {
 	zugang func(context.Context) (zugang, error)
 }
 
-func (v smtpVersender) sende(ctx context.Context, an, betreff, text, html string) error {
+func (v smtpVersender) sende(ctx context.Context, an, antwortAn, betreff, text, html string) error {
 	z, err := v.zugang(ctx)
 	if err != nil {
 		return err
@@ -42,7 +43,7 @@ func (v smtpVersender) sende(ctx context.Context, an, betreff, text, html string
 		return err
 	}
 	defer func() { _ = c.Close() }()
-	return uebergebe(c, absender.Address, an, baueNachricht(absender, an, betreff, text, html))
+	return uebergebe(c, absender.Address, an, baueNachricht(absender, an, antwortAn, betreff, text, html))
 }
 
 // verbinde öffnet die Verbindung zum Mailserver: auf Port 465 gleich über TLS, sonst per STARTTLS.
@@ -115,13 +116,16 @@ func uebergebe(c *smtp.Client, von, an string, nachricht []byte) error {
 }
 
 // baueNachricht setzt eine Mail mit Text- und HTML-Teil zusammen (multipart/alternative, UTF-8).
-func baueNachricht(von *mail.Address, an, betreff, text, html string) []byte {
+func baueNachricht(von *mail.Address, an, antwortAn, betreff, text, html string) []byte {
 	grenze := "schaden-" + zufallsHex(12)
 	domain := von.Address[strings.LastIndex(von.Address, "@")+1:]
 	var b bytes.Buffer
 	kopf := func(name, wert string) { fmt.Fprintf(&b, "%s: %s\r\n", name, wert) }
 	kopf("From", (&mail.Address{Name: "Schadensmeldung", Address: von.Address}).String())
 	kopf("To", an)
+	if antwortAn != "" {
+		kopf("Reply-To", (&mail.Address{Address: antwortAn}).String())
+	}
 	kopf("Subject", mime.QEncoding.Encode("utf-8", betreff))
 	kopf("Date", time.Now().Format(time.RFC1123Z))
 	kopf("Message-ID", fmt.Sprintf("<%s@%s>", zufallsHex(16), domain))

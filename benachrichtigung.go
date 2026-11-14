@@ -55,6 +55,7 @@ type mailDaten struct {
 	Offen                                  int
 	MitKnoepfen                            bool
 	Rueckmeldung                           bool // an die meldende Person: ohne Aufgabenzahl und Abbestellen
+	AntwortAn                              string
 	Meldung                                mailMeldung
 }
 
@@ -78,6 +79,9 @@ func (a *app) baueMail(ctx context.Context, e empfaenger, m meldung) (mailDaten,
 	if m.Dringend {
 		d.Betreff, d.Ueberschrift = fmt.Sprintf("Dringend: %s – %s", m.Was, m.Ort), "Dringende Meldung"
 	}
+	// „Antworten“ geht an die meldende Person, etwa für eine Rückfrage, statt ins Postfach der App, das
+	// niemand liest.
+	d.AntwortAn = m.GemeldetVon
 	if e.DarfBearbeiten {
 		token, hash := neuesToken()
 		if err := a.sp.legeMailLinkAn(ctx, hash, m.ID, e.Email, a.jetzt().Add(linkGueltigkeit)); err != nil {
@@ -113,7 +117,7 @@ func (a *app) sendeMail(ctx context.Context, an string, d mailDaten) error {
 	if err := mailHTML.Execute(&html, d); err != nil {
 		return err
 	}
-	err := a.versender.sende(ctx, an, d.Betreff, text.String(), html.String())
+	err := a.versender.sende(ctx, an, d.AntwortAn, d.Betreff, text.String(), html.String())
 	a.mailVersuch(err)
 	return err
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// Speicher für die Mitteilungen aufs Handy (push.go): die Abos je Gerät und das Schlüsselpaar des Servers.
+// Speicher für die Mitteilungen (push.go): die Abos je Gerät und das Schlüsselpaar des Servers.
 
 type pushAbo struct {
 	Endpunkt, Email, P256dh, Auth string
