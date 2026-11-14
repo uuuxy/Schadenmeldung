@@ -9,16 +9,12 @@ Lizenz: [EUPL-1.2](LICENSE).
 - `.env` aus `.env.example` anlegen, dann `./update.sh`: sichert die Datenbank, holt `origin/main`,
   baut, startet und prüft. Dasselbe bei jedem Update. Fertiges Image: `ghcr.io/uuuxy/schadenmeldung`.
 - Caddy: Abschnitt aus `Caddyfile.beispiel`. Nur im Schulnetz erreichbar: dort `SCHULNETZ` einschalten.
-- Cron als root:
-
-  ```
-  */5 * * * * /pfad/zur/schadenmeldung/waechter.sh 2>&1 | logger -t schadenmeldung
-  30 2 * * * /pfad/zur/schadenmeldung/sicherung.sh 2>&1 | logger -t schadenmeldung
-  ```
-
-  Der Wächter startet Hängendes neu und mailt an `WAECHTER_AN`. Die Sicherung hält sieben Tage und
+- Zeitplan: `update.sh` plant beim Aufspielen die nächtliche Sicherung (2:30) und den Wächter (alle
+  fünf Minuten) in der crontab von root ein, falls sie fehlen. Der Wächter startet Hängendes neu und mailt an `WAECHTER_AN`. Die Sicherung hält sieben Tage und
   kopiert mit `SICHERUNG_KOPIE` auf ein zweites Gerät. Probe: `./waechter.sh --probe` und
   `./sicherung-pruefen.sh`.
+- Protokoll: App, Sicherung und Wächter schreiben ins Journal des Servers, `journalctl -t schadenmeldung`
+  (braucht systemd, das prüft `update.sh`). Namen und Freitexte stehen nicht darin.
 - Vor dem Start: Die Schul-IT nimmt den Server beim Mailserver von fail2ban aus (`ignoreip`), sonst
   sperren ein paar falsche Passwörter alle aus.
 
