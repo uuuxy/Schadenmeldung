@@ -1,6 +1,6 @@
 import { api } from './api.js';
 import { legeAb, entferne, nimmHeraus } from './ausgang.js';
-import { zustand, uebernimm, ausgangVon, ladeAusgang, ladeMeldungen, ladeEinstellungen, merkeStand } from './zustand.svelte.js';
+import { zustand, uebernimm, setzeStatus, ausgangVon, ladeAusgang, ladeMeldungen, ladeEinstellungen, merkeStand } from './zustand.svelte.js';
 import { zeige } from './snackbar.svelte.js';
 
 // Nachreichen: Was im Funkloch nicht rausging, Meldungen und Änderungen am Stand, wartet im Ausgang
@@ -30,9 +30,12 @@ export async function legeInAusgang(felder, foto, anzeige) {
 	return id;
 }
 
-/** Legt eine Änderung am Stand in den Ausgang, wenn sie gerade nicht rausgeht; zurück kommt ihre Nummer dort. */
-export async function legeStandInAusgang(meldungId, aenderung) {
-	const id = await legeAb({ von: zustand.benutzer?.email, art: 'stand', meldungId, aenderung, erstellt: new Date().toISOString() });
+/**
+ * Legt eine Änderung am Stand in den Ausgang, wenn sie gerade nicht rausgeht; zurück kommt ihre Nummer dort.
+ * vorher reist mit: Erledigt jemand anderes die Meldung, während die Änderung wartet, öffnet sie sie nicht wieder.
+ */
+export async function legeStandInAusgang(meldungId, aenderung, vorher) {
+	const id = await legeAb({ von: zustand.benutzer?.email, art: 'stand', meldungId, aenderung, vorher, erstellt: new Date().toISOString() });
 	await ladeAusgang();
 	return id;
 }
@@ -62,7 +65,7 @@ async function sendeDerReiheNach() {
 			const stand = eintrag.art === 'stand';
 			try {
 				if (stand) {
-					uebernimm(await api(`/api/meldungen/${eintrag.meldungId}/status`, { methode: 'POST', json: eintrag.aenderung }));
+					await setzeStatus(eintrag.meldungId, eintrag.aenderung, eintrag.vorher);
 					staende++;
 				} else {
 					const formular = new FormData();

@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { zustand, setzeStatus, uebernimm, mitAenderung } from './zustand.svelte.js';
+import { zustand, setzeStatus, uebernimm, mitAenderung, ladeMeldungen } from './zustand.svelte.js';
 import { legeStandInAusgang, nimmAusAusgang } from './nachreichen.js';
 import { zeige } from './snackbar.svelte.js';
 import { frage } from './rueckfrage.svelte.js';
@@ -12,15 +12,18 @@ import { stati } from './status.js';
 // Meldung und geht raus, sobald es wieder geht (nachreichen.js). Sonst hat der Server abgelehnt.
 const wartet = (e) => e.status === 0 || e.status === 401 || e.status === 429 || e.status >= 500;
 
-/** Speichert eine Änderung am Stand; geht das gerade nicht, kommt sie in den Ausgang, und zurück kommt ihre Nummer dort. */
-async function speichere(id, aenderung) {
+/**
+ * Speichert eine Änderung am Stand; geht das gerade nicht, kommt sie in den Ausgang, und zurück kommt ihre
+ * Nummer dort. vorher ist der Stand, den die Seite kannte (nur bei Änderungen am Stand).
+ */
+async function speichere(id, aenderung, vorher) {
 	try {
-		await setzeStatus(id, aenderung);
+		await setzeStatus(id, aenderung, vorher);
 		return null;
 	} catch (e) {
 		if (!wartet(e)) throw e;
 		if (e.status === 0) zustand.offline = true;
-		return legeStandInAusgang(id, aenderung);
+		return legeStandInAusgang(id, aenderung, vorher);
 	}
 }
 
@@ -34,24 +37,26 @@ function sofort(meldung, aenderung, text) {
 	const vorher = { ...meldung };
 	uebernimm(mitAenderung(vorher, aenderung));
 	rueckmeldung();
-	return speichere(vorher.id, aenderung)
+	return speichere(vorher.id, aenderung, vorher.status)
 		.then((wartend) =>
 			zeige(`${text}: ${vorher.ort}${wartend ? ' · wird nachgereicht' : ''}`, {
 				name: 'Rückgängig',
-				tun: () => zuruecknehmen(vorher, wartend)
+				tun: () => zuruecknehmen(vorher, wartend, aenderung.status)
 			})
 		)
 		.catch((e) => {
 			uebernimm(vorher);
 			zeige(e.message);
+			// Überholt: Jemand hat inzwischen erledigt, also gilt der Stand vom Server, nicht der von hier.
+			if (e.status === 409) ladeMeldungen().catch(() => {});
 		});
 }
 
 /** „Rückgängig“: Wartet die Änderung noch im Ausgang, fällt sie dort einfach weg; sonst geht der alte Stand hinterher. */
-async function zuruecknehmen(vorher, wartend) {
+async function zuruecknehmen(vorher, wartend, danach) {
 	uebernimm(vorher);
 	if (wartend && (await nimmAusAusgang(wartend))) return;
-	await speichere(vorher.id, { status: vorher.status }).catch((e) => zeige(e.message));
+	await speichere(vorher.id, { status: vorher.status }, danach).catch((e) => zeige(e.message));
 }
 
 export function abhaken(meldung, vermerk = {}) {

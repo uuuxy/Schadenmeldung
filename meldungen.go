@@ -117,7 +117,10 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 	if !ok {
 		return
 	}
-	var ein aenderung
+	var ein struct {
+		aenderung
+		Vorher string `json:"vorher"` // der Stand, den Seite oder Ausgang kannten
+	}
 	if !leseJSON(w, r, &ein) {
 		return
 	}
@@ -133,7 +136,10 @@ func (a *app) statusSetzen(w http.ResponseWriter, r *http.Request, b benutzer) {
 		}
 		ein.Antwort = &t
 	}
-	neu, err := a.sp.setzeStatus(r.Context(), id, ein, b.Email, a.jetzt())
+	if a.standUeberholt(w, r, id, ein.Vorher, ein.Status) {
+		return
+	}
+	neu, err := a.sp.setzeStatus(r.Context(), id, ein.aenderung, b.Email, a.jetzt())
 	if err != nil {
 		nichtGefundenOderIntern(w, err)
 		return
