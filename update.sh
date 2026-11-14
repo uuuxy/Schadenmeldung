@@ -9,6 +9,7 @@
 #   3. Bauen und starten: Basis-Images frisch, Datenbank in der neuesten Nebenversion
 #   4. Warten, bis die App gesund antwortet
 #   5. Aufräumen: Sicherungen älter als 7 Tage, alte Images dieser App
+#   6. Zeitplan: nächtliche Sicherung und Wächter, falls sie noch fehlen (neuer Server)
 # Geht etwas schief, bricht das Skript ab und nennt den Weg zurück.
 # ==============================================================================
 set -euo pipefail
@@ -45,8 +46,15 @@ rueckweg() {
         echo "    gunzip -c ${SICHERUNG} | docker compose exec -T db psql -v ON_ERROR_STOP=1 -U schaden -d schaden"
         echo "    docker compose up -d"
     fi
-    echo "  Protokoll:    docker compose logs --tail 50 schaden"
+    echo "  Protokoll:    journalctl -t schadenmeldung -n 50"
 }
+
+# Das Protokoll der App geht ins Journal des Servers (docker-compose.yml). Ohne journald startete der
+# Container nicht; dann lieber gleich abbrechen, solange noch nichts geändert ist.
+if ! systemctl is-active --quiet systemd-journald 2>/dev/null; then
+    fehler "systemd-journald läuft nicht, die App könnte kein Protokoll schreiben. In docker-compose.yml beim Dienst schaden driver: json-file eintragen."
+    exit 1
+fi
 
 # ── 1. Sicherung ──────────────────────────────────────────────────────────────
 schritt "1. Datenbank sichern"
@@ -129,6 +137,26 @@ gut "${WEG} Sicherung(en) älter als ${AUFBEWAHRUNG_TAGE} Tage gelöscht."
 # Nur namenlose, unbenutzte Images (Reste früherer Bauten); benannte Images und alle Volumes
 # bleiben, auch die der anderen Dienste auf diesem Server.
 docker image prune -f >/dev/null 2>&1 || true
+
+# ── 6. Zeitplan ───────────────────────────────────────────────────────────────
+schritt "6. Zeitplan prüfen"
+# Nächtliche Sicherung und Wächter laufen über cron. Fehlen sie, etwa auf einem neuen Server, legt das
+# Update sie an, damit sie nicht vergessen werden; vorhandene Einträge bleiben, wie sie sind.
+if command -v crontab >/dev/null; then
+    HIER="$(pwd)"
+    ZEITPLAN="$(crontab -l 2>/dev/null || true)"
+    NEU="${ZEITPLAN}"
+    grep -qF "${HIER}/sicherung.sh" <<<"${ZEITPLAN}" || NEU+=$'\n'"30 2 * * * ${HIER}/sicherung.sh 2>&1 | logger -t schadenmeldung"
+    grep -qF "${HIER}/waechter.sh" <<<"${ZEITPLAN}" || NEU+=$'\n'"*/5 * * * * ${HIER}/waechter.sh 2>&1 | logger -t schadenmeldung"
+    if [ "${NEU}" != "${ZEITPLAN}" ]; then
+        sed '/^$/d' <<<"${NEU}" | crontab -
+        gut "Zeitplan angelegt: Sicherung jede Nacht um 2:30, Wächter alle fünf Minuten."
+    else
+        gut "Zeitplan steht: nächtliche Sicherung und Wächter."
+    fi
+else
+    warnung "cron fehlt: Sicherung und Wächter bitte von Hand einplanen (README)."
+fi
 echo -e "\n${gruen}${fett}Fertig.${aus} Speicher frei: $(df -h / | awk 'NR==2 {print $4}')"
 
 exit 0

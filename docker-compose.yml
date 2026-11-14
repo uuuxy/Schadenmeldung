@@ -1,7 +1,7 @@
 # App und PostgreSQL. Die App hängt am Netz des Caddy, der schon Bibliothek und schul-orga bedient
 # (caddy_global_net); die Datenbank nur am internen Netz dieses Stacks.
 # Einstellungen stehen in der .env daneben (Vorlage: .env.example).
-# Docker-Logs je Dienst auf 3 × 10 MB begrenzen; ohne Grenze wachsen sie unbemerkt.
+# Docker-Logs der Datenbank auf 3 × 10 MB begrenzen; ohne Grenze wachsen sie unbemerkt.
 x-logs: &logs
   driver: json-file
   options:
@@ -25,7 +25,13 @@ services:
       GOMEMLIMIT: 400MiB
     # Speichergrenze: Ein Fehler oder Angriff trifft nur diesen Dienst, nicht die Nachbarn auf dem Server.
     mem_limit: 512m
-    logging: *logs
+    # Das Protokoll der App geht ins Journal des Servers: Es übersteht Updates (ein neuer Container finge
+    # sonst leer an), journald begrenzt die Größe selbst, und Sicherung und Wächter schreiben unter
+    # demselben Namen. Lesen: journalctl -t schadenmeldung
+    logging:
+      driver: journald
+      options:
+        tag: schadenmeldung
     depends_on:
       db:
         condition: service_healthy
