@@ -23,6 +23,7 @@ const raum = (await (await lehrer.request.get(`${B}/api/raeume`)).json())[0];
 const melde = async (was) => (await lehrer.request.post(`${B}/api/meldungen`, { headers: H, multipart: { raumId: String(raum.id), kategorie: 'licht', was } })).json();
 const keller = await melde('Funkloch Keller');
 const flur = await melde('Funkloch Flur');
+const zwei = await melde('Funkloch Zwei');
 const pruefer = await angemeldet('admin@schule.de');
 const standAmServer = async (id) => {
 	const d = await (await pruefer.request.get(`${B}/api/meldungen`)).json();
@@ -81,6 +82,17 @@ await s.getByText('Änderung nachgereicht').waitFor({ timeout: 10000 });
 pruefe((await standAmServer(keller.id)) === 'erledigt', 'Wieder Netz: „Erledigt“ ist beim Server angekommen');
 pruefe((await standAmServer(flur.id)) === 'offen', 'Die zurückgenommene Änderung kam nie beim Server an');
 
+// 5b. Zwei Hausmeister: Erledigt jemand anderes die Meldung, während hier „In Arbeit“ im Funkloch wartet,
+// öffnet das Nachreichen sie nicht wieder, und die App sagt es.
+await k.setOffline(true);
+await zeile('Funkloch Zwei').getByRole('button').first().click();
+await s.getByRole('group', { name: 'Stand' }).getByRole('button', { name: 'In Arbeit' }).click();
+await s.getByText(`In Arbeit: ${raum.name} · wird nachgereicht`).waitFor({ timeout: 5000 });
+await pruefer.request.post(`${B}/api/meldungen/${zwei.id}/status`, { headers: H, data: { status: 'erledigt' } });
+await k.setOffline(false);
+const gesagt = await s.getByText('Eine Änderung wurde abgelehnt: Inzwischen hat jemand die Meldung erledigt.').waitFor({ timeout: 10000 }).then(() => true, () => false);
+pruefe(gesagt && (await standAmServer(zwei.id)) === 'erledigt', 'Inzwischen von jemand anderem erledigt: Die wartende Änderung öffnet nicht wieder, die App sagt es');
+
 // 6. Endet die Sitzung, während etwas wartet (etwa „Auf allen Geräten abmelden“), und meldet sich danach
 // eine andere Person am Gerät an, geht es nicht unter deren Namen raus, sondern erst mit dem Hausmeister.
 const anmelden = async (name) => {
@@ -123,7 +135,7 @@ const nachgereicht = (await (await pruefer.request.get(`${B}/api/meldungen`)).js
 	.filter((m) => m.raumId === raum.id && m.was === 'Wasserhahn tropft')
 	.sort((x, y) => y.id - x.id)[0];
 
-for (const m of [keller, flur, nachgereicht].filter(Boolean)) await pruefer.request.delete(`${B}/api/meldungen/${m.id}`, { headers: H });
+for (const m of [keller, flur, zwei, nachgereicht].filter(Boolean)) await pruefer.request.delete(`${B}/api/meldungen/${m.id}`, { headers: H });
 await browser.close();
 if (fehler.length) {
 	console.log(fehler.join('\n'));

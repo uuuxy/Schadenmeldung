@@ -83,11 +83,9 @@ func (a *app) aktionAusfuehren(w http.ResponseWriter, r *http.Request) {
 		fehler(w, http.StatusBadRequest, "Unbekannter Status.")
 		return
 	}
-	// Zwei Hausmeister bekommen dieselbe Meldung. Hat einer erledigt, während die Seite des anderen noch
-	// den alten Stand zeigte, öffnet dessen Tipp die Meldung nicht wieder; die Seite zeigt dann „Schon
-	// erledigt“, und wer wirklich ändern will, tut es von dort bewusst. Ohne Vorher (alte Seite) wie bisher.
-	if m.Status == "erledigt" && ein.Vorher != "" && ein.Vorher != "erledigt" && ein.Status != "erledigt" {
-		fehler(w, http.StatusConflict, "Inzwischen hat jemand die Meldung erledigt.")
+	// Die Seite zeigt dann „Schon erledigt“, und wer wirklich ändern will, tut es von dort bewusst.
+	if ueberholt(m.Status, ein.Vorher, ein.Status) {
+		fehler(w, http.StatusConflict, ueberholtText)
 		return
 	}
 	neu, err := a.sp.setzeStatus(r.Context(), m.ID, aenderung{Status: &ein.Status}, b.Email, a.jetzt())
@@ -119,4 +117,30 @@ func (a *app) fuerAktion(m meldung, b benutzer, token string) meldung {
 		m.Foto = "/api/aktion/" + token + "/foto"
 	}
 	return m
+}
+
+const ueberholtText = "Inzwischen hat jemand die Meldung erledigt."
+
+// ueberholt: Zwei Hausmeister bekommen dieselbe Meldung. Hat einer erledigt, während Seite, Mail oder
+// Ausgang des anderen noch den alten Stand kannten, öffnet dessen Tipp die Meldung nicht wieder. Wer von
+// der erledigten Meldung aus ändert, meint es so. Ohne vorher (alte Seite) gilt die Änderung wie bisher.
+func ueberholt(jetzt, vorher, neu string) bool {
+	return jetzt == "erledigt" && vorher != "" && vorher != "erledigt" && neu != "erledigt"
+}
+
+// standUeberholt antwortet mit 409, wenn eine Änderung am Stand von einem überholten Stand kommt.
+func (a *app) standUeberholt(w http.ResponseWriter, r *http.Request, id int64, vorher string, neu *string) bool {
+	if neu == nil || vorher == "" {
+		return false
+	}
+	m, err := a.sp.meldung(r.Context(), id)
+	if err != nil {
+		nichtGefundenOderIntern(w, err)
+		return true
+	}
+	if ueberholt(m.Status, vorher, *neu) {
+		fehler(w, http.StatusConflict, ueberholtText)
+		return true
+	}
+	return false
 }

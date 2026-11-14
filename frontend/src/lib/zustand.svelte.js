@@ -148,8 +148,9 @@ export function mitAenderung(meldung, aenderung, zeit = new Date().toISOString()
 	return { ...meldung, ...aenderung, ...(aenderung.status === 'erledigt' && meldung.status !== 'erledigt' && { erledigtAm: zeit }) };
 }
 
-export async function setzeStatus(id, aenderung) {
-	const neu = await api(`/api/meldungen/${id}/status`, { methode: 'POST', json: aenderung });
+/** vorher: der Stand, den Seite oder Ausgang kannten. Hat inzwischen jemand erledigt, lehnt der Server ab, statt wieder zu öffnen. */
+export async function setzeStatus(id, aenderung, vorher) {
+	const neu = await api(`/api/meldungen/${id}/status`, { methode: 'POST', json: vorher ? { ...aenderung, vorher } : aenderung });
 	uebernimm(neu);
 	return neu;
 }
