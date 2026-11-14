@@ -152,7 +152,7 @@ func (a *app) postfachLoeschen(w http.ResponseWriter, r *http.Request, b benutze
 // Passwort und Absender.
 func (a *app) pruefeVersandSMTP(ctx context.Context, z zugang, an string) error {
 	v := smtpVersender{k: a.konf, zugang: func(context.Context) (zugang, error) { return z, nil }}
-	return v.sende(ctx, an, "Schadensmeldung: Postfach eingerichtet", testmailText, testmailHTML)
+	return v.sende(ctx, an, "", "Schadensmeldung: Postfach eingerichtet", testmailText, testmailHTML)
 }
 
 const testmailText = `Postfach eingerichtet

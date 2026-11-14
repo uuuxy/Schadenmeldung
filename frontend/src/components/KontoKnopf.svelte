@@ -147,7 +147,7 @@
 
 	{#if darfSehen() && mitteilung}
 		<hr class="border-outline-variant" />
-		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mitteilung aufs Handy</p>
+		<p class="px-4 pt-3 pb-1 text-label-medium text-on-surface-variant">Mitteilungen</p>
 		<div class="pb-1">
 			{@render zeile('mitteilung-neu', 'Auf diesem Gerät', mitteilungDetail, mitteilung === 'an', mitteilungSetzen, mitteilungGesperrt)}
 		</div>

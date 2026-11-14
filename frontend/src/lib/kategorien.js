@@ -2,7 +2,7 @@
 // (server.go, kategorien); eine neue Art braucht beide Stellen und ihre Farbrollen kat-<key> in
 // styles/rollen.css. Die Klassen stehen ausgeschrieben, sonst findet Tailwind sie nicht.
 // Ein Fall muss allein verständlich sein, denn so steht er ohne die Art im Betreff der Mail, in der
-// Mitteilung aufs Handy und unter „Schon gemeldet“: „Fenster klemmt“, nicht „Klemmt“.
+// Mitteilung und unter „Schon gemeldet“: „Fenster klemmt“, nicht „Klemmt“.
 export const kategorien = [
 	{
 		key: 'licht',

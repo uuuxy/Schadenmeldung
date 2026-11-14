@@ -97,7 +97,7 @@ var postfachDesHausmeisters = zugang{absender: "hm@schule.de", benutzer: "hm@sch
 func TestMailGehtMitAnmeldungRaus(t *testing.T) {
 	a := starteSMTPAttrappe(t, false)
 	betreff := "Neue Schadensmeldung: Tür klemmt – Raum 204"
-	err := a.versender(true, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", betreff, "Gemeldet: Tür klemmt.", "<p>Tür klemmt</p>")
+	err := a.versender(true, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", "kollegin@schule.de", betreff, "Gemeldet: Tür klemmt.", "<p>Tür klemmt</p>")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,6 +108,9 @@ func TestMailGehtMitAnmeldungRaus(t *testing.T) {
 	m, err := mail.ReadMessage(strings.NewReader(string(a.daten)))
 	if err != nil {
 		t.Fatal(err)
+	}
+	if m.Header.Get("Reply-To") != "<kollegin@schule.de>" {
+		t.Errorf("Reply-To %q, erwartet die meldende Person", m.Header.Get("Reply-To"))
 	}
 	if b, _ := new(mime.WordDecoder).DecodeHeader(m.Header.Get("Subject")); b != betreff {
 		t.Fatalf("Betreff kam als %q an", b)
@@ -146,7 +149,7 @@ func mailTeile(t *testing.T, m *mail.Message) map[string]string {
 
 func TestFalschesPasswortMeldetDerMailserver(t *testing.T) {
 	a := starteSMTPAttrappe(t, true)
-	err := a.versender(true, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", "Test", "x", "x")
+	err := a.versender(true, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", "", "Test", "x", "x")
 	<-a.fertig
 	var antwort *textproto.Error
 	if !errors.As(err, &antwort) || antwort.Code != 535 || !strings.Contains(postfachFehlerText(err), "Passwort") {
@@ -160,7 +163,7 @@ func TestFalschesPasswortMeldetDerMailserver(t *testing.T) {
 func TestPasswortNieOhneVerschluesselung(t *testing.T) {
 	a := starteSMTPAttrappe(t, false)
 	// Außerhalb der Entwicklung muss der Mailserver STARTTLS anbieten, sonst ginge das Passwort im Klartext.
-	err := a.versender(false, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", "Test", "x", "x")
+	err := a.versender(false, postfachDesHausmeisters).sende(context.Background(), "lehrer@schule.de", "", "Test", "x", "x")
 	<-a.fertig
 	if err == nil || !strings.Contains(err.Error(), "STARTTLS") || a.anmeldung != "" {
 		t.Fatalf("ohne STARTTLS: Fehler %v, Anmeldung %q", err, a.anmeldung)

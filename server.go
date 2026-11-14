@@ -28,7 +28,7 @@ type app struct {
 	verteiler   *verteiler
 	// postWecker stößt den Postausgang an, sobald eine Meldung eingeht (Puffer 1, nichts geht verloren).
 	postWecker chan struct{}
-	// Mitteilungen aufs Handy (push.go): der Schlüssel des Servers, einmal geladen, und der Versand.
+	// Mitteilungen (push.go): der Schlüssel des Servers, einmal geladen, und der Versand.
 	pushMu         sync.Mutex
 	pushSchluessel *ecdsa.PrivateKey
 	pushClient     *http.Client

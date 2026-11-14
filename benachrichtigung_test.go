@@ -26,6 +26,9 @@ func TestJedeMeldungGehtSofortRaus(t *testing.T) {
 		t.Fatalf("Mails %v, erwartet je Meldung eine eigene (nicht die selbst gemeldete): %v", betreffe(mails), erwartet)
 	}
 	for _, m := range mails {
+		if m.AntwortAn != "lehrer@schule.de" {
+			t.Errorf("Antworten geht an %q, nicht an die meldende Person", m.AntwortAn)
+		}
 		if m.An != "hm@schule.de" || !strings.Contains(m.HTML, "https://schaden.schule.de/aktion/") {
 			t.Errorf("Mail an %q ohne Knöpfe", m.An)
 		}

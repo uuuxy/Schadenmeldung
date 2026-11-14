@@ -56,7 +56,7 @@ async function sonstiges(e) {
 	}
 }
 
-// Mitteilungen aufs Handy (push.go): Titel, Text, Weg zur Meldung und die Zahl der neuen Meldungen für
+// Mitteilungen (push.go): Titel, Text, Weg zur Meldung und die Zahl der neuen Meldungen für
 // das App-Symbol. Ein Tipp öffnet die Meldung, in einem offenen Fenster der App oder in einem neuen.
 self.addEventListener('push', (e) => {
 	let n = {};

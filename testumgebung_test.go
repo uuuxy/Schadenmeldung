@@ -74,15 +74,15 @@ type testPost struct {
 	stoerung error
 }
 
-type testMail struct{ An, Betreff, Text, HTML string }
+type testMail struct{ An, AntwortAn, Betreff, Text, HTML string }
 
-func (p *testPost) sende(_ context.Context, an, betreff, text, html string) error {
+func (p *testPost) sende(_ context.Context, an, antwortAn, betreff, text, html string) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.stoerung != nil {
 		return p.stoerung
 	}
-	p.mails = append(p.mails, testMail{an, betreff, text, html})
+	p.mails = append(p.mails, testMail{an, antwortAn, betreff, text, html})
 	return nil
 }
 
